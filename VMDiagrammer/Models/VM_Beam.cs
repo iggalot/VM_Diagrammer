@@ -7,7 +7,7 @@ namespace VMDiagrammer.Models
     /// <summary>
     /// Typical data for a beam object in our Model
     /// </summary>
-    public class VM_Beam : IDrawingObjects
+    public class VM_Beam : BaseVMObject, IDrawingObjects
     {
         private VM_Node m_Start;   // start node for the beam
         private VM_Node m_End;     // end node for the beam
@@ -51,9 +51,10 @@ namespace VMDiagrammer.Models
         /// Method to draw the beam object
         /// </summary>
         /// <param name="c"></param>
-        public override void Draw(Canvas c)
+        public void Draw(Canvas c)
         {
             DrawingHelpers.DrawLine(c, this.Start, this.End);
+            DrawingHelpers.DrawText(c, 0.5 * (this.Start.X + this.End.X), 0.5 * (this.Start.Y + this.End.Y), 0, this.Index.ToString());
         }
     }
 }

@@ -7,7 +7,7 @@ namespace VMDiagrammer.Models
     /// <summary>
     /// Data for a typical Node in our model
     /// </summary>
-    public class VM_Node : IDrawingObjects
+    public class VM_Node : BaseVMObject, IDrawingObjects
     {
         /// <summary>
         /// Private members
@@ -48,9 +48,10 @@ namespace VMDiagrammer.Models
         /// The method to draw this object
         /// </summary>
         /// <param name="c"></param>
-        public override void Draw(Canvas c)
+        public void Draw(Canvas c)
         {
             DrawingHelpers.DrawCircle(c, this.X, this.Y);
+            DrawingHelpers.DrawText(c, this.X, this.Y, 0, Index.ToString());
         }
     }
 }

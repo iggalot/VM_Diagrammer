@@ -5,8 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VMDiagrammer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="500" Width="800">
     <Grid>
-        <Canvas x:Name="MainCanvas" Width="750" Height="400" Background="LightGray"/>
+        <StackPanel Orientation="Vertical">
+            <TextBox Height="25" Width="100" Text="{Binding MouseLocationString}"/>
+
+            <Canvas x:Name="MainCanvas" Width="750" Height="400" Background="LightGray"
+                MouseMove="MainCanvas_MouseMove"
+                    MouseUp="MainCanvas_MouseUp"/>
+
+
+        </StackPanel>
+
+
+
     </Grid>
 </Window>

@@ -21,8 +21,8 @@ namespace VMDiagrammer.Helpers
         {
             // Draw circle node
             Ellipse myEllipse = new Ellipse();
-            myEllipse.Fill = new SolidColorBrush(Colors.Black);
-            myEllipse.Stroke = new SolidColorBrush(Colors.White);
+            myEllipse.Fill = Brushes.Black;
+            myEllipse.Stroke = Brushes.White;
             myEllipse.StrokeThickness = 2.0;
 
             myEllipse.Width = 30.0;
@@ -46,7 +46,7 @@ namespace VMDiagrammer.Helpers
         public static Shape DrawLine(Canvas c, VM_Node start, VM_Node end)
         {
             Line myLine = new Line();
-            myLine.Stroke = new SolidColorBrush(Colors.Red);
+            myLine.Stroke = Brushes.Red;
             myLine.StrokeThickness = 2.0;
             myLine.X1 = start.X;
             myLine.Y1 = start.Y;
@@ -56,6 +56,22 @@ namespace VMDiagrammer.Helpers
             c.Children.Add(myLine);
 
             return myLine;
+        }
+
+        public static void DrawText(Canvas c, double x, double y, double z, string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return;
+            // Draw text
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = str;
+            textBlock.FontSize = 24.0;
+            textBlock.Foreground = Brushes.Green;
+
+            Canvas.SetLeft(textBlock, x);
+            Canvas.SetTop(textBlock, y);
+
+            c.Children.Add(textBlock);
         }
     }
 }

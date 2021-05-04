@@ -17,16 +17,16 @@ namespace VMDiagrammer.Helpers
         /// <param name="x">the upper left x-coordinate for a bounding box around the node</param>
         /// <param name="y">the upper left y-coordinate for a bounding box around the node</param>
         /// <returns></returns>
-        public static Shape DrawCircle(Canvas c, double x, double y)
+        public static Shape DrawCircle(Canvas c, double x, double y, Brush fill, Brush stroke, double radius=30.0)
         {
             // Draw circle node
             Ellipse myEllipse = new Ellipse();
-            myEllipse.Fill = Brushes.Black;
-            myEllipse.Stroke = Brushes.White;
+            myEllipse.Fill = fill;
+            myEllipse.Stroke = stroke;
             myEllipse.StrokeThickness = 2.0;
 
-            myEllipse.Width = 30.0;
-            myEllipse.Height = 30.0;
+            myEllipse.Width = radius;
+            myEllipse.Height = radius;
 
             Canvas.SetLeft(myEllipse, x - myEllipse.Width / 2.0);
             Canvas.SetTop(myEllipse, y - myEllipse.Height / 2.0);
@@ -36,6 +36,11 @@ namespace VMDiagrammer.Helpers
             return myEllipse;
         }
 
+        public static Shape DrawCircleHollow(Canvas c, double x, double y, Brush stroke, double radius = 30.0)
+        {
+            return DrawCircle(c, x, y, Brushes.Transparent, stroke, radius);
+        }
+
         /// <summary>
         /// Draws a basic line object on a WPF canvas
         /// </summary>
@@ -43,10 +48,10 @@ namespace VMDiagrammer.Helpers
         /// <param name="start">the starting VM_Node</param>
         /// <param name="end">the ending VM_Node</param>
         /// <returns></returns>
-        public static Shape DrawLine(Canvas c, VM_Node start, VM_Node end)
+        public static Shape DrawLine(Canvas c, VM_Node start, VM_Node end, Brush stroke)
         {
             Line myLine = new Line();
-            myLine.Stroke = Brushes.Red;
+            myLine.Stroke = stroke;
             myLine.StrokeThickness = 2.0;
             myLine.X1 = start.X;
             myLine.Y1 = start.Y;

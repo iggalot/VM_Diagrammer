@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Media;
 using VMDiagrammer.Helpers;
 using VMDiagrammer.Interfaces;
 
@@ -45,12 +46,20 @@ namespace VMDiagrammer.Models
         }
 
         /// <summary>
+        /// Default constructor
+        /// </summary>
+        public VM_Node()
+        {
+
+        }
+
+        /// <summary>
         /// The method to draw this object
         /// </summary>
         /// <param name="c"></param>
         public void Draw(Canvas c)
         {
-            DrawingHelpers.DrawCircle(c, this.X, this.Y);
+            DrawingHelpers.DrawCircle(c, this.X, this.Y,Brushes.Black,Brushes.White);
             DrawingHelpers.DrawText(c, this.X, this.Y, 0, Index.ToString());
         }
     }

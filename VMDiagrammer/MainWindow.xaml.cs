@@ -85,16 +85,6 @@ namespace VMDiagrammer
             Nodes = new List<IDrawingObjects>();
             Beams = new List<IDrawingObjects>();
 
-            // Test support
-            VM_Support support = new VM_Support(50, 150, SupportTypes.SUPPORT_ROLLER_X);
-            support.Draw(MainCanvas);
-
-            VM_Support support2 = new VM_Support(50, 200, SupportTypes.SUPPORT_PIN);
-            support2.Draw(MainCanvas);
-
-            VM_Support support3 = new VM_Support(50, 250, SupportTypes.SUPPORT_FIXED_HOR);
-            support3.Draw(MainCanvas);
-
             for (int i=0; i < 10; i++)
             {
                 VM_Node node = new VM_Node(i * 100, i * 50);
@@ -106,6 +96,16 @@ namespace VMDiagrammer
                     Beams.Add(beam);
                 }
             }
+
+            // Creatre test support conditions
+            VM_Node temp = (VM_Node)Nodes[0];
+            temp.SupportType = SupportTypes.SUPPORT_PIN;
+
+            VM_Node temp2 = (VM_Node)Nodes[1];
+            VM_Node temp3 = (VM_Node)Nodes[2];
+            temp2.SupportType = SupportTypes.SUPPORT_ROLLER_X;
+            temp3.SupportType = SupportTypes.SUPPORT_FIXED_HOR;
+
 
             foreach (VM_Node item in Nodes)
                 item.Draw(MainCanvas);

@@ -54,7 +54,7 @@ namespace VMDiagrammer.Models
         /// <param name="c"></param>
         public void Draw(Canvas c)
         {
-            DrawingHelpers.DrawLine(c, this.Start, this.End, Brushes.Red);
+            DrawingHelpers.DrawLine(c, this.Start.X, this.Start.Y, this.End.X, this.End.Y, Brushes.Red);
             DrawingHelpers.DrawText(c, 0.5 * (this.Start.X + this.End.X), 0.5 * (this.Start.Y + this.End.Y), 0, this.Index.ToString());
         }
     }

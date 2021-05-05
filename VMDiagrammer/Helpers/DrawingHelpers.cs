@@ -45,18 +45,21 @@ namespace VMDiagrammer.Helpers
         /// Draws a basic line object on a WPF canvas
         /// </summary>
         /// <param name="c">the WPF canvas object</param>
-        /// <param name="start">the starting VM_Node</param>
-        /// <param name="end">the ending VM_Node</param>
-        /// <returns></returns>
-        public static Shape DrawLine(Canvas c, VM_Node start, VM_Node end, Brush stroke)
+        /// <param name="ex">end point x-coord</param>
+        /// <param name="ey">end point y-coord</param>
+        /// <param name="sx">start point x_coord</param>
+        /// <param name="sy">start point y-coord</param>
+        /// <param name="stroke">color of the line object as a <see cref="Brush"/></param>
+        /// <returns>the Shape object</returns>
+        public static Shape DrawLine(Canvas c, double sx, double sy, double ex, double ey, Brush stroke)
         {
             Line myLine = new Line();
             myLine.Stroke = stroke;
             myLine.StrokeThickness = 2.0;
-            myLine.X1 = start.X;
-            myLine.Y1 = start.Y;
-            myLine.X2 = end.X;
-            myLine.Y2 = end.Y;
+            myLine.X1 = sx;
+            myLine.Y1 = sy;
+            myLine.X2 = ex;
+            myLine.Y2 = ey;
 
             c.Children.Add(myLine);
 

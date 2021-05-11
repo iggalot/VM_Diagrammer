@@ -26,6 +26,8 @@ namespace VMDiagrammer
         public List<IDrawingObjects> Nodes{ get; set; }
         public List<IDrawingObjects> Beams { get; set; }
 
+        public List<IDrawingObjects> Loads { get; set; }
+
         /// <summary>
         /// The current mouse location stored as a Windows Point.
         /// </summary>
@@ -84,6 +86,7 @@ namespace VMDiagrammer
         {
             Nodes = new List<IDrawingObjects>();
             Beams = new List<IDrawingObjects>();
+            Loads = new List<IDrawingObjects>();
 
             for (int i=0; i < 10; i++)
             {
@@ -97,6 +100,10 @@ namespace VMDiagrammer
                 }
             }
 
+            VMBaseLoad load1 = new VM_PointLoad((VM_Beam)Beams[0], LoadTypes.LOADTYPE_CONC_FORCE, 10, 20, 5, 5);
+            Loads.Add(load1);
+
+
             // Creatre test support conditions
             VM_Node temp = (VM_Node)Nodes[0];
             temp.SupportType = SupportTypes.SUPPORT_PIN;
@@ -106,12 +113,21 @@ namespace VMDiagrammer
             temp2.SupportType = SupportTypes.SUPPORT_ROLLER_X;
             temp3.SupportType = SupportTypes.SUPPORT_FIXED_HOR;
 
-
+            // Draw the nodes
             foreach (VM_Node item in Nodes)
                 item.Draw(MainCanvas);
 
+            // Draw the beams
             foreach (VM_Beam item in Beams)
                 item.Draw(MainCanvas);
+
+            // Draw the loads
+            foreach (VMBaseLoad item in Loads)
+            {
+                if(item.LoadType == LoadTypes.LOADTYPE_CONC_FORCE)
+                    ((VM_PointLoad)item).Draw(MainCanvas);
+            }
+
         }
 
         /// <summary>

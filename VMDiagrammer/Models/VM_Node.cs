@@ -99,7 +99,7 @@ namespace VMDiagrammer.Models
                         double endY = insertY + 2.0 * offset;
 
                         double base_startX = startX - radius;
-                        double base_startyY = startY;
+                        double base_startY = startY;
 
                         double base_endX = endX + radius;
                         double base_endY = endY;
@@ -110,7 +110,7 @@ namespace VMDiagrammer.Models
                         DrawingHelpers.DrawLine(c, endX, endY, startX, startY, Brushes.Green);
 
                         // Draw the base line
-                        DrawingHelpers.DrawLine(c, base_startX, base_startyY, base_endX, base_endY, Brushes.Green);
+                        DrawingHelpers.DrawLine(c, base_startX, base_startY, base_endX, base_endY, Brushes.Green);
 
                         break;
                     }

@@ -12,6 +12,7 @@ namespace VMDiagrammer.Models
     {
         private VM_Node m_Start;   // start node for the beam
         private VM_Node m_End;     // end node for the beam
+        private VM_Node m_MidPoint; // midpoint of our beam element
 
         /// <summary>
         /// public accessor for the start node
@@ -37,6 +38,15 @@ namespace VMDiagrammer.Models
             }
         }
 
+        public VM_Node MidPoint
+        {
+            get => m_MidPoint;
+            set
+            {
+                m_MidPoint = value;
+            }
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -46,6 +56,7 @@ namespace VMDiagrammer.Models
         {
             Start = start;
             End = end;
+            MidPoint = new VM_Node(0.5 * (Start.X + End.X), 0.5 * (Start.Y + End.Y));
         }
 
         /// <summary>

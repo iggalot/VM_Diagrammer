@@ -81,5 +81,19 @@ namespace VMDiagrammer.Helpers
 
             c.Children.Add(textBlock);
         }
+
+        public static void DrawArrowDown(Canvas c, double x, double y, Brush fill, Brush stroke)
+        {
+            DrawLine(c, x, y, x, y - 20, stroke);
+            DrawLine(c, x, y, x - 5, y - 5, stroke);
+            DrawLine(c, x, y, x + 5, y - 5, stroke);
+        }
+
+        public static void DrawArrowUp(Canvas c, double x, double y, Brush fill, Brush stroke)
+        {
+            DrawLine(c, x, y, x, y + 20, stroke);
+            DrawLine(c, x, y, x - 5, y + 5, stroke);
+            DrawLine(c, x, y, x + 5, y + 5, stroke);
+        }
     }
 }

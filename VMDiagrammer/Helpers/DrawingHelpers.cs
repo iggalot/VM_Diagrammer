@@ -5,6 +5,13 @@ using VMDiagrammer.Models;
 
 namespace VMDiagrammer.Helpers
 {
+    public enum ArrowDirections
+    {
+        ARROW_UP = 0,
+        ARROW_RIGHT = 1,
+        ARROW_DOWN = 2,
+        ARROW_LEFT = 3
+    }
     /// <summary>
     /// A class for drawing shapes onto a WPF canvas
     /// </summary>
@@ -80,6 +87,24 @@ namespace VMDiagrammer.Helpers
             Canvas.SetTop(textBlock, y);
 
             c.Children.Add(textBlock);
+        }
+
+        public static void DrawArrow(Canvas c, double x, double y, Brush fill, Brush stroke, ArrowDirections dir)
+        {
+            switch (dir)    
+            {
+                case ArrowDirections.ARROW_DOWN:
+                    DrawArrowDown(c, x, y, fill, stroke);
+                    break;
+                case ArrowDirections.ARROW_UP:
+                    DrawArrowUp(c, x, y, fill, stroke);
+                    break;
+                case ArrowDirections.ARROW_RIGHT:
+                case ArrowDirections.ARROW_LEFT:
+                default:
+                    DrawCircle(c, x, y, fill, stroke);
+                    break;
+            }
         }
 
         public static void DrawArrowDown(Canvas c, double x, double y, Brush fill, Brush stroke)

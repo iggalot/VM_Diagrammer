@@ -45,7 +45,7 @@ namespace VMDiagrammer.Models
             get => m_w1;
             set
             {
-                m_d1 = value;
+                m_w1 = value;
             }
         }
 
@@ -80,6 +80,10 @@ namespace VMDiagrammer.Models
         {
             Beam = beam;
             LoadType = load_type;
+            W1 = w1;
+            W2 = w2;
+            D1 = d1;
+            D2 = d2;
         }
 
         public virtual void Draw(Canvas c) { }
@@ -94,8 +98,10 @@ namespace VMDiagrammer.Models
 
         public override void Draw(Canvas c)
         {
-            DrawingHelpers.DrawArrowDown(c, Beam.MidPoint.X + D1, Beam.MidPoint.Y + D1, Brushes.Black, Brushes.Black);
-            DrawingHelpers.DrawArrowUp(c, Beam.MidPoint.X + D1, Beam.MidPoint.Y + D1, Brushes.Black, Brushes.Black);
+            if (W1 < 0)
+                DrawingHelpers.DrawArrow(c, Beam.MidPoint.X + D1, Beam.MidPoint.Y + D1, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN);
+            else
+                DrawingHelpers.DrawArrow(c, Beam.MidPoint.X + D1, Beam.MidPoint.Y + D1, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP);
         }
 
     }

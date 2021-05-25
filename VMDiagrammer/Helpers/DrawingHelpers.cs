@@ -89,15 +89,24 @@ namespace VMDiagrammer.Helpers
             c.Children.Add(textBlock);
         }
 
-        public static void DrawArrow(Canvas c, double x, double y, Brush fill, Brush stroke, ArrowDirections dir)
+        /// <summary>
+        /// A helper routine to draw an arrow shape
+        /// </summary>
+        /// <param name="c">the canvas object to draw to</param>
+        /// <param name="x">x-position on cavas</param>
+        /// <param name="y">y-poistion on canvas</param>
+        /// <param name="fill">color to fill the arrow</param>
+        /// <param name="stroke">color of the arrow lines</param>
+        /// <param name="len">length of the arrow to draw as a multiplier of the default length</param>
+        public static void DrawArrow(Canvas c, double x, double y, Brush fill, Brush stroke, ArrowDirections dir, double len = 1.0)
         {
             switch (dir)    
             {
                 case ArrowDirections.ARROW_DOWN:
-                    DrawArrowDown(c, x, y, fill, stroke);
+                    DrawArrowDown(c, x, y, fill, stroke, len);
                     break;
                 case ArrowDirections.ARROW_UP:
-                    DrawArrowUp(c, x, y, fill, stroke);
+                    DrawArrowUp(c, x, y, fill, stroke, len);
                     break;
                 case ArrowDirections.ARROW_RIGHT:
                 case ArrowDirections.ARROW_LEFT:
@@ -107,18 +116,36 @@ namespace VMDiagrammer.Helpers
             }
         }
 
-        public static void DrawArrowDown(Canvas c, double x, double y, Brush fill, Brush stroke)
+        /// <summary>
+        /// A helper routine to draw an arrow shape
+        /// </summary>
+        /// <param name="c">the canvas object to draw to</param>
+        /// <param name="x">x-position on cavas</param>
+        /// <param name="y">y-poistion on canvas</param>
+        /// <param name="fill">color to fill the arrow</param>
+        /// <param name="stroke">color of the arrow lines</param>
+        /// <param name="len">length of the arrow to draw as a multiplier of the default length</param>
+        public static void DrawArrowDown(Canvas c, double x, double y, Brush fill, Brush stroke, double len = 1.0)
         {
-            DrawLine(c, x, y, x, y - 20, stroke);
-            DrawLine(c, x, y, x - 5, y - 5, stroke);
-            DrawLine(c, x, y, x + 5, y - 5, stroke);
+            DrawLine(c, x, y, x, y - 20 * len, stroke);
+            DrawLine(c, x, y, x - 5, y - 5 * len, stroke);
+            DrawLine(c, x, y, x + 5, y - 5 * len, stroke);
         }
 
-        public static void DrawArrowUp(Canvas c, double x, double y, Brush fill, Brush stroke)
+        /// <summary>
+        /// A helper routine to draw an arrow shape
+        /// </summary>
+        /// <param name="c">the canvas object to draw to</param>
+        /// <param name="x">x-position on cavas</param>
+        /// <param name="y">y-poistion on canvas</param>
+        /// <param name="fill">color to fill the arrow</param>
+        /// <param name="stroke">color of the arrow lines</param>
+        /// <param name="len">length of the arrow to draw as a multiplier of the default length</param>
+        public static void DrawArrowUp(Canvas c, double x, double y, Brush fill, Brush stroke, double len = 1.0)
         {
-            DrawLine(c, x, y, x, y + 20, stroke);
-            DrawLine(c, x, y, x - 5, y + 5, stroke);
-            DrawLine(c, x, y, x + 5, y + 5, stroke);
+            DrawLine(c, x, y, x, y + 20 * len, stroke);
+            DrawLine(c, x, y, x - 5, y + 5 * len, stroke);
+            DrawLine(c, x, y, x + 5, y + 5 * len, stroke);
         }
     }
 }

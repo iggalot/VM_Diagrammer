@@ -123,16 +123,16 @@ namespace VMDiagrammer.Models
 
             if (W1 < 0)
             {
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len1);
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + 0.5 * (D1 + D2), Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len2);
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + D2, Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len3);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len1);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + 0.5 * (D1 + D2), Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len2);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D2, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len3);
                 DrawingHelpers.DrawLine(c, Beam.Start.X + D1, Beam.Start.Y - len1, Beam.Start.X + D2, Beam.Start.Y - len3, Brushes.Black);
             }
             else
             {
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len1);
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + 0.5 * (D1 + D2), Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len2);
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + D2, Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len3);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len1);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + 0.5 * (D1 + D2), Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len2);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D2, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len3);
                 DrawingHelpers.DrawLine(c, Beam.Start.X + D1, Beam.Start.Y + len1, Beam.Start.X + D2, Beam.Start.Y + len3, Brushes.Black);
             }
         }

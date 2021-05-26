@@ -5,6 +5,7 @@ using VMDiagrammer.Models;
 
 namespace VMDiagrammer.Helpers
 {
+
     public enum ArrowDirections
     {
         ARROW_UP = 0,
@@ -17,6 +18,11 @@ namespace VMDiagrammer.Helpers
     /// </summary>
     public class DrawingHelpers
     {
+        public const double DEFAULT_NODE_RADIUS = 15;
+        public const double DEFAULT_ARROW_SHAFTLENGTH = 20;
+        public const double DEFAULT_ARROW_HEADLENGTH = 8;
+
+
         /// <summary>
         /// Draws a basic circle (ellipse) on a WPF canvas
         /// </summary>
@@ -24,7 +30,7 @@ namespace VMDiagrammer.Helpers
         /// <param name="x">the upper left x-coordinate for a bounding box around the node</param>
         /// <param name="y">the upper left y-coordinate for a bounding box around the node</param>
         /// <returns></returns>
-        public static Shape DrawCircle(Canvas c, double x, double y, Brush fill, Brush stroke, double radius=30.0)
+        public static Shape DrawCircle(Canvas c, double x, double y, Brush fill, Brush stroke, double radius= DEFAULT_NODE_RADIUS)
         {
             // Draw circle node
             Ellipse myEllipse = new Ellipse();
@@ -43,7 +49,7 @@ namespace VMDiagrammer.Helpers
             return myEllipse;
         }
 
-        public static Shape DrawCircleHollow(Canvas c, double x, double y, Brush stroke, double radius = 30.0)
+        public static Shape DrawCircleHollow(Canvas c, double x, double y, Brush stroke, double radius = DEFAULT_NODE_RADIUS)
         {
             return DrawCircle(c, x, y, Brushes.Transparent, stroke, radius);
         }
@@ -89,15 +95,15 @@ namespace VMDiagrammer.Helpers
             c.Children.Add(textBlock);
         }
 
-        public static void DrawArrow(Canvas c, double x, double y, Brush fill, Brush stroke, ArrowDirections dir)
+        public static void DrawArrow(Canvas c, double x, double y, Brush fill, Brush stroke, ArrowDirections dir, double shaft_len=DEFAULT_ARROW_SHAFTLENGTH, double head_len = DEFAULT_ARROW_HEADLENGTH)
         {
             switch (dir)    
             {
                 case ArrowDirections.ARROW_DOWN:
-                    DrawArrowDown(c, x, y, fill, stroke);
+                    DrawArrowDown(c, x, y, fill, stroke, shaft_len, head_len);
                     break;
                 case ArrowDirections.ARROW_UP:
-                    DrawArrowUp(c, x, y, fill, stroke);
+                    DrawArrowUp(c, x, y, fill, stroke, shaft_len, head_len);
                     break;
                 case ArrowDirections.ARROW_RIGHT:
                 case ArrowDirections.ARROW_LEFT:
@@ -107,18 +113,18 @@ namespace VMDiagrammer.Helpers
             }
         }
 
-        public static void DrawArrowDown(Canvas c, double x, double y, Brush fill, Brush stroke)
+        public static void DrawArrowDown(Canvas c, double x, double y, Brush fill, Brush stroke, double shaft_len, double head_len)
         {
-            DrawLine(c, x, y, x, y - 20, stroke);
-            DrawLine(c, x, y, x - 5, y - 5, stroke);
-            DrawLine(c, x, y, x + 5, y - 5, stroke);
+            DrawLine(c, x, y, x, y - shaft_len, stroke);
+            DrawLine(c, x, y, x - head_len, y - head_len, stroke);
+            DrawLine(c, x, y, x + head_len, y - head_len, stroke);
         }
 
-        public static void DrawArrowUp(Canvas c, double x, double y, Brush fill, Brush stroke)
+        public static void DrawArrowUp(Canvas c, double x, double y, Brush fill, Brush stroke, double shaft_len, double head_len)
         {
-            DrawLine(c, x, y, x, y + 20, stroke);
-            DrawLine(c, x, y, x - 5, y + 5, stroke);
-            DrawLine(c, x, y, x + 5, y + 5, stroke);
+            DrawLine(c, x, y, x, y + shaft_len, stroke);
+            DrawLine(c, x, y, x - head_len, y + head_len, stroke);
+            DrawLine(c, x, y, x + head_len, y + head_len, stroke);
         }
     }
 }

@@ -111,8 +111,17 @@ namespace VMDiagrammer
             // Draw the loads
             foreach (VMBaseLoad item in Loads)
             {
-                if (item.LoadType == LoadTypes.LOADTYPE_CONC_FORCE)
-                    ((VM_PointLoad)item).Draw(MainCanvas);
+                switch(item.LoadType)
+                {
+                    case LoadTypes.LOADTYPE_CONC_FORCE:
+                        ((VM_PointForce)item).Draw(MainCanvas);
+                        break;
+                    case LoadTypes.LOADTYPE_DIST_FORCE:
+                        ((VM_DistributedForce)item).Draw(MainCanvas);
+                        break;
+
+
+                }
             }
 
 
@@ -133,11 +142,11 @@ namespace VMDiagrammer
 
 
 
-            VM_Node NodeB = new VM_Node(420, 20, SupportTypes.SUPPORT_ROLLER_X);
+            VM_Node NodeB = new VM_Node(520, 200, SupportTypes.SUPPORT_ROLLER_X);
             AddNode(NodeB);
-            VM_Node NodeC = new VM_Node(220, 20);
+            VM_Node NodeC = new VM_Node(320, 200);
             AddNode(NodeC);
-            VM_Node NodeA = new VM_Node(20, 20, SupportTypes.SUPPORT_PIN);
+            VM_Node NodeA = new VM_Node(120, 200, SupportTypes.SUPPORT_PIN);
             AddNode(NodeA);
 
             VM_Beam Beam1 = new VM_Beam(NodeA, NodeC);
@@ -146,8 +155,24 @@ namespace VMDiagrammer
             Beams.Add(Beam2);
 
             // Add point load
-            VMBaseLoad load1 = new VM_PointLoad((VM_Beam)Beams[1], LoadTypes.LOADTYPE_CONC_FORCE, 10, 20, +5, +5);
+            VMBaseLoad load1 = new VM_PointForce((VM_Beam)Beams[1], LoadTypes.LOADTYPE_CONC_FORCE, 100, 200, -5, -5);
             Loads.Add(load1);
+
+         
+
+            // Add distributed load
+            VMBaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0], LoadTypes.LOADTYPE_DIST_FORCE, 50, 150, -50, -80);
+            Loads.Add(load2);
+            // Add distributed load
+            VMBaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0], LoadTypes.LOADTYPE_DIST_FORCE, 150, 200, -80, 0);
+            Loads.Add(load4);
+
+            // Add distributed load
+            VMBaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1], LoadTypes.LOADTYPE_DIST_FORCE, 100, 120, +30, +100);
+            Loads.Add(load3);
+            // Add distributed load
+            VMBaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1], LoadTypes.LOADTYPE_DIST_FORCE, 120, 500, +100, +100);
+            Loads.Add(load5);
 
         }
 

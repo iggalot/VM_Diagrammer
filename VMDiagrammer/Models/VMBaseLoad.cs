@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 using System.Windows.Media;
 using VMDiagrammer.Helpers;
 using VMDiagrammer.Interfaces;
@@ -89,9 +90,9 @@ namespace VMDiagrammer.Models
         public virtual void Draw(Canvas c) { }
     }
 
-    public class VM_PointLoad : VMBaseLoad
+    public class VM_PointForce : VMBaseLoad
     {
-        public VM_PointLoad(VM_Beam beam, LoadTypes load_type, double d1, double d2, double w1, double w2) : base(beam, load_type, d1, d2, w1, w2)
+        public VM_PointForce(VM_Beam beam, LoadTypes load_type, double d1, double d2, double w1, double w2) : base(beam, load_type, d1, d2, w1, w2)
         {
 
         }
@@ -99,9 +100,41 @@ namespace VMDiagrammer.Models
         public override void Draw(Canvas c)
         {
             if (W1 < 0)
-                DrawingHelpers.DrawArrow(c, Beam.MidPoint.X + D1, Beam.MidPoint.Y + D1, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN);
             else
-                DrawingHelpers.DrawArrow(c, Beam.MidPoint.X + D1, Beam.MidPoint.Y + D1, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP);
+        }
+
+    }
+
+    public class VM_DistributedForce : VMBaseLoad
+    {
+        public VM_DistributedForce(VM_Beam beam, LoadTypes load_type, double d1, double d2, double w1, double w2) : base(beam, load_type, d1, d2, w1, w2)
+        {
+
+        }
+
+        public override void Draw(Canvas c)
+        {
+            double len1 = Math.Abs(W1);
+            double len2 = Math.Abs(0.5 *(W1+W2));
+            double len3 = Math.Abs(W2);
+
+
+            if (W1 < 0)
+            {
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len1);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + 0.5 * (D1 + D2), Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len2);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D2, Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len3);
+                DrawingHelpers.DrawLine(c, Beam.Start.X + D1, Beam.Start.Y - len1, Beam.Start.X + D2, Beam.Start.Y - len3, Brushes.Black);
+            }
+            else
+            {
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len1);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + 0.5 * (D1 + D2), Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len2);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D2, Beam.MidPoint.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len3);
+                DrawingHelpers.DrawLine(c, Beam.Start.X + D1, Beam.Start.Y + len1, Beam.Start.X + D2, Beam.Start.Y + len3, Brushes.Black);
+            }
         }
 
     }

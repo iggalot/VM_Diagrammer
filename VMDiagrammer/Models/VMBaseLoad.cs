@@ -107,9 +107,9 @@ namespace VMDiagrammer.Models
     {
         public VM_PointForce(VM_Beam beam, double d1, double d2, double w1, double w2) : base(beam, LoadTypes.LOADTYPE_CONC_FORCE, d1, d2, w1, w2)
         {
-            if (d1 != d2)
+            if (D1 != D2)
                 throw new NotImplementedException("D1 = " + D1 + " and D2 = " + D2 + " -- dimensions muse be the same for a point force");
-            if (w1 != w2)
+            if (W1 != W2)
                 throw new NotImplementedException("W1 = " + W1 + " and W2 = " + W2 + " -- intensities muse be the same for a point force");
 
         }
@@ -129,11 +129,11 @@ namespace VMDiagrammer.Models
         public VM_DistributedForce(VM_Beam beam,  double d1, double d2, double w1, double w2) : base(beam, LoadTypes.LOADTYPE_DIST_FORCE, d1, d2, w1, w2)
         {
             // is D1 to the left of the start node?
-            if (d1 < 0)
+            if (D1 < 0)
                 throw new NotImplementedException("Dimension D1 = " + D1 + " cannot be less than zero!");
 
             // are the intensities of W1 and W2 opposite signs
-            if(((w1 < 0) && (w2 > 0)) || ((w1 > 0) && (w2 < 0)))
+            if(((W1 < 0) && (W2 > 0)) || ((W1 > 0) && (W2 < 0)))
                 throw new NotImplementedException("Distributed load magnitude W1 = " + W1 + " and W2 = " + W2 + " -- load intensities cannot be opposite signs!");
 
             // is D2 beyond the end of the beam

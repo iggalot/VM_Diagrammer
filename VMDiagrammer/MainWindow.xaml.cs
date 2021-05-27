@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
@@ -26,22 +27,22 @@ namespace VMDiagrammer
         // List containing all of our objects to be drawn
         public List<IDrawingObjects> Nodes{ get; set; }
         public List<IDrawingObjects> Beams { get; set; }
-
         public List<IDrawingObjects> Loads { get; set; }
 
 
-        public VM_Node ReferenceNode { get; set; } = null; // leftmost node on the structure
+        public VM_Node LeftMostNode { get; set; } = null; // leftmost node on the structure
+        public VM_Node RightMostNode { get; set; } = null; // leftmost node on the structure
 
-        /// <summary>
-        /// Adds a node to the Nodes list and updates the reference
-        /// </summary>
-        /// <param name="node"></param>
-        protected void AddNode(VM_Node node)
+        protected void UpdateBeamExtents()
         {
-            Nodes.Add(node);
+            // if there arent current nodes in the list, exit
+            if (Nodes.Count == 0)
+                return;
 
             VM_Node temp = (VM_Node)Nodes[0];
-            foreach(VM_Node item in Nodes)
+
+            // first check for leftmost
+            foreach (VM_Node item in Nodes)
             {
                 if (item.X < temp.X)
                     temp = item;
@@ -51,8 +52,41 @@ namespace VMDiagrammer
                         temp = item;
                 }
             }
+            LeftMostNode = temp;
 
-            ReferenceNode = temp;
+            // now check for rightmost node
+            if(Nodes.Count > 1)
+            {
+                temp = (VM_Node)Nodes[Nodes.Count - 1];
+
+                foreach (VM_Node item in Nodes)
+                {
+                    if (item.X > temp.X)
+                        temp = item;
+                    else if (item.X == temp.X)
+                    {
+                        if (item.Y > temp.Y)
+                            temp = item;
+                    }
+                }
+                RightMostNode = temp;
+            } else
+            {
+                RightMostNode = LeftMostNode;
+            }
+        }
+
+
+        /// <summary>
+        /// Adds a node to the Nodes list and updates the reference
+        /// </summary>
+        /// <param name="node"></param>
+        protected void AddNode(VM_Node node)
+        {
+            Nodes.Add(node);
+
+            // Now update our leftmost and right most nodes -- and our critical points
+            UpdateBeamExtents();
         }
 
         /// <summary>
@@ -92,6 +126,7 @@ namespace VMDiagrammer
             DataContext = this; // Needed for the data binding!  Don't forget this line!!
 
             OnUserCreate();  // called once when application starts
+
             OnUserUpdate();  // called when a redraw is needed (once per frame?)
         }
 
@@ -119,14 +154,17 @@ namespace VMDiagrammer
                     case LoadTypes.LOADTYPE_DIST_FORCE:
                         ((VM_DistributedForce)item).Draw(MainCanvas);
                         break;
-
-
+                    case LoadTypes.LOADTYPE_UNDEFINED:
+                    case LoadTypes.LOADTYPE_DIST_MOMENT:
+                    case LoadTypes.LOADTYPE_CONC_MOMENT:
+                    default:
+                        throw new NotImplementedException("In drawing loads of MainWindow.xaml.cs -- load type detected for which there is no DRAW implemented!");
                 }
             }
 
 
-            // Draw a reference line (temp)
-            DrawingHelpers.DrawLine(MainCanvas, ReferenceNode.X, ReferenceNode.Y, 300, 300, Brushes.Blue);
+            // Draw a reference line just below the nodes (temp)
+            DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + 25, RightMostNode.X, RightMostNode.Y + 25, Brushes.Blue);
 
 
         }
@@ -155,23 +193,23 @@ namespace VMDiagrammer
             Beams.Add(Beam2);
 
             // Add point load
-            VMBaseLoad load1 = new VM_PointForce((VM_Beam)Beams[1], LoadTypes.LOADTYPE_CONC_FORCE, 100, 200, -5, -5);
+            VMBaseLoad load1 = new VM_PointForce((VM_Beam)Beams[1], 100, 100, -5, -5);
             Loads.Add(load1);
 
          
 
             // Add distributed load
-            VMBaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0], LoadTypes.LOADTYPE_DIST_FORCE, 50, 150, -50, -80);
+            VMBaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0],  50, 150, -50, -80);
             Loads.Add(load2);
             // Add distributed load
-            VMBaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0], LoadTypes.LOADTYPE_DIST_FORCE, 150, 200, -80, 0);
+            VMBaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0],  150, 200, -80, 0);
             Loads.Add(load4);
 
             // Add distributed load
-            VMBaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1], LoadTypes.LOADTYPE_DIST_FORCE, 100, 120, +30, +100);
+            VMBaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1],  100, 120, +30, +100);
             Loads.Add(load3);
             // Add distributed load
-            VMBaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1], LoadTypes.LOADTYPE_DIST_FORCE, 120, 500, +100, +100);
+            VMBaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1],  120, 200, +100, +100);
             Loads.Add(load5);
 
         }

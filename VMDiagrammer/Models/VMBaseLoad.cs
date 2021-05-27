@@ -81,10 +81,23 @@ namespace VMDiagrammer.Models
         {
             Beam = beam;
             LoadType = load_type;
-            W1 = w1;
-            W2 = w2;
-            D1 = d1;
-            D2 = d2;
+
+            // if the start of distributed load is to the left of the end
+            if (d1 < d2)
+            {
+                W1 = w1;
+                W2 = w2;
+                D1 = d1;
+                D2 = d2;
+            }
+            else
+            {
+                W1 = w2;
+                W2 = w1;
+                D1 = d2;
+                D2 = d1;
+            }
+
         }
 
         public virtual void Draw(Canvas c) { }
@@ -92,8 +105,12 @@ namespace VMDiagrammer.Models
 
     public class VM_PointForce : VMBaseLoad
     {
-        public VM_PointForce(VM_Beam beam, LoadTypes load_type, double d1, double d2, double w1, double w2) : base(beam, load_type, d1, d2, w1, w2)
+        public VM_PointForce(VM_Beam beam, double d1, double d2, double w1, double w2) : base(beam, LoadTypes.LOADTYPE_CONC_FORCE, d1, d2, w1, w2)
         {
+            if (d1 != d2)
+                throw new NotImplementedException("D1 = " + D1 + " and D2 = " + D2 + " -- dimensions muse be the same for a point force");
+            if (w1 != w2)
+                throw new NotImplementedException("W1 = " + W1 + " and W2 = " + W2 + " -- intensities muse be the same for a point force");
 
         }
 
@@ -109,9 +126,19 @@ namespace VMDiagrammer.Models
 
     public class VM_DistributedForce : VMBaseLoad
     {
-        public VM_DistributedForce(VM_Beam beam, LoadTypes load_type, double d1, double d2, double w1, double w2) : base(beam, load_type, d1, d2, w1, w2)
+        public VM_DistributedForce(VM_Beam beam,  double d1, double d2, double w1, double w2) : base(beam, LoadTypes.LOADTYPE_DIST_FORCE, d1, d2, w1, w2)
         {
+            // is D1 to the left of the start node?
+            if (d1 < 0)
+                throw new NotImplementedException("Dimension D1 = " + D1 + " cannot be less than zero!");
 
+            // are the intensities of W1 and W2 opposite signs
+            if(((w1 < 0) && (w2 > 0)) || ((w1 > 0) && (w2 < 0)))
+                throw new NotImplementedException("Distributed load magnitude W1 = " + W1 + " and W2 = " + W2 + " -- load intensities cannot be opposite signs!");
+
+            // is D2 beyond the end of the beam
+            if (beam.Start.X + D2 > beam.End.X)
+                throw new NotImplementedException("Dimension D2 = " + D2 + " -- dimension is beyond the end of the beam");
         }
 
         public override void Draw(Canvas c)

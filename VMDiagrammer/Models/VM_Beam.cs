@@ -54,8 +54,17 @@ namespace VMDiagrammer.Models
         /// <param name="end">end node for the beam</param>
         public VM_Beam(VM_Node start, VM_Node end)
         {
-            Start = start;
-            End = end;
+            // If the start node is to the right of the end node, reverse their order in this data object
+            if(start.X < end.X)
+            {
+                Start = start;
+                End = end;
+            } else
+            {
+                Start = end;
+                End = start;
+            }
+
             MidPoint = new VM_Node(0.5 * (Start.X + End.X), 0.5 * (Start.Y + End.Y));
         }
 

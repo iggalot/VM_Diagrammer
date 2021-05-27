@@ -29,7 +29,7 @@ namespace VMDiagrammer
         public List<IDrawingObjects> Beams { get; set; }
         public List<IDrawingObjects> Loads { get; set; }
 
-        public List<VM_Node> CriticalPoints { get; set; } = null;
+        public List<IDrawingObjects> CriticalPoints { get; set; } = null;
 
         public VM_Node LeftMostNode { get; set; } = null; // leftmost node on the structure
         public VM_Node RightMostNode { get; set; } = null; // leftmost node on the structure
@@ -77,7 +77,6 @@ namespace VMDiagrammer
             }
         }
 
-
         /// <summary>
         /// Adds a node to the Nodes list and updates the reference
         /// </summary>
@@ -90,9 +89,37 @@ namespace VMDiagrammer
             UpdateBeamExtents();
         }
 
-        protected List<VM_Node> ListCriticalPoints()
+        /// <summary>
+        /// Returns a VM_Node object for specified coordinates if it exists in a list.
+        /// </summary>
+        /// <param name="x">x-coordinate</param>
+        /// <param name="y">y-coordinate</param>
+        /// <param name="l">the list of <see cref="IDrawingObjects"/> to be searched for matching nodes</param>
+        /// <returns>true if a matching node is not found, otherwise it returns the false</returns>
+        private VM_Node FindNodeInList(double x, double y, List<IDrawingObjects> l)
         {
-            List<VM_Node> list = new List<VM_Node>();
+            double temp_x = x;
+            double temp_y = y;
+
+            // search our Nodes list for node at this location
+            foreach (VM_Node n in Nodes)
+            {
+                if (n.X == temp_x)
+                {
+                    // A node at this point has same x value
+                    if (n.Y == temp_y)
+                    {
+                        return n;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        protected List<IDrawingObjects> ListCriticalPoints()
+        {
+            List<IDrawingObjects> list = new List<IDrawingObjects>();
 
             // Support Reactions
             foreach (VM_Node item in Nodes)
@@ -122,7 +149,7 @@ namespace VMDiagrammer
                     {
                         // Is the load at the start node or end node?
                         // 1. It's the start node?
-                        if(item.D1 == 0)
+                        if (item.D1 == 0)
                         {
                             if (!list.Contains(item.Beam.Start))
                                 list.Add(item.Beam.Start);
@@ -139,56 +166,35 @@ namespace VMDiagrammer
                         // Check that the new node isn't already in the Nodes list.
                         else
                         {
-                            VM_Node tempNode = null;
                             double temp_x = item.Beam.Start.X + item.D1;
                             double temp_y = item.Beam.Start.Y;
-                            bool node_found = false;
-                            
-                            // search our Nodes list for node at this location
-                            foreach (VM_Node n in Nodes)
+
+                            // First check our Nodes list to see if it exists
+                            VM_Node tempNode = FindNodeInList(temp_x, temp_y, Nodes);
+
+                            // Is the node already in Nodes list
+                            if (tempNode != null)
                             {
-                                if (n.X == temp_x)
+                                // Is the node in the Critical Point list?
+                                if (FindNodeInList(tempNode.X, tempNode.Y, list) == null)
                                 {
-                                    // A node at this point has same x value
-                                    if(n.Y == temp_y)
-                                    {
-                                        node_found = true;
-                                        tempNode = n;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (!node_found)
-                            {
-                                VM_Node newNode = new VM_Node(temp_x, temp_y);
-                                tempNode = newNode;
-                            }
-                            else
-                            {
-                                // Do nothing since tempNode was already set.
-                            }
-
-                            bool node_found2 = false;
-
-                            // search our critical point list for a node at this location
-                            foreach (VM_Node n in list)
-                            {
-                                if (n.X == tempNode.X)
-                                {
-                                    // A node at this point has same x value
-                                    if (n.Y == tempNode.Y)
-                                    {
-                                        node_found2 = true;
-                                        break;
-                                    }
-                                }
-                            }
-                         
-                            if(!node_found2)
-                            {
-                                if (!list.Contains(tempNode))
+                                    // No matching node already in the critical point list..
                                     list.Add(tempNode);
+                                } else
+                                {
+                                    // Matching node found so do nothing
+                                }
+                            } else
+                            {
+                                // Is a node with these coordinates already in the Critical Point list?
+                                if(FindNodeInList(temp_x,temp_y,list) == null)
+                                {
+                                    // No matching node already in critical point list..
+                                    list.Add(new VM_Node(temp_x, temp_y));
+                                } else
+                                {
+                                    // Do nothing
+                                }
                             }
                         }
                     }
@@ -207,57 +213,39 @@ namespace VMDiagrammer
                         }
                         else
                         {
-                            VM_Node tempNode = null;
                             double temp_x = item.Beam.Start.X + item.D1;
                             double temp_y = item.Beam.Start.Y;
-                            bool node_found = false;
 
-                            // search our Nodes list for node at this location
-                            foreach (VM_Node n in Nodes)
+                            // First check our Nodes list to see if it exists
+                            VM_Node tempNode = FindNodeInList(temp_x, temp_y, Nodes);
+
+                            // Is the node already in Nodes list
+                            if (tempNode != null)
                             {
-                                if (n.X == temp_x)
+                                // Is the node in the Critical Point list?
+                                if (FindNodeInList(tempNode.X, tempNode.Y, list) == null)
                                 {
-                                    // A node at this point has same x value
-                                    if (n.Y == temp_y)
-                                    {
-                                        node_found = true;
-                                        tempNode = n;
-                                        break;
-                                    }
+                                    // No matching node already in the critical point list..
+                                    list.Add(tempNode);
                                 }
-                            }
-
-                            if (!node_found)
-                            {
-                                VM_Node newNode = new VM_Node(temp_x, temp_y);
-                                tempNode = newNode;
+                                else
+                                {
+                                    // Matching node found so do nothing
+                                }
                             }
                             else
                             {
-                                // Do nothing since tempNode was already set.
-                            }
-
-                            bool node_found2 = false;
-
-                            // search our critical point list for a node at this location
-                            foreach (VM_Node n in list)
-                            {
-                                if (n.X == tempNode.X)
+                                // Is a node with these coordinates already in the Critical Point list?
+                                if (FindNodeInList(temp_x, temp_y, list) == null)
                                 {
-                                    // A node at this point has same x value
-                                    if (n.Y == tempNode.Y)
-                                    {
-                                        node_found2 = true;
-                                        break;
-                                    }
+                                    // No matching node already in critical point list..
+                                    list.Add(new VM_Node(temp_x, temp_y));
                                 }
-                            }
-
-                            if (!node_found2)
-                            {
-                                if (!list.Contains(tempNode))
-                                    list.Add(tempNode);
-                            }
+                                else
+                                {
+                                    // Do nothing
+                                }
+                            }                            
                         }
 
                         // 2. Is the end point of the distributed load at the beam's end node?
@@ -265,66 +253,46 @@ namespace VMDiagrammer
                         {
                             if (!list.Contains(item.Beam.End))
                                 list.Add(item.Beam.End);
-                        } else
+                        }
+                    }
+                    else
+                    {
+                        double temp_x = item.Beam.Start.X + item.D2;
+                        double temp_y = item.Beam.Start.Y;
+
+                        // First check our Nodes list to see if it exists
+                        VM_Node tempNode = FindNodeInList(temp_x, temp_y, Nodes);
+
+                        // Is the node already in Nodes list
+                        if (tempNode != null)
                         {
-                            VM_Node tempNode = null;
-                            double temp_x = item.Beam.Start.X + item.D2;
-                            double temp_y = item.Beam.Start.Y;
-                            bool node_found = false;
-
-                            // search our Nodes list for node at this location
-                            foreach (VM_Node n in Nodes)
+                            // Is the node in the Critical Point list?
+                            if (FindNodeInList(tempNode.X, tempNode.Y, list) == null)
                             {
-                                if (n.X == temp_x)
-                                {
-                                    // A node at this point has same x value
-                                    if (n.Y == temp_y)
-                                    {
-                                        node_found = true;
-                                        tempNode = n;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (!node_found)
-                            {
-                                VM_Node newNode = new VM_Node(temp_x, temp_y);
-                                tempNode = newNode;
+                                // No matching node already in the critical point list..
+                                list.Add(tempNode);
                             }
                             else
                             {
-                                // Do nothing since tempNode was already set.
+                                // Matching node found so do nothing
                             }
-
-                            bool node_found2 = false;
-
-                            // search our critical point list for a node at this location
-                            foreach (VM_Node n in list)
+                        }
+                        else
+                        {
+                            // Is a node with these coordinates already in the Critical Point list?
+                            if (FindNodeInList(temp_x, temp_y, list) == null)
                             {
-                                if (n.X == tempNode.X)
-                                {
-                                    // A node at this point has same x value
-                                    if (n.Y == tempNode.Y)
-                                    {
-                                        node_found2 = true;
-                                        break;
-                                    }
-                                }
+                                // No matching node already in critical point list..
+                                list.Add(new VM_Node(temp_x, temp_y));
                             }
-
-                            if (!node_found2)
+                            else
                             {
-                                if (!list.Contains(tempNode))
-                                    list.Add(tempNode);
+                                // Do nothing
                             }
                         }
                     }
                 }
-
             }
-
-
 
             // TODO:: Shear = 0 critical point location
             // Shear = 0;
@@ -412,7 +380,7 @@ namespace VMDiagrammer
             }
 
             // Draw a reference line just below the nodes (temp)
-            DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + 25, RightMostNode.X, RightMostNode.Y + 25, Brushes.Blue);
+            DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + 40, RightMostNode.X, RightMostNode.Y + 40, Brushes.Blue);
 
 
         }
@@ -427,7 +395,7 @@ namespace VMDiagrammer
             Loads = new List<IDrawingObjects>();
 
 
-
+            // Create some nodes
             VM_Node NodeB = new VM_Node(520, 200, SupportTypes.SUPPORT_ROLLER_X);
             AddNode(NodeB);
             VM_Node NodeC = new VM_Node(320, 200);
@@ -439,7 +407,7 @@ namespace VMDiagrammer
             VM_Node NodeE = new VM_Node(50, 200, SupportTypes.SUPPORT_UNDEFINED);
             AddNode(NodeE);
 
-
+            // Create some beams
             VM_Beam Beam1 = new VM_Beam(NodeA, NodeC);
             Beams.Add(Beam1);
             VM_Beam Beam2 = new VM_Beam(NodeC, NodeB);
@@ -450,23 +418,23 @@ namespace VMDiagrammer
             Beams.Add(Beam4);
 
             // Add point load
-            VMBaseLoad load1 = new VM_PointForce((VM_Beam)Beams[1], 50, 50, -5, -5);
-            Loads.Add(load1);
-
-         
+            VMBaseLoad loada = new VM_PointForce((VM_Beam)Beams[1], 50, 50, -50, -50);
+            Loads.Add(loada);
+            // Add point load
+            VMBaseLoad loadb = new VM_PointForce((VM_Beam)Beams[1], 150, 150, +100, +100);
+            Loads.Add(loadb);
 
             // Add distributed load
-            VMBaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0],  50, 150, -50, -80);
+            VMBaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0], 50, 150, -50, -80);
             Loads.Add(load2);
             // Add distributed load
-            VMBaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0],  150, 200, -80, 0);
+            VMBaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0], 150, 200, -80, 0);
             Loads.Add(load4);
-
             // Add distributed load
-            VMBaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1],  100, 120, +30, +100);
+            VMBaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1], 100, 120, +30, +100);
             Loads.Add(load3);
             // Add distributed load
-            VMBaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1],  120, 200, +100, +100);
+            VMBaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1], 120, 200, +100, +100);
             Loads.Add(load5);
 
             CriticalPoints = ListCriticalPoints();

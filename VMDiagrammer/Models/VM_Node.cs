@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 using System.Windows.Media;
 using VMDiagrammer.Helpers;
 using VMDiagrammer.Interfaces;
@@ -10,6 +11,8 @@ namespace VMDiagrammer.Models
     /// </summary>
     public class VM_Node : BaseVMObject, IDrawingObjects
     {
+        public const double DEFAULT_NODE_RADIUS = 15;
+
         /// <summary>
         /// Private members
         /// </summary>
@@ -68,15 +71,18 @@ namespace VMDiagrammer.Models
         /// <param name="c"></param>
         public void Draw(Canvas c)
         {
-            double radius = 10.0;
+            double radius = 15.0;
             double offset = radius / 2.0;
 
             switch (m_SupportType)
             {
                 case SupportTypes.SUPPORT_ROLLER_X:
                     {
+                        // Draw the node icon
+                        DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White, DEFAULT_NODE_RADIUS);
+
                         // Draw the roller "ball"
-                        DrawingHelpers.DrawCircleHollow(c, this.X, this.Y, Brushes.Blue, 10.0);
+                        DrawingHelpers.DrawCircleHollow(c, this.X, this.Y+2.0 * offset, Brushes.Blue, radius);
 
                         // Draw the surface line
                         double startX = this.X - radius;
@@ -84,7 +90,7 @@ namespace VMDiagrammer.Models
                         double endX = this.X + radius;
                         double endY = this.Y + offset;
 
-                        DrawingHelpers.DrawLine(c, startX, startY, endX, endY, Brushes.Blue);
+                        DrawingHelpers.DrawLine(c, startX, startY + 2.0 * offset, endX, endY + 2.0 * offset, Brushes.Blue);
                     }
                     break;
                 case SupportTypes.SUPPORT_ROLLER_Y:
@@ -93,16 +99,19 @@ namespace VMDiagrammer.Models
                     {
                         double insertX = this.X;
                         double insertY = this.Y + offset;
-                        double startX = insertX - radius;
+                        double startX = insertX - 0.75 * radius;
                         double startY = insertY+ 2.0 * offset;
-                        double endX = insertX + radius;
+                        double endX = insertX + 0.75 * radius;
                         double endY = insertY + 2.0 * offset;
 
-                        double base_startX = startX - radius;
+                        double base_startX = startX - 0.5 * radius;
                         double base_startY = startY;
 
-                        double base_endX = endX + radius;
+                        double base_endX = endX + 0.52 * radius;
                         double base_endY = endY;
+
+                        // Draw the node icon
+                        DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White, DEFAULT_NODE_RADIUS);
 
                         // Draw the pin "triangle"
                         DrawingHelpers.DrawLine(c, startX, startY, insertX, insertY, Brushes.Green);
@@ -124,6 +133,9 @@ namespace VMDiagrammer.Models
                         double endX = insertX - radius;
                         double endY = insertY + 3.0 * offset;
 
+                        // Draw the node icon
+                        DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White, DEFAULT_NODE_RADIUS);
+
                         // Draw the pin "triangle"
                         DrawingHelpers.DrawLine(c, startX, startY, endX, endY, Brushes.Red);
 
@@ -131,21 +143,48 @@ namespace VMDiagrammer.Models
                     }
 
                 case SupportTypes.SUPPORT_UNDEFINED:
+                    // Default node
+                    DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White, DEFAULT_NODE_RADIUS);
+                    break;
                 case SupportTypes.SUPPORT_FIXED_VERT:
                 default:
-                    DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White);
-                    DrawingHelpers.DrawText(c, this.X, this.Y, 0, Index.ToString());
-                    break;
-
-
+                    {
+                        throw new NotImplementedException("Support type drawing ability not defined for support type: " + m_SupportType);
+                    }
             }
 
+            // Draw the node label
+            DrawNodeLabel(c, this.X, this.Y, 0);
+        }
 
+        private void DrawNodeLabel(Canvas c, double x, double y, double z, double size=DrawingHelpers.DEFAULT_TEXT_HEIGHT, TextPositions pos=TextPositions.TEXT_ABOVE)
+        {
+            double xpos = x;
+            double ypos = y;
+            double zpos = z;
 
+            switch (pos)
+            {
+                case TextPositions.TEXT_ABOVE:
+                    ypos -= 2.5*size;
+                    break;
+                case TextPositions.TEXT_BELOW:
+                    ypos += 0.5 * size -4;
+                    break;
+                case TextPositions.TEXT_LEFT:
+                case TextPositions.TEXT_RIGHT:
+                default:
+                    throw new NotImplementedException("Invalid text position, " + pos + " detected in DrawText function");
+            }
 
+            // Draw the node icon
+            DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White, DEFAULT_NODE_RADIUS);
+            
+            // Draw the node label text
+            DrawingHelpers.DrawText(c, xpos, ypos, zpos, Index.ToString(), Brushes.Black, DrawingHelpers.DEFAULT_TEXT_HEIGHT);
 
-
-
+            // Draw the node label icon
+            DrawingHelpers.DrawCircleHollow(c, xpos+3, ypos+8, Brushes.Black, 1.5 * DrawingHelpers.DEFAULT_TEXT_HEIGHT);
         }
     }
 }

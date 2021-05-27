@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 using System.Windows.Media;
 using VMDiagrammer.Helpers;
 using VMDiagrammer.Interfaces;
@@ -74,8 +75,46 @@ namespace VMDiagrammer.Models
         /// <param name="c"></param>
         public void Draw(Canvas c)
         {
+            // Draw the beam object line
             DrawingHelpers.DrawLine(c, this.Start.X, this.Start.Y, this.End.X, this.End.Y, Brushes.Red);
-            DrawingHelpers.DrawText(c, 0.5 * (this.Start.X + this.End.X), 0.5 * (this.Start.Y + this.End.Y), 0, this.Index.ToString());
+
+            // Draw the beam label
+            DrawBeamLabel(c, this.MidPoint.X, this.MidPoint.Y, 0);
+        }
+
+        private void DrawBeamLabel(Canvas c, double x, double y, double z, double size = DrawingHelpers.DEFAULT_TEXT_HEIGHT, TextPositions pos = TextPositions.TEXT_BELOW)
+        {
+            double xpos = x-3;
+            double ypos = y;
+            double zpos = z;
+
+            double offset = 15;
+            Brush color = Brushes.Green;
+
+            switch (pos)
+            {
+                case TextPositions.TEXT_ABOVE:
+                    ypos -= 2.5 * size;
+                    break;
+                case TextPositions.TEXT_BELOW:
+                    ypos += 0.5 * size + 2;
+                    break;
+                case TextPositions.TEXT_LEFT:
+                case TextPositions.TEXT_RIGHT:
+                default:
+                    throw new NotImplementedException("Invalid text position, " + pos + " detected in DrawText function");
+            }
+
+            // Draw the text
+            DrawingHelpers.DrawText(c, xpos, ypos, 0, this.Index.ToString(), color, DrawingHelpers.DEFAULT_TEXT_HEIGHT);
+
+            // Draw the box around the text
+            DrawingHelpers.DrawLine(c, xpos - 0.25 * offset, ypos, xpos + 1.25 * offset, ypos, color);
+            DrawingHelpers.DrawLine(c, xpos + 1.25 * offset, ypos, xpos + 1.25 * offset, ypos + offset, color);
+            DrawingHelpers.DrawLine(c, xpos + 1.25 * offset, ypos + offset, xpos - 0.25 * offset, ypos + offset, color);
+            DrawingHelpers.DrawLine(c, xpos - 0.25 * offset, ypos + offset, xpos - 0.25 * offset, ypos, color);
+
+            //DrawingHelpers.DrawCircleHollow(c, xpos + 3, ypos + 8, Brushes.Black, 1.5 * DrawingHelpers.DEFAULT_TEXT_HEIGHT);
         }
     }
 }

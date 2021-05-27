@@ -14,6 +14,10 @@ namespace VMDiagrammer.Models
         LOADTYPE_DIST_FORCE = 2,
         LOADTYPE_DIST_MOMENT = 3
     }
+
+    /// <summary>
+    /// A base load object for loads.
+    /// </summary>
     public class VMBaseLoad : IDrawingObjects
     {
         private LoadTypes m_LoadType = LoadTypes.LOADTYPE_UNDEFINED;
@@ -23,6 +27,8 @@ namespace VMDiagrammer.Models
         private double m_d2 = 0; // distance from start to end of load
         private double m_w1 = 0; // intensity at start of load
         private double m_w2 = 0; // intensity at end of load
+
+        private double m_ArrowThickness = 1; // thickness of the load arrows
 
         public double D1
         {
@@ -77,10 +83,20 @@ namespace VMDiagrammer.Models
             }
         }
 
-        public VMBaseLoad(VM_Beam beam, LoadTypes load_type, double d1, double d2, double w1, double w2)
+        public double ArrowThickness
+        {
+            get => m_ArrowThickness;
+            set
+            {
+                m_ArrowThickness = value;
+            }
+        }
+
+        public VMBaseLoad(VM_Beam beam, LoadTypes load_type, double d1, double d2, double w1, double w2, double thickness)
         {
             Beam = beam;
             LoadType = load_type;
+            ArrowThickness = thickness;
 
             // if the start of distributed load is to the left of the end
             if (d1 < d2)
@@ -103,9 +119,12 @@ namespace VMDiagrammer.Models
         public virtual void Draw(Canvas c) { }
     }
 
+    /// <summary>
+    /// Class definition for the point force
+    /// </summary>
     public class VM_PointForce : VMBaseLoad
     {
-        public VM_PointForce(VM_Beam beam, double d1, double d2, double w1, double w2) : base(beam, LoadTypes.LOADTYPE_CONC_FORCE, d1, d2, w1, w2)
+        public VM_PointForce(VM_Beam beam, double d1, double d2, double w1, double w2) : base(beam, LoadTypes.LOADTYPE_CONC_FORCE, d1, d2, w1, w2, 3.0)
         {
             if (D1 != D2)
                 throw new NotImplementedException("D1 = " + D1 + " and D2 = " + D2 + " -- dimensions muse be the same for a point force");
@@ -116,17 +135,22 @@ namespace VMDiagrammer.Models
 
         public override void Draw(Canvas c)
         {
+            double len1 = Math.Abs(W1);
+
             if (W1 < 0)
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Blue, Brushes.Blue, ArrowDirections.ARROW_DOWN, this.ArrowThickness, len1 );
             else
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Blue, Brushes.Blue, ArrowDirections.ARROW_UP, this.ArrowThickness, len1);
         }
 
     }
 
+    /// <summary>
+    /// Class definition for the distributed force
+    /// </summary>
     public class VM_DistributedForce : VMBaseLoad
     {
-        public VM_DistributedForce(VM_Beam beam,  double d1, double d2, double w1, double w2) : base(beam, LoadTypes.LOADTYPE_DIST_FORCE, d1, d2, w1, w2)
+        public VM_DistributedForce(VM_Beam beam,  double d1, double d2, double w1, double w2) : base(beam, LoadTypes.LOADTYPE_DIST_FORCE, d1, d2, w1, w2, 1.0)
         {
             // is D1 to the left of the start node?
             if (D1 < 0)
@@ -141,6 +165,10 @@ namespace VMDiagrammer.Models
                 throw new NotImplementedException("Dimension D2 = " + D2 + " -- dimension is beyond the end of the beam");
         }
 
+        /// <summary>
+        /// Draws the distributed load diagram
+        /// </summary>
+        /// <param name="c"></param>
         public override void Draw(Canvas c)
         {
             double len1 = Math.Abs(W1);
@@ -150,17 +178,17 @@ namespace VMDiagrammer.Models
 
             if (W1 < 0)
             {
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len1);
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + 0.5 * (D1 + D2), Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len2);
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + D2, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, len3);
-                DrawingHelpers.DrawLine(c, Beam.Start.X + D1, Beam.Start.Y - len1, Beam.Start.X + D2, Beam.Start.Y - len3, Brushes.Black);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, this.ArrowThickness, len1);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + 0.5 * (D1 + D2), Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, this.ArrowThickness, len2);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D2, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_DOWN, this.ArrowThickness, len3);
+                DrawingHelpers.DrawLine(c, Beam.Start.X + D1, Beam.Start.Y - len1, Beam.Start.X + D2, Beam.Start.Y - len3, Brushes.Black, 3*this.ArrowThickness);
             }
             else
             {
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len1);
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + 0.5 * (D1 + D2), Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len2);
-                DrawingHelpers.DrawArrow(c, Beam.Start.X + D2, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, len3);
-                DrawingHelpers.DrawLine(c, Beam.Start.X + D1, Beam.Start.Y + len1, Beam.Start.X + D2, Beam.Start.Y + len3, Brushes.Black);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D1, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, this.ArrowThickness, len1);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + 0.5 * (D1 + D2), Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, this.ArrowThickness, len2);
+                DrawingHelpers.DrawArrow(c, Beam.Start.X + D2, Beam.Start.Y, Brushes.Black, Brushes.Black, ArrowDirections.ARROW_UP, this.ArrowThickness, len3);
+                DrawingHelpers.DrawLine(c, Beam.Start.X + D1, Beam.Start.Y + len1, Beam.Start.X + D2, Beam.Start.Y + len3, Brushes.Black, 3*this.ArrowThickness);
             }
         }
 

@@ -12,7 +12,11 @@ namespace VMDiagrammer.Helpers
         ARROW_UP = 0,
         ARROW_RIGHT = 1,
         ARROW_DOWN = 2,
-        ARROW_LEFT = 3
+        ARROW_LEFT = 3,
+        ARROW_CLOCKWISE = 4,
+        ARROW_COUNTERCLOCKWISE = 5
+
+
     }
 
     public enum TextPositions
@@ -91,6 +95,56 @@ namespace VMDiagrammer.Helpers
             return myLine;
         }
 
+        public static void DrawCircularArc(Canvas c, double x, double y, Brush fill, Brush stroke, double thickness, double radius, double start_angle, double end_angle)
+        {
+            double sa, ea;
+
+            Path path = new Path();
+            path.Fill = fill; ;
+            path.Stroke = stroke;
+            path.StrokeThickness = thickness;
+            Canvas.SetLeft(path, 0);
+            Canvas.SetTop(path, 0);
+
+            sa = ((start_angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+            ea = ((end_angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+
+            if(ea < sa)
+            {
+                double temp_angle = ea;
+                ea = sa;
+                sa = ea;
+            }
+
+            double angle_diff = ea - sa;
+
+            PathGeometry pg = new PathGeometry();
+            PathFigure pf = new PathFigure();
+            
+            ArcSegment arcSegment = new ArcSegment();
+            arcSegment.IsLargeArc = angle_diff >= Math.PI;
+
+            // Set the start of arc
+            pf.StartPoint = new System.Windows.Point(x + radius * Math.Cos(sa), y + radius * Math.Sin(sa));
+
+            // Set the end point of the arc
+            arcSegment.Point = new System.Windows.Point(x + radius * Math.Cos(ea), y + radius * Math.Sin(ea));
+
+            arcSegment.Size = new System.Windows.Size(radius, radius);
+            arcSegment.SweepDirection = SweepDirection.Clockwise;
+
+            pf.Segments.Add(arcSegment);
+            pg.Figures.Add(pf);
+            path.Data = pg;
+
+            c.Children.Add(path);
+
+
+
+
+            return;
+        }
+
         public static void DrawText(Canvas c, double x, double y, double z, string str, Brush brush, double size)
         {
             double xpos = x;
@@ -141,6 +195,49 @@ namespace VMDiagrammer.Helpers
             DrawLine(c, x, y, x, y + shaft_len, stroke, thickness);
             DrawLine(c, x, y, x - head_len, y + head_len, stroke, thickness);
             DrawLine(c, x, y, x + head_len, y + head_len, stroke, thickness);
+        }
+
+        /// <summary>
+        /// Draws a circular arrow in a counterclockwise orientation.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="fill"></param>
+        /// <param name="stroke"></param>
+        /// <param name="thickness"></param>
+        /// <param name="shaft_len"></param>
+        /// <param name="head_len"></param>
+        public static void DrawCircularArrow(Canvas c, double x, double y, Brush fill, Brush stroke, 
+            ArrowDirections dir = ArrowDirections.ARROW_COUNTERCLOCKWISE, double thickness = DEFAULT_ARROW_THICKNESS, 
+            double radius = 32.0, double start_angle = Math.PI / 2.0, double end_angle = (-1) * Math.PI / 2.0, 
+            double shaft_len = DEFAULT_ARROW_SHAFTLENGTH, double head_len = DEFAULT_ARROW_HEADLENGTH)
+        {
+            double s_x, s_y;
+            double e_x, e_y;
+
+            // Draw the circular arc
+            DrawingHelpers.DrawCircularArc(c, x, y, Brushes.Transparent, Brushes.OrangeRed, thickness,radius,start_angle, end_angle);
+
+            // Draw the arrow head
+            // StartPoint
+            s_x = x + radius * Math.Cos(start_angle);
+            s_y = y + radius * Math.Sin(start_angle);
+            e_x = x + radius * Math.Cos(end_angle);
+            e_y = y + radius * Math.Sin(end_angle);
+
+            if(dir == ArrowDirections.ARROW_COUNTERCLOCKWISE)
+            {
+                // use the startpoint to draw the head
+                DrawLine(c, s_x, s_y, s_x - head_len, s_y - head_len, stroke, thickness);
+                DrawLine(c, s_x, s_y, s_x - head_len, s_y + head_len, stroke, thickness);
+            }
+            else
+            {
+                // use the endpoint to draw the head
+                DrawLine(c, e_x, e_y, e_x - head_len, e_y - head_len, stroke, thickness);
+                DrawLine(c, e_x, e_y, e_x - head_len, e_y + head_len, stroke, thickness);
+            }
         }
     }
 }

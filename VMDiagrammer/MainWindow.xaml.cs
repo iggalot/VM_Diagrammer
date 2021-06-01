@@ -102,7 +102,7 @@ namespace VMDiagrammer
             double temp_y = y;
 
             // search our Nodes list for node at this location
-            foreach (VM_Node n in Nodes)
+            foreach (VM_Node n in l)
             {
                 if (n.X == temp_x)
                 {
@@ -382,6 +382,12 @@ namespace VMDiagrammer
             // Draw a reference line just below the nodes (temp)
             DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + 40, RightMostNode.X, RightMostNode.Y + 40, Brushes.Blue);
 
+            // Test drawing an arc on screen (temp)
+            DrawingHelpers.DrawCircularArrow(MainCanvas, LeftMostNode.X, LeftMostNode.Y, Brushes.Transparent, Brushes.OrangeRed, ArrowDirections.ARROW_COUNTERCLOCKWISE, 4.0);
+
+
+            // Test drawing an arc on screen (temp)
+            DrawingHelpers.DrawCircularArrow(MainCanvas, RightMostNode.X, RightMostNode.Y, Brushes.Transparent, Brushes.OrangeRed, ArrowDirections.ARROW_CLOCKWISE, 4.0);
 
         }
 

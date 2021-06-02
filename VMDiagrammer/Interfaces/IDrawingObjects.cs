@@ -5,8 +5,12 @@ namespace VMDiagrammer.Interfaces
     /// <summary>
     /// A interface for drawable objects
     /// </summary>
-    public class IDrawingObjects
+    public interface IDrawingObjects
     {
-        public virtual void Draw(Canvas c) { }
+        /// <summary>
+        /// Routine to draw a drawable object
+        /// </summary>
+        /// <param name="c"></param>
+        void Draw(Canvas c);
     }
 }

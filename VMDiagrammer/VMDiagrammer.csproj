@@ -71,8 +71,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\BaseVMObject.cs" />
+    <Compile Include="Models\Loads\VM_BaseLoad.cs" />
+    <Compile Include="Models\Loads\VM_DistributedForce.cs" />
+    <Compile Include="Models\Loads\VM_PointMoment.cs" />
+    <Compile Include="Models\Loads\VM_PointForce.cs" />
     <Compile Include="Models\VM_Beam.cs" />
     <Compile Include="Models\VM_Node.cs" />
+    <Compile Include="Models\VM_Support.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -289,7 +289,7 @@ namespace VMDiagrammer.Helpers
             }
 
             // Draw the circular arc
-            DrawingHelpers.DrawCircularArc(c, x, y, Brushes.Transparent, Brushes.OrangeRed, thickness,radius,sa, ea);
+            DrawingHelpers.DrawCircularArc(c, x, y, fill, stroke, thickness,radius,sa, ea);
 
             // Draw the arrow head
             s_x = x - radius * Math.Cos(sa);

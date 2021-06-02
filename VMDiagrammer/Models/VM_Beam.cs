@@ -39,6 +39,9 @@ namespace VMDiagrammer.Models
             }
         }
 
+        /// <summary>
+        /// Returns the mid point of the beam on a stored value.
+        /// </summary>
         public VM_Node MidPoint
         {
             get => m_MidPoint;
@@ -66,6 +69,10 @@ namespace VMDiagrammer.Models
                 End = start;
             }
 
+            // Set the line thickness for this object when drawn
+            Thickness = 8.0;
+
+            // Calculate the midpoint of the beam
             MidPoint = new VM_Node(0.5 * (Start.X + End.X), 0.5 * (Start.Y + End.Y));
         }
 
@@ -76,14 +83,14 @@ namespace VMDiagrammer.Models
         public void Draw(Canvas c)
         {
             // Draw the beam object line
-            DrawingHelpers.DrawLine(c, this.Start.X, this.Start.Y, this.End.X, this.End.Y, Brushes.Red);
+            DrawingHelpers.DrawLine(c, this.Start.X, this.Start.Y, this.End.X, this.End.Y, Brushes.Red, Thickness);
 
             // Draw the beam label
             DrawBeamLabel(c, this.MidPoint.X, this.MidPoint.Y, 0);
         }
 
         /// <summary>
-        /// Draws a 
+        /// Draws a beam label (text and graphic) for a beam.
         /// </summary>
         /// <param name="c"></param>
         /// <param name="x"></param>

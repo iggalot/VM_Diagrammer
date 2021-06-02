@@ -9,6 +9,8 @@
         private static double currentIndex = 0;
         private double m_Index = 0;  // our object's id
 
+        private double m_Thickness = 1;  // the line thickness of this object
+
         public BaseVMObject()
         {
             m_Index = currentIndex;
@@ -24,6 +26,18 @@
             private set
             {
                 m_Index = value;
+            }
+        }
+
+        public double Thickness
+        {
+            get
+            {
+                return m_Thickness;
+            }
+            set
+            {
+                m_Thickness = value;
             }
         }
     }

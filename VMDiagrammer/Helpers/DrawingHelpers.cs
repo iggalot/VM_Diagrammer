@@ -49,7 +49,7 @@ namespace VMDiagrammer.Helpers
         /// <param name="x">the upper left x-coordinate for a bounding box around the node</param>
         /// <param name="y">the upper left y-coordinate for a bounding box around the node</param>
         /// <returns></returns>
-        public static Shape DrawCircle(Canvas c, double x, double y, Brush fill, Brush stroke, double radius)
+        public static Shape DrawCircle(Canvas c, double x, double y, Brush fill, Brush stroke, double radius, double thickness)
         {
             // Draw circle node
             Ellipse myEllipse = new Ellipse();
@@ -68,9 +68,9 @@ namespace VMDiagrammer.Helpers
             return myEllipse;
         }
 
-        public static Shape DrawCircleHollow(Canvas c, double x, double y, Brush stroke, double radius)
+        public static Shape DrawCircleHollow(Canvas c, double x, double y, Brush stroke, double radius, double thickness=1.0)
         {
-            return DrawCircle(c, x, y, Brushes.Transparent, stroke, radius);
+            return DrawCircle(c, x, y, Brushes.Transparent, stroke, radius, thickness);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace VMDiagrammer.Helpers
         /// <param name="sy">start point y-coord</param>
         /// <param name="stroke">color of the line object as a <see cref="Brush"/></param>
         /// <returns>the Shape object</returns>
-        public static Shape DrawLine(Canvas c, double sx, double sy, double ex, double ey, Brush stroke, double thickness = 2.0)
+        public static Shape DrawLine(Canvas c, double sx, double sy, double ex, double ey, Brush stroke, double thickness=1.0)
         {
             Line myLine = new Line();
             myLine.Stroke = stroke;

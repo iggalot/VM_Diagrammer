@@ -346,12 +346,12 @@ namespace VMDiagrammer
         /// </summary>
         private void OnUserUpdate()
         {
-            // Draw the nodes
-            foreach (VM_Node item in Nodes)
+            // Draw the beams -- drawn first so they are behind everything on the screen
+            foreach (VM_Beam item in Beams)
                 item.Draw(MainCanvas);
 
-            // Draw the beams
-            foreach (VM_Beam item in Beams)
+            // Draw the nodes
+            foreach (VM_Node item in Nodes)
                 item.Draw(MainCanvas);
 
             // Draw the loads
@@ -376,7 +376,7 @@ namespace VMDiagrammer
             // Draw the lines for the critical points
             foreach(VM_Node item in CriticalPoints)
             {
-                DrawingHelpers.DrawLine(MainCanvas, item.X, item.Y + 50, item.X, item.Y + 600, Brushes.Green);
+                DrawingHelpers.DrawLine(MainCanvas, item.X, item.Y + 50, item.X, item.Y + 600, Brushes.Green, item.Thickness);
             }
 
             // Draw a reference line just below the nodes (temp)
@@ -427,7 +427,7 @@ namespace VMDiagrammer
             VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[1], 50, 50, -50, -50);
             Loads.Add(loada);
             // Add point load
-            VM_BaseLoad loadb = new VM_PointForce((VM_Beam)Beams[1], 150, 150, +100, +100);
+            VM_BaseLoad loadb = new VM_PointForce((VM_Beam)Beams[2], 150, 150, +100, +100);
             Loads.Add(loadb);
 
             // Add distributed load

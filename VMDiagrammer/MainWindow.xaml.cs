@@ -365,9 +365,12 @@ namespace VMDiagrammer
                     case LoadTypes.LOADTYPE_DIST_FORCE:
                         ((VM_DistributedForce)item).Draw(MainCanvas);
                         break;
+                    case LoadTypes.LOADTYPE_CONC_MOMENT:
+                        ((VM_PointMoment)item).Draw(MainCanvas);
+                        break;
                     case LoadTypes.LOADTYPE_UNDEFINED:
                     case LoadTypes.LOADTYPE_DIST_MOMENT:
-                    case LoadTypes.LOADTYPE_CONC_MOMENT:
+
                     default:
                         throw new NotImplementedException("In drawing loads of MainWindow.xaml.cs -- load type detected for which there is no DRAW implemented!");
                 }
@@ -380,14 +383,7 @@ namespace VMDiagrammer
             }
 
             // Draw a reference line just below the nodes (temp)
-            DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + 40, RightMostNode.X, RightMostNode.Y + 40, Brushes.Blue);
-
-            // Test drawing an arc on screen (temp)
-            DrawingHelpers.DrawCircularArrow(MainCanvas, LeftMostNode.X, LeftMostNode.Y, Brushes.Transparent, Brushes.OrangeRed, ArrowDirections.ARROW_COUNTERCLOCKWISE, 4.0);
-
-
-            // Test drawing an arc on screen (temp)
-            DrawingHelpers.DrawCircularArrow(MainCanvas, RightMostNode.X, RightMostNode.Y, Brushes.Transparent, Brushes.OrangeRed, ArrowDirections.ARROW_CLOCKWISE, 4.0);
+ //           DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + 40, RightMostNode.X, RightMostNode.Y + 40, Brushes.Blue);
 
         }
 
@@ -442,6 +438,14 @@ namespace VMDiagrammer
             // Add distributed load
             VM_BaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1], 120, 200, +100, +100);
             Loads.Add(load5);
+
+
+            // Add concentrated moments
+            VM_BaseLoad loadc = new VM_PointMoment((VM_Beam)Beams[3], 100, 100, 50, 50, ArrowDirections.ARROW_COUNTERCLOCKWISE);
+            Loads.Add(loadc);
+            //VM_BaseLoad loadd = new VM_PointMoment((VM_Beam)Beams[2], 0, 0, 50, 50, ArrowDirections.ARROW_CLOCKWISE);
+            //Loads.Add(loadd);
+
 
             CriticalPoints = ListCriticalPoints();
 

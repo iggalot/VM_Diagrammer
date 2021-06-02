@@ -7,18 +7,22 @@ using VMDiagrammer.Models;
 namespace VMDiagrammer.Helpers
 {
 
+    /// <summary>
+    /// Enum for types of arrows (both straight and circular)
+    /// </summary>
     public enum ArrowDirections
     {
         ARROW_UP = 0,
         ARROW_RIGHT = 1,
         ARROW_DOWN = 2,
         ARROW_LEFT = 3,
-        ARROW_CLOCKWISE = 4,
-        ARROW_COUNTERCLOCKWISE = 5
-
-
+        ARROW_CLOCKWISE = 4,            // circular
+        ARROW_COUNTERCLOCKWISE = 5      // circular
     }
 
+    /// <summary>
+    /// Enum for positioning of text relative to an object.
+    /// </summary>
     public enum TextPositions
     {
         TEXT_ABOVE = 0,
@@ -31,12 +35,11 @@ namespace VMDiagrammer.Helpers
     /// </summary>
     public class DrawingHelpers
     {
-
-        public const double DEFAULT_ARROW_SHAFTLENGTH = 20;
-        public const double DEFAULT_ARROW_HEADLENGTH = 8;
-        public const double DEFAULT_ARROW_THICKNESS = 3;
-
-        public const double DEFAULT_TEXT_HEIGHT = 12.0;
+        // Constants used by the drawing helpers -- unless overridden in the functon call
+        public const double DEFAULT_ARROW_SHAFTLENGTH = 20;    // arrow shaft length
+        public const double DEFAULT_ARROW_HEADLENGTH = 8;      // arrow head length
+        public const double DEFAULT_ARROW_THICKNESS = 3;       // line thickness of arrow components
+        public const double DEFAULT_TEXT_HEIGHT = 12.0;        // text height (in pixels)
 
 
         /// <summary>
@@ -95,6 +98,20 @@ namespace VMDiagrammer.Helpers
             return myLine;
         }
 
+        /// <summary>
+        /// Draws a circular arc on a WPF canvas object
+        /// Angles are measured as positive - clockwise.
+        /// </summary>
+        /// <param name="c">canvas to draw on</param>
+        /// <param name="x">x-coord for center of circlular arc</param>
+        /// <param name="y">y-coord for center of circular arc</param>
+        /// <param name="fill">the fill color for the arc -- usually transparent</param>
+        /// <param name="stroke">the stroke line color of the arc</param>
+        /// <param name="radius">radius of the ciruclar arrow</param>
+        /// <param name="thickness">stroke thickness of the arrow</param>
+        /// <param name="end_angle">angle from center to the end of the arc (clockwise positive)/param>
+        /// <param name="start_angle">angle from center to the start of the arc (clockwise positive)/param>
+        /// <param name="head_len">length of the arrow head in pixels</param>
         public static void DrawCircularArc(Canvas c, double x, double y, Brush fill, Brush stroke, double thickness, double radius, double start_angle, double end_angle)
         {
             double sa, ea;
@@ -125,13 +142,13 @@ namespace VMDiagrammer.Helpers
             arcSegment.IsLargeArc = angle_diff >= Math.PI;
 
             // Set the start of arc
-            pf.StartPoint = new System.Windows.Point(x + radius * Math.Cos(sa), y + radius * Math.Sin(sa));
+            pf.StartPoint = new System.Windows.Point(x - radius * Math.Cos(sa), y - radius * Math.Sin(sa));
 
             // Set the end point of the arc
-            arcSegment.Point = new System.Windows.Point(x + radius * Math.Cos(ea), y + radius * Math.Sin(ea));
+            arcSegment.Point = new System.Windows.Point(x - radius * Math.Cos(ea), y - radius * Math.Sin(ea));
 
-            arcSegment.Size = new System.Windows.Size(radius, radius);
-            arcSegment.SweepDirection = SweepDirection.Clockwise;
+            arcSegment.Size = new System.Windows.Size(0.8*radius, radius);
+            arcSegment.SweepDirection = SweepDirection.Counterclockwise;
 
             pf.Segments.Add(arcSegment);
             pg.Figures.Add(pf);
@@ -139,12 +156,19 @@ namespace VMDiagrammer.Helpers
 
             c.Children.Add(path);
 
-
-
-
             return;
         }
 
+        /// <summary>
+        /// Helper function to draw text on a WPF canvas
+        /// </summary>
+        /// <param name="c">canvas to draw on</param>
+        /// <param name="x">x-coord</param>
+        /// <param name="y">y-coord</param>
+        /// <param name="z">z-coord (0 for 2D)</param>
+        /// <param name="str">text string</param>
+        /// <param name="brush">color of the text</param>
+        /// <param name="size">size of the text</param>
         public static void DrawText(Canvas c, double x, double y, double z, string str, Brush brush, double size)
         {
             double xpos = x;
@@ -165,6 +189,18 @@ namespace VMDiagrammer.Helpers
             c.Children.Add(textBlock);
         }
 
+
+        /// <summary>
+        /// A helper function to draw an arrow in a specified direction on a WPF canvas
+        /// <param name="c">canvas to draw on</param>
+        /// <param name="x">x-coord</param>
+        /// <param name="y">y-coord</param>
+        /// <param name="fill">fill color --- usually transparent</param>
+        /// <param name="stroke">color of the arrow</param>
+        /// <param name="dir">enum for the direction of the arroe <see cref="ArrowDirections"/></param>
+        /// <param name="thickness">stroke thickness of the arrow</param>
+        /// <param name="shaft_len">length of the arrow shaft in pixels</param>
+        /// <param name="head_len">length of the arrow head in pixels</param>
         public static void DrawArrow(Canvas c, double x, double y, Brush fill, Brush stroke, ArrowDirections dir, double thickness, double shaft_len=DEFAULT_ARROW_SHAFTLENGTH, double head_len = DEFAULT_ARROW_HEADLENGTH)
         {
             switch (dir)    
@@ -179,10 +215,20 @@ namespace VMDiagrammer.Helpers
                 case ArrowDirections.ARROW_LEFT:
                 default:
                     throw new NotImplementedException("draw function not defined for arrow of direction = " + dir);
-                    break;
             }
         }
 
+        /// <summary>
+        /// A helper function to draw downward arrow
+        /// <param name="c">canvas to draw on</param>
+        /// <param name="x">x-coord</param>
+        /// <param name="y">y-coord</param>
+        /// <param name="fill">fill color --- usually transparent</param>
+        /// <param name="stroke">color of the arrow</param>
+        /// <param name="dir">enum for the direction of the arroe <see cref="ArrowDirections"/></param>
+        /// <param name="thickness">stroke thickness of the arrow</param>
+        /// <param name="shaft_len">length of the arrow shaft in pixels</param>
+        /// <param name="head_len">length of the arrow head in pixels</param>
         public static void DrawArrowDown(Canvas c, double x, double y, Brush fill, Brush stroke, double thickness, double shaft_len, double head_len)
         {
             DrawLine(c, x, y, x, y - shaft_len, stroke, thickness);
@@ -190,6 +236,18 @@ namespace VMDiagrammer.Helpers
             DrawLine(c, x, y, x + head_len, y - head_len, stroke, thickness);
         }
 
+
+        /// <summary>
+        /// A helper function to draw an upward arrow in a specified direction
+        /// <param name="c">canvas to draw on</param>
+        /// <param name="x">x-coord</param>
+        /// <param name="y">y-coord</param>
+        /// <param name="fill">fill color --- usually transparent</param>
+        /// <param name="stroke">color of the arrow</param>
+        /// <param name="dir">enum for the direction of the arroe <see cref="ArrowDirections"/></param>
+        /// <param name="thickness">stroke thickness of the arrow</param>
+        /// <param name="shaft_len">length of the arrow shaft in pixels</param>
+        /// <param name="head_len">length of the arrow head in pixels</param>
         public static void DrawArrowUp(Canvas c, double x, double y, Brush fill, Brush stroke, double thickness, double shaft_len, double head_len)
         {
             DrawLine(c, x, y, x, y + shaft_len, stroke, thickness);
@@ -198,45 +256,58 @@ namespace VMDiagrammer.Helpers
         }
 
         /// <summary>
-        /// Draws a circular arrow in a counterclockwise orientation.
+        /// Draws a circular arrow in a particular direction
+        /// Angles are measured as positive - clockwise.
         /// </summary>
-        /// <param name="c"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="fill"></param>
-        /// <param name="stroke"></param>
-        /// <param name="thickness"></param>
-        /// <param name="shaft_len"></param>
-        /// <param name="head_len"></param>
+        /// <param name="c">canvas to draw on</param>
+        /// <param name="x">x-coord for center of circlular arc</param>
+        /// <param name="y">y-coord for center of circular arc</param>
+        /// <param name="dir">enum for the direction of the circular arrow <see cref="ArrowDirections"/></param>
+        /// <param name="radius">radius of the ciruclar arrow</param>
+        /// <param name="thickness">stroke thickness of the arrow</param>
+        /// <param name="end_angle">angle from center to the end of the arc (clockwise positive)/param>
+        /// <param name="start_angle"/>angle from center to the start of the arc (clockwise positive)/param>
+        /// <param name="head_len">length of the arrow head in pixels</param>
         public static void DrawCircularArrow(Canvas c, double x, double y, Brush fill, Brush stroke, 
-            ArrowDirections dir = ArrowDirections.ARROW_COUNTERCLOCKWISE, double thickness = DEFAULT_ARROW_THICKNESS, 
+            ArrowDirections dir, double thickness = DEFAULT_ARROW_THICKNESS, 
             double radius = 32.0, double start_angle = Math.PI / 2.0, double end_angle = (-1) * Math.PI / 2.0, 
-            double shaft_len = DEFAULT_ARROW_SHAFTLENGTH, double head_len = DEFAULT_ARROW_HEADLENGTH)
+            double head_len = DEFAULT_ARROW_HEADLENGTH)
         {
             double s_x, s_y;
             double e_x, e_y;
 
+            // Ensure that the angles are between zero and 2 x pi
+            double sa = ((start_angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+            double ea = ((end_angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+
+            // switch the end and start angle if they are outsize the zero to 2x pi range.
+            if (ea < sa)
+            {
+                double temp_angle = ea;
+                ea = sa;
+                sa = ea;
+            }
+
             // Draw the circular arc
-            DrawingHelpers.DrawCircularArc(c, x, y, Brushes.Transparent, Brushes.OrangeRed, thickness,radius,start_angle, end_angle);
+            DrawingHelpers.DrawCircularArc(c, x, y, Brushes.Transparent, Brushes.OrangeRed, thickness,radius,sa, ea);
 
             // Draw the arrow head
-            // StartPoint
-            s_x = x + radius * Math.Cos(start_angle);
-            s_y = y + radius * Math.Sin(start_angle);
-            e_x = x + radius * Math.Cos(end_angle);
-            e_y = y + radius * Math.Sin(end_angle);
+            s_x = x - radius * Math.Cos(sa);
+            s_y = y - radius * Math.Sin(sa);
+            e_x = x - radius * Math.Cos(ea);
+            e_y = y - radius * Math.Sin(ea);
 
             if(dir == ArrowDirections.ARROW_COUNTERCLOCKWISE)
-            {
-                // use the startpoint to draw the head
-                DrawLine(c, s_x, s_y, s_x - head_len, s_y - head_len, stroke, thickness);
-                DrawLine(c, s_x, s_y, s_x - head_len, s_y + head_len, stroke, thickness);
-            }
-            else
             {
                 // use the endpoint to draw the head
                 DrawLine(c, e_x, e_y, e_x - head_len, e_y - head_len, stroke, thickness);
                 DrawLine(c, e_x, e_y, e_x - head_len, e_y + head_len, stroke, thickness);
+            }
+            else
+            {
+                // use the startpoint to draw the head
+                DrawLine(c, s_x, s_y, s_x - head_len, s_y - head_len, stroke, thickness);
+                DrawLine(c, s_x, s_y, s_x - head_len, s_y + head_len, stroke, thickness);
             }
         }
     }

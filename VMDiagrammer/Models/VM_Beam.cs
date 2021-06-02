@@ -82,6 +82,15 @@ namespace VMDiagrammer.Models
             DrawBeamLabel(c, this.MidPoint.X, this.MidPoint.Y, 0);
         }
 
+        /// <summary>
+        /// Draws a 
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="size"></param>
+        /// <param name="pos"></param>
         private void DrawBeamLabel(Canvas c, double x, double y, double z, double size = DrawingHelpers.DEFAULT_TEXT_HEIGHT, TextPositions pos = TextPositions.TEXT_BELOW)
         {
             double xpos = x-3;

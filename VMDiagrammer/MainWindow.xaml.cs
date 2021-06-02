@@ -138,7 +138,7 @@ namespace VMDiagrammer
 
             
             // Concentrated forces and moments
-            foreach (VMBaseLoad item in Loads)
+            foreach (VM_BaseLoad item in Loads)
             {
                 // Concentrated forces or moments
                 if (item.LoadType == LoadTypes.LOADTYPE_CONC_FORCE || item.LoadType == LoadTypes.LOADTYPE_CONC_MOMENT)
@@ -355,7 +355,7 @@ namespace VMDiagrammer
                 item.Draw(MainCanvas);
 
             // Draw the loads
-            foreach (VMBaseLoad item in Loads)
+            foreach (VM_BaseLoad item in Loads)
             {
                 switch(item.LoadType)
                 {
@@ -424,23 +424,23 @@ namespace VMDiagrammer
             Beams.Add(Beam4);
 
             // Add point load
-            VMBaseLoad loada = new VM_PointForce((VM_Beam)Beams[1], 50, 50, -50, -50);
+            VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[1], 50, 50, -50, -50);
             Loads.Add(loada);
             // Add point load
-            VMBaseLoad loadb = new VM_PointForce((VM_Beam)Beams[1], 150, 150, +100, +100);
+            VM_BaseLoad loadb = new VM_PointForce((VM_Beam)Beams[1], 150, 150, +100, +100);
             Loads.Add(loadb);
 
             // Add distributed load
-            VMBaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0], 50, 150, -50, -80);
+            VM_BaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0], 50, 150, -50, -80);
             Loads.Add(load2);
             // Add distributed load
-            VMBaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0], 150, 200, -80, 0);
+            VM_BaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0], 150, 200, -80, 0);
             Loads.Add(load4);
             // Add distributed load
-            VMBaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1], 100, 120, +30, +100);
+            VM_BaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1], 100, 120, +30, +100);
             Loads.Add(load3);
             // Add distributed load
-            VMBaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1], 120, 200, +100, +100);
+            VM_BaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1], 120, 200, +100, +100);
             Loads.Add(load5);
 
             CriticalPoints = ListCriticalPoints();

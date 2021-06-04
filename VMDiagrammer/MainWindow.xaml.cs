@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using VMDiagrammer.Helpers;
@@ -16,6 +17,7 @@ namespace VMDiagrammer
     {
         private Point m_CurrentMouseLocation = new Point();
         private string m_MouseLocationString = "N/A";
+        private List<IDrawingObjects> l_CriticalPoints = new List<IDrawingObjects>();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -29,10 +31,25 @@ namespace VMDiagrammer
         public List<IDrawingObjects> Beams { get; set; }
         public List<IDrawingObjects> Loads { get; set; }
 
-        public List<IDrawingObjects> CriticalPoints { get; set; } = null;
+        public List<IDrawingObjects> CriticalPoints
+        {
+            get
+            {
+                return l_CriticalPoints;
+            }
+            set
+            {
+                l_CriticalPoints = value;
+            }
+        }
 
         public VM_Node LeftMostNode { get; set; } = null; // leftmost node on the structure
         public VM_Node RightMostNode { get; set; } = null; // leftmost node on the structure
+
+        public string strDisplayInfo
+        {
+            get => DisplayInfo();
+        }
 
         protected void UpdateBeamExtents()
         {
@@ -117,6 +134,10 @@ namespace VMDiagrammer
             return null;
         }
 
+        /// <summary>
+        /// Function that creates a sorted list of critical points from lowest to highest
+        /// </summary>
+        /// <returns></returns>
         protected List<IDrawingObjects> ListCriticalPoints()
         {
             List<IDrawingObjects> list = new List<IDrawingObjects>();
@@ -297,6 +318,9 @@ namespace VMDiagrammer
             // TODO:: Shear = 0 critical point location
             // Shear = 0;
 
+            // Now sort the list from lowest X to highest X
+            MathHelpers.BubbleSortXCoord(ref list);
+
             return list;
         }
 
@@ -396,55 +420,56 @@ namespace VMDiagrammer
 
 
             // Create some nodes
-            VM_Node NodeB = new VM_Node(520, 200, SupportTypes.SUPPORT_ROLLER_X);
-            AddNode(NodeB);
-            VM_Node NodeC = new VM_Node(320, 200);
+            VM_Node NodeC = new VM_Node(320, 200, SupportTypes.SUPPORT_ROLLER_X);
             AddNode(NodeC);
             VM_Node NodeA = new VM_Node(120, 200, SupportTypes.SUPPORT_PIN);
             AddNode(NodeA);
-            VM_Node NodeD = new VM_Node(750, 200, SupportTypes.SUPPORT_UNDEFINED);
+
+            VM_Node NodeB = new VM_Node(420, 200, SupportTypes.SUPPORT_ROLLER_X);
+            AddNode(NodeB);
+            VM_Node NodeD = new VM_Node(520, 200, SupportTypes.SUPPORT_UNDEFINED);
             AddNode(NodeD);
             VM_Node NodeE = new VM_Node(50, 200, SupportTypes.SUPPORT_UNDEFINED);
             AddNode(NodeE);
 
             // Create some beams
-            VM_Beam Beam1 = new VM_Beam(NodeA, NodeC);
+            VM_Beam Beam1 = new VM_Beam(NodeC, NodeA);
             Beams.Add(Beam1);
-            VM_Beam Beam2 = new VM_Beam(NodeC, NodeB);
-            Beams.Add(Beam2);
-            VM_Beam Beam3 = new VM_Beam(NodeB, NodeD);
-            Beams.Add(Beam3);
-            VM_Beam Beam4 = new VM_Beam(NodeE, NodeA);
-            Beams.Add(Beam4);
+            //VM_Beam Beam2 = new VM_Beam(NodeC, NodeB);
+            //Beams.Add(Beam2);
+            //VM_Beam Beam3 = new VM_Beam(NodeB, NodeD);
+            //Beams.Add(Beam3);
+            //VM_Beam Beam4 = new VM_Beam(NodeE, NodeA);
+            //Beams.Add(Beam4);
 
             // Add point load
-            VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[1], 50, 50, -50, -50);
+            VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[0], 100, 100, -50, -50);
             Loads.Add(loada);
-            // Add point load
-            VM_BaseLoad loadb = new VM_PointForce((VM_Beam)Beams[2], 150, 150, +100, +100);
-            Loads.Add(loadb);
 
-            // Add distributed load
-            VM_BaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0], 50, 150, -50, -80);
-            Loads.Add(load2);
-            // Add distributed load
-            VM_BaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0], 150, 200, -80, 0);
-            Loads.Add(load4);
-            // Add distributed load
-            VM_BaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1], 100, 120, +30, +100);
-            Loads.Add(load3);
-            // Add distributed load
-            VM_BaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1], 120, 200, +100, +100);
-            Loads.Add(load5);
+            //// Add point load
+            //VM_BaseLoad loadb = new VM_PointForce((VM_Beam)Beams[2], 150, 150, +100, +100);
+            //Loads.Add(loadb);
 
-            // Add concentrated moments
-            VM_BaseLoad loadc = new VM_PointMoment((VM_Beam)Beams[3], 100, 100, 50, 50, ArrowDirections.ARROW_COUNTERCLOCKWISE);
-            Loads.Add(loadc);
-            VM_BaseLoad loadd = new VM_PointMoment((VM_Beam)Beams[2], 0, 0, 50, 50, ArrowDirections.ARROW_CLOCKWISE);
-            Loads.Add(loadd);
+            //// Add distributed load
+            //VM_BaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0], 50, 150, -50, -80);
+            //Loads.Add(load2);
+            //// Add distributed load
+            //VM_BaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0], 150, 200, -80, 0);
+            //Loads.Add(load4);
+            //// Add distributed load
+            //VM_BaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1], 100, 120, +30, +100);
+            //Loads.Add(load3);
+            //// Add distributed load
+            //VM_BaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1], 120, 200, +100, +100);
+            //Loads.Add(load5);
+
+            //// Add concentrated moments
+            //VM_BaseLoad loadc = new VM_PointMoment((VM_Beam)Beams[3], 100, 100, 50, 50, ArrowDirections.ARROW_COUNTERCLOCKWISE);
+            //Loads.Add(loadc);
+            //VM_BaseLoad loadd = new VM_PointMoment((VM_Beam)Beams[2], 0, 0, 50, 50, ArrowDirections.ARROW_CLOCKWISE);
+            //Loads.Add(loadd);
 
             CriticalPoints = ListCriticalPoints();
-
         }
 
         /// <summary>
@@ -473,6 +498,57 @@ namespace VMDiagrammer
             Nodes.Add(newNode);
 
             OnUserUpdate();
+        }
+
+
+        private protected string DisplayInfo()
+        {
+            string str = "";
+            str += NodesListToString() + "\n";
+            str += BeamsListToString()+ "\n";
+            str += CriticalPointsListToString() + "\n";
+
+
+            return str;
+        }
+
+        private protected string NodesListToString()
+        {
+            string str = "";
+            str += "NODES\n";
+            str += "-----------------------------------\n";
+            foreach (IDrawingObjects item in Nodes)
+            {
+                str += ((VM_Node)item).ToString();
+            }
+
+            return str;
+        }
+
+        private protected string CriticalPointsListToString()
+        {
+            string str = "";
+            str += "CRITICAL POINTS\n";
+            str += "-----------------------------------\n";
+            foreach (IDrawingObjects item in CriticalPoints)
+            {
+                str += ((VM_Node)item).ToString();
+            }
+
+            return str;
+        }
+
+        private protected string BeamsListToString()
+        {
+            string str = "";
+            str += "BEAMS\n";
+            str += "-----------------------------------\n";
+            foreach (IDrawingObjects item in Beams)
+            {
+                str += ((VM_Beam)item).ToString();
+            }
+
+            return str;
         }
     }
 }

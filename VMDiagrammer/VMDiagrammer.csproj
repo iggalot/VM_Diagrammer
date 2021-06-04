@@ -64,6 +64,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Helpers\DrawingHelpers.cs" />
+    <Compile Include="Helpers\MathHelpers.cs" />
     <Compile Include="Helpers\MatrixOperations.cs" />
     <Compile Include="Interfaces\IDrawingObjects.cs" />
     <Compile Include="MainWindow.xaml.cs">

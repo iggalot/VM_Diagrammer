@@ -66,6 +66,11 @@ namespace VMDiagrammer.Models
 
         }
 
+        public override string ToString()
+        {
+            return Index.ToString() + " -- X: " + X + "    Y: " + Y + "\n";
+        }
+
         /// <summary>
         /// The method to draw this object
         /// </summary>

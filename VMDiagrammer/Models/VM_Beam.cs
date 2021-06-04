@@ -75,6 +75,10 @@ namespace VMDiagrammer.Models
             // Calculate the midpoint of the beam
             MidPoint = new VM_Node(0.5 * (Start.X + End.X), 0.5 * (Start.Y + End.Y));
         }
+        public override string ToString()
+        {
+            return Index.ToString() + " -- START: " + Start.Index.ToString() + "    END: " + End.Index.ToString() + "\n";
+        }
 
         /// <summary>
         /// Method to draw the beam object

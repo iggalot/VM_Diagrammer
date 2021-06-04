@@ -17,6 +17,9 @@ namespace VMDiagrammer
     {
         private Point m_CurrentMouseLocation = new Point();
         private string m_MouseLocationString = "N/A";
+        private List<IDrawingObjects> l_Nodes = new List<IDrawingObjects>();
+        private List<IDrawingObjects> l_Beams = new List<IDrawingObjects>();
+        private List<IDrawingObjects> l_Loads = new List<IDrawingObjects>();
         private List<IDrawingObjects> l_CriticalPoints = new List<IDrawingObjects>();
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -27,10 +30,6 @@ namespace VMDiagrammer
         }
 
         // List containing all of our objects to be drawn
-        public List<IDrawingObjects> Nodes{ get; set; }
-        public List<IDrawingObjects> Beams { get; set; }
-        public List<IDrawingObjects> Loads { get; set; }
-
         public List<IDrawingObjects> CriticalPoints
         {
             get
@@ -40,6 +39,42 @@ namespace VMDiagrammer
             set
             {
                 l_CriticalPoints = value;
+            }
+        }
+
+        public List<IDrawingObjects> Nodes
+        {
+            get
+            {
+                return l_Nodes;
+            }
+            set
+            {
+                l_Nodes = value;
+            }
+        }
+
+        public List<IDrawingObjects> Beams
+        {
+            get
+            {
+                return l_Beams;
+            }
+            set
+            {
+                l_Beams = value;
+            }
+        }
+
+        public List<IDrawingObjects> Loads
+        {
+            get
+            {
+                return l_Loads;
+            }
+            set
+            {
+                l_Loads = value;
             }
         }
 
@@ -318,9 +353,6 @@ namespace VMDiagrammer
             // TODO:: Shear = 0 critical point location
             // Shear = 0;
 
-            // Now sort the list from lowest X to highest X
-            MathHelpers.BubbleSortXCoord(ref list);
-
             return list;
         }
 
@@ -418,7 +450,6 @@ namespace VMDiagrammer
             Beams = new List<IDrawingObjects>();
             Loads = new List<IDrawingObjects>();
 
-
             // Create some nodes
             VM_Node NodeC = new VM_Node(320, 200, SupportTypes.SUPPORT_ROLLER_X);
             AddNode(NodeC);
@@ -469,7 +500,17 @@ namespace VMDiagrammer
             VM_BaseLoad loadd = new VM_PointMoment((VM_Beam)Beams[2], 0, 0, 50, 50, ArrowDirections.ARROW_CLOCKWISE);
             Loads.Add(loadd);
 
+            // Create a list of Critical Points.
             CriticalPoints = ListCriticalPoints();
+
+            // Sort lists in order of lowest to highest X-coord
+            MathHelpers.BubbleSortNodesByXCoord(ref l_Nodes);
+            MathHelpers.BubbleSortBeamsByXCoord(ref l_Beams);
+            MathHelpers.BubbleSortNodesByXCoord(ref l_CriticalPoints);
+
+            // TODO:: Sort the loads from left to right based on D1 position and Start node of beam position....
+
+
         }
 
         /// <summary>
@@ -550,5 +591,19 @@ namespace VMDiagrammer
 
             return str;
         }
+
+        /// <summary>
+        /// Determines the shear value at a specified point x on the beam.
+        /// </summary>
+        /// <param name="x"></param>
+        protected void ComputeShearValue(double x)
+        {
+            // 1st critical point
+            
+            // Compute change
+
+
+        }
     }
+
 }

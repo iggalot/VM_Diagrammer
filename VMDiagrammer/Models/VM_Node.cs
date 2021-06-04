@@ -68,7 +68,13 @@ namespace VMDiagrammer.Models
 
         public override string ToString()
         {
-            return Index.ToString() + " -- X: " + X + "    Y: " + Y + "\n";
+            string str = "";
+            str += Index.ToString() + " -- X: " + X + "    Y: " + Y;
+            if (SupportType != SupportTypes.SUPPORT_UNDEFINED)
+                str += "    (S)";
+            str += "\n";
+            return str;
+
         }
 
         /// <summary>

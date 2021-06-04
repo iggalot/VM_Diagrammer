@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 using VMDiagrammer.Interfaces;
 
 namespace VMDiagrammer.Models
@@ -101,6 +102,26 @@ namespace VMDiagrammer.Models
         /// <param name="thickness">thickness of the associated load arrows</param>
         public VM_BaseLoad(VM_Beam beam, LoadTypes load_type, double d1, double d2, double w1, double w2, double thickness)
         {
+            // is D1 to the left of the start node?
+            if (d1 < 0)
+                throw new NotImplementedException("D1 = " + d1 + " cannot be less than zero!");
+
+            // is D2 to the left of the start node?
+            if (d2 < 0)
+                throw new NotImplementedException("D1 = " + d2 + " cannot be less than zero!");
+
+            // is D1 beyond the end of the beam?
+            if (beam.Start.X + d1 > beam.End.X)
+                throw new NotImplementedException("Dimension D1 = " + d1 + " -- dimension is beyond end of beam " + beam.Index.ToString());
+            // is D2 beyond the end of the beam
+            if (beam.Start.X + d2 > beam.End.X)
+                throw new NotImplementedException("Dimension D2 = " + d2 + " -- dimension is beyond the end of the beam" + beam.Index.ToString());
+
+            // are the intensities of W1 and W2 opposite signs
+            if (((W1 < 0) && (W2 > 0)) || ((W1 > 0) && (W2 < 0)))
+                throw new NotImplementedException("Distributed load magnitude W1 = " + W1 + " and W2 = " + W2 + " -- load intensities cannot be opposite signs!");
+
+
             Beam = beam;
             LoadType = load_type;
             ArrowThickness = thickness;

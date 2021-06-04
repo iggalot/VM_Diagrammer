@@ -435,39 +435,39 @@ namespace VMDiagrammer
             // Create some beams
             VM_Beam Beam1 = new VM_Beam(NodeC, NodeA);
             Beams.Add(Beam1);
-            //VM_Beam Beam2 = new VM_Beam(NodeC, NodeB);
-            //Beams.Add(Beam2);
-            //VM_Beam Beam3 = new VM_Beam(NodeB, NodeD);
-            //Beams.Add(Beam3);
-            //VM_Beam Beam4 = new VM_Beam(NodeE, NodeA);
-            //Beams.Add(Beam4);
+            VM_Beam Beam2 = new VM_Beam(NodeC, NodeB);
+            Beams.Add(Beam2);
+            VM_Beam Beam3 = new VM_Beam(NodeB, NodeD);
+            Beams.Add(Beam3);
+            VM_Beam Beam4 = new VM_Beam(NodeE, NodeA);
+            Beams.Add(Beam4);
 
             // Add point load
             VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[0], 100, 100, -50, -50);
             Loads.Add(loada);
 
-            //// Add point load
-            //VM_BaseLoad loadb = new VM_PointForce((VM_Beam)Beams[2], 150, 150, +100, +100);
-            //Loads.Add(loadb);
+            // Add point load
+            VM_BaseLoad loadb = new VM_PointForce((VM_Beam)Beams[2], 60, 60, +100, +100);
+            Loads.Add(loadb);
 
-            //// Add distributed load
-            //VM_BaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0], 50, 150, -50, -80);
-            //Loads.Add(load2);
-            //// Add distributed load
-            //VM_BaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0], 150, 200, -80, 0);
-            //Loads.Add(load4);
-            //// Add distributed load
-            //VM_BaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1], 100, 120, +30, +100);
-            //Loads.Add(load3);
-            //// Add distributed load
-            //VM_BaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1], 120, 200, +100, +100);
-            //Loads.Add(load5);
+            // Add distributed load
+            VM_BaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0], 50, 150, -50, -80);
+            Loads.Add(load2);
+            // Add distributed load
+            VM_BaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0], 150, 200, -80, 0);
+            Loads.Add(load4);
+            // Add distributed load
+            VM_BaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1], 20, 60, +30, +100);
+            Loads.Add(load3);
+            // Add distributed load
+            VM_BaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1], 60, 80, +100, +100);
+            Loads.Add(load5);
 
-            //// Add concentrated moments
-            //VM_BaseLoad loadc = new VM_PointMoment((VM_Beam)Beams[3], 100, 100, 50, 50, ArrowDirections.ARROW_COUNTERCLOCKWISE);
-            //Loads.Add(loadc);
-            //VM_BaseLoad loadd = new VM_PointMoment((VM_Beam)Beams[2], 0, 0, 50, 50, ArrowDirections.ARROW_CLOCKWISE);
-            //Loads.Add(loadd);
+            // Add concentrated moments
+            VM_BaseLoad loadc = new VM_PointMoment((VM_Beam)Beams[3], 70, 70, 50, 50, ArrowDirections.ARROW_COUNTERCLOCKWISE);
+            Loads.Add(loadc);
+            VM_BaseLoad loadd = new VM_PointMoment((VM_Beam)Beams[2], 0, 0, 50, 50, ArrowDirections.ARROW_CLOCKWISE);
+            Loads.Add(loadd);
 
             CriticalPoints = ListCriticalPoints();
         }

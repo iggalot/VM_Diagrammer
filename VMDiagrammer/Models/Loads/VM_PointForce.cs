@@ -16,7 +16,6 @@ namespace VMDiagrammer.Models
                 throw new NotImplementedException("D1 = " + D1 + " and D2 = " + D2 + " -- dimensions muse be the same for a point force");
             if (W1 != W2)
                 throw new NotImplementedException("W1 = " + W1 + " and W2 = " + W2 + " -- intensities muse be the same for a point force");
-
         }
 
         public override void Draw(Canvas c)

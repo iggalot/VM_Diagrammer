@@ -438,7 +438,11 @@ namespace VMDiagrammer
             }
 
             // Draw a reference line just below the nodes (temp)
- //           DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + 40, RightMostNode.X, RightMostNode.Y + 40, Brushes.Blue);
+            //           DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + 40, RightMostNode.X, RightMostNode.Y + 40, Brushes.Blue);
+
+            for(double i = LeftMostNode.X; i<= 520; i = i+10)
+            Console.WriteLine(i.ToString() + " is on Beam #" + GetBeamByXCoord(i).Index) ;
+        
         }
 
         /// <summary>
@@ -590,19 +594,116 @@ namespace VMDiagrammer
             }
 
             return str;
+        } 
+
+        /// <summary>
+        /// Returns the distance of an offset from the START node of a beam
+        /// to the LeftMostNode
+        /// 
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        protected double GetDistanceFromLeftMost(double offset, VM_Beam beam)
+        {
+            return beam.Start.X + offset - LeftMostNode.X;
         }
 
         /// <summary>
-        /// Determines the shear value at a specified point x on the beam.
+        /// Returns the beam that contains a specified x-coordinate.  If the x-coord is at the Rightmost node, return the
+        /// rightmost beam
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        protected VM_Beam GetBeamByXCoord(double x)
+        {
+            foreach(VM_Beam b in Beams)
+            {
+                // Is x at the RightMostNode?  If so, consider it found, return the beam
+                if(((VM_Beam)b).End.X == x)
+                        return b;
+
+                // Otherwise, check that x is between the start (inclusive) and end of the beam
+                if(((VM_Beam)b).End.X > x && ((VM_Beam)b).Start.X <= x)
+                {
+                    // found our beam!
+                    return b;
+                }
+            }
+
+            // Otherwise throw an exception since our X coord isn't on a current beam.
+            throw new NotImplementedException("No beam found contains specified position of X: " + x);
+        }
+
+        /// <summary>
+        /// Algorithm for computing support reactions of statically determinate beam
+        /// </summary>
+        protected void ComputeVerticalSupportReactions()
+        {
+            // Compute total vertical force on beam
+            double totalVert = 0.0;
+            foreach(IDrawingObjects b in Loads)
+            {
+                VM_BaseLoad bl = (VM_BaseLoad)b;
+
+                switch (bl.LoadType)
+                {
+
+                    case LoadTypes.LOADTYPE_CONC_FORCE:
+                        break;
+                    case LoadTypes.LOADTYPE_CONC_MOMENT:
+                        break;
+                    case LoadTypes.LOADTYPE_DIST_FORCE:
+                        break;
+                    case LoadTypes.LOADTYPE_DIST_MOMENT:
+                        break;
+                    case LoadTypes.LOADTYPE_UNDEFINED:                      
+                    default:
+                        throw new NotImplementedException("Unrecognized Load Type in load " + ": " + bl.LoadType);
+                        break;
+                }
+            }
+                    
+            // Compute equivalent moment calculation at leftmost support reaction
+                    //Compute moments of all loads relative to leftmost support reaction
+                    // Add results to get total equivalent moment
+
+            // If selected support is a fixed support (has a concentrated moment).
+                   // Moment reaction is Total equivalent moment.
+                   // Vertical force at support is total vertical force
+            // Else
+                   // Divide total by distance to other support to get second vertical reaction
+                   // Compute second vertical reaction = Total vertical force minus 2nd reaction.
+        }
+
+        /// <summary>
+        /// Algorithm for finding the shear value at a specified point x along the beam.
         /// </summary>
         /// <param name="x"></param>
-        protected void ComputeShearValue(double x)
+        protected void ComputeShearValueAtX(double x)
         {
-            // 1st critical point
+            // Create a list for shear values
+            // Create a correspondind list for position x
+
+            ////////////////////////////////////////
+            /// Begin Algorithm
+            /// ////////////////////////////////////
             
-            // Compute change
+            // Start at leftmost (this is a CP).
+                // Plot a zero point.
 
+            // If on critical point, check for instantaneous critical point changes
+                // 1. Support reactions
+                // 2. Concentrated forces
+                    // Compute value to left of CP
+                    // Compute value just to right of CP
 
+            // Search for distributed loads between previous critical point and current point.
+                // Does dist. load straddle the CP?
+                   // 1. No -- it ends at CP.  And isn't allowed to extend beyond -- we throw an exception when the load is created if this happens..
+
+                // Iterate along distributed load for 10x points to establish the line.
+
+            // At last point (after CP), plot a zero point
         }
     }
 

@@ -7,6 +7,7 @@ using System.Windows.Media;
 using VMDiagrammer.Helpers;
 using VMDiagrammer.Interfaces;
 using VMDiagrammer.Models;
+using VMDiagrammer.Models.Elements;
 
 namespace VMDiagrammer
 {
@@ -514,6 +515,21 @@ namespace VMDiagrammer
 
             // TODO:: Sort the loads from left to right based on D1 position and Start node of beam position....
 
+
+
+            // Create our Structure Stiffness Model from our beams
+            StructureStiffnessModel model = new StructureStiffnessModel(Nodes.Count*3, Nodes.Count*3);
+            foreach (var beam in Beams)
+            {
+                model.AddElement((VM_Beam)beam);
+                // TODO::  Add matrix transformations.
+            }
+
+            model.Assemble();
+            Console.WriteLine(model.ToString());
+
+            //BeamElement elem = new BeamElement((VM_Node)Nodes[0], (VM_Node)Nodes[1], 1, 1, 1, 1);
+            //Console.WriteLine(elem.ToString());
 
         }
 

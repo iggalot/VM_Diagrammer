@@ -21,6 +21,30 @@ namespace VMDiagrammer.Models
         private double m_Y;   // y-coordinate
         private SupportTypes m_SupportType;  // type of support as an ENUM
 
+        private static int dof_index_current = 0;
+
+        private int m_dof_x_index = 0;
+        private int m_dof_y_index = 0;
+        private int m_dof_rot_index = 0;
+
+        public int DOF_X
+        {
+            get => m_dof_x_index;
+            set { m_dof_x_index = value; }
+        }
+
+        public int DOF_Y
+        {
+            get => m_dof_y_index;
+            set { m_dof_y_index = value; }
+        }
+
+        public int DOF_ROT
+        {
+            get => m_dof_rot_index;
+            set { m_dof_rot_index = value; }
+        }
+
         /// <summary>
         /// Accessor for the X coordinate of our node
         /// </summary>
@@ -56,6 +80,13 @@ namespace VMDiagrammer.Models
             Y = y;
 
             SupportType = support;
+
+            DOF_X = dof_index_current;
+            dof_index_current++;
+            DOF_Y = dof_index_current;
+            dof_index_current++;
+            DOF_ROT = dof_index_current;
+            dof_index_current++;
         }
 
         /// <summary>
@@ -72,6 +103,7 @@ namespace VMDiagrammer.Models
             str += Index.ToString() + " -- X: " + X + "    Y: " + Y;
             if (SupportType != SupportTypes.SUPPORT_UNDEFINED)
                 str += "    (S)";
+            str += "-- DOF " + DOF_X.ToString() + "  " + DOF_Y.ToString() + "  " + DOF_ROT.ToString();
             str += "\n";
             return str;
 

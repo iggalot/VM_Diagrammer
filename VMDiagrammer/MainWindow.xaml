@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VMDiagrammer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1000">
+        Title="MainWindow" Height="600" Width="1200">
     <Grid Margin ="15">
         <StackPanel Orientation="Vertical">
             <TextBox Height="25" Width="100" Text="{Binding MouseLocationString}"/>
@@ -13,7 +13,7 @@
                 <Canvas x:Name="MainCanvas" Width="800" Height="600" Background="LightGray"
                 MouseMove="MainCanvas_MouseMove"
                     MouseUp="MainCanvas_MouseUp"/>
-                <TextBlock Text="{Binding strDisplayInfo}" Width="150" Height="600" Background="DarkGray"/>
+                <TextBlock Text="{Binding strDisplayInfo}" Width="300" Height="600" Background="DarkGray"/>
             </StackPanel>
         </StackPanel>
     </Grid>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using VMDiagrammer.Helpers;
 using VMDiagrammer.Interfaces;
 
@@ -23,9 +24,35 @@ namespace VMDiagrammer.Models
 
         private static int dof_index_current = 0;
 
+        private bool m_X_restrained = false;
+        private bool m_Y_restrained = false;
+        private bool m_ROT_restrained = false;
+
+        // Displacement vector for boundary conditions (null = unknown)
+        private double?[] m_DisplaceVector = { null, null, null };
+        private int[] m_DOFIndices = { 0, 0, 0 };
+
+        // Boundary conditions for displacements
+        private double? disp_x = null;
+        private double? disp_y = null;
+        private double? disp_rot = null;
+        public double?[] DisplacementVector
+        {
+            get => m_DisplaceVector;
+            set { m_DisplaceVector = value; }
+        }
+
+        // index numbers for degrees of freedom
         private int m_dof_x_index = 0;
         private int m_dof_y_index = 0;
         private int m_dof_rot_index = 0;
+        public int[] DOF_IndexVector
+        {
+            get => m_DOFIndices;
+            set { m_DOFIndices = value; }
+        }
+
+
 
         public int DOF_X
         {
@@ -74,19 +101,67 @@ namespace VMDiagrammer.Models
         /// </summary>
         /// <param name="x">x position on the canvas</param>
         /// <param name="y">y position on the canvas</param>
-        public VM_Node(double x, double y, SupportTypes support = SupportTypes.SUPPORT_UNDEFINED)
+        public VM_Node(double x, double y, bool x_restrain, bool y_restrain, bool rot_restrain)
         {
+            m_X_restrained = x_restrain;
+            m_Y_restrained = y_restrain;
+            m_ROT_restrained = rot_restrain;
+
             X = x;
             Y = y;
 
-            SupportType = support;
-
+            // Update degree of freedom indices
             DOF_X = dof_index_current;
             dof_index_current++;
             DOF_Y = dof_index_current;
             dof_index_current++;
             DOF_ROT = dof_index_current;
             dof_index_current++;
+
+            // Store index numbers in array
+            m_DOFIndices[0] = DOF_X;
+            m_DOFIndices[1] = DOF_Y;
+            m_DOFIndices[2] = DOF_ROT;
+
+
+            // Determine if boundary conditions can be classified as a SupportType directly
+            SupportType = SupportTypes.SUPPORT_UNDEFINED;  // default
+
+            if (m_X_restrained)
+            {
+                if (m_Y_restrained)
+                {
+                    if (m_ROT_restrained)
+                    {
+                        m_SupportType = SupportTypes.SUPPORT_FIXED;
+                        disp_x = 0;
+                        disp_y = 0;
+                        disp_rot = 0;
+                    }
+                    else
+                    {
+                        m_SupportType = SupportTypes.SUPPORT_PIN;
+                        disp_x = 0;
+                        disp_y = 0;
+                    }
+                } else
+                {
+                    m_SupportType = SupportTypes.SUPPORT_ROLLER_Y;
+                    disp_x = 0;
+                }
+            } else
+            {
+                if (m_Y_restrained)
+                {
+                    m_SupportType = SupportTypes.SUPPORT_ROLLER_X;
+                    disp_y = 0;
+                }
+            }
+
+            // Assign boundary condition to the nodes displacement vector.
+            m_DisplaceVector[0] = disp_x;
+            m_DisplaceVector[1] = disp_y;
+            m_DisplaceVector[2] = disp_rot;
         }
 
         /// <summary>
@@ -168,7 +243,7 @@ namespace VMDiagrammer.Models
                         break;
                     }
 
-                case SupportTypes.SUPPORT_FIXED_HOR:
+                case SupportTypes.SUPPORT_FIXED:
                     {
                         double insertX = this.X;
                         double insertY = this.Y;
@@ -190,7 +265,6 @@ namespace VMDiagrammer.Models
                     // Default node
                     DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White, DEFAULT_NODE_RADIUS, 1.0);
                     break;
-                case SupportTypes.SUPPORT_FIXED_VERT:
                 default:
                     {
                         throw new NotImplementedException("Support type drawing ability not defined for support type: " + m_SupportType);

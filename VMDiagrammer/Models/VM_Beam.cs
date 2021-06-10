@@ -73,7 +73,7 @@ namespace VMDiagrammer.Models
             Thickness = 8.0;
 
             // Calculate the midpoint of the beam
-            MidPoint = new VM_Node(0.5 * (Start.X + End.X), 0.5 * (Start.Y + End.Y));
+            MidPoint = new VM_Node(0.5 * (Start.X + End.X), 0.5 * (Start.Y + End.Y), false, false, false);
         }
         public override string ToString()
         {

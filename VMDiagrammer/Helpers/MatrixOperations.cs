@@ -90,5 +90,103 @@ namespace VMDiagrammer.Helpers
                 arr[i, second] = temp;
             }
         }
+
+        /// <summary>
+        /// Helper function that removes a specified row from the matrix
+        /// </summary>
+        /// <param name="arr">the array to manipulate</param>
+        /// <param name="rows">number of rows in the matrix</param>
+        /// <param name="cols">number of cols in the matrix</param>
+        /// <param name="num">index to remove</param>
+        /// <returns></returns>
+        public static double[,] RemoveRow(double[,] arr, int rows, int cols, int num)
+        {
+            if (rows < 1 || cols < 1)
+                throw new NotImplementedException("Invalid value in number of rows (" + rows + " or columns (" + cols + ") specified for the array[]");
+
+            if (num < 0 || num >= rows)
+                throw new ArgumentOutOfRangeException("Out of range index received:  (" + num + ") -- rows: " + rows + "  cols: " + cols);
+
+            // create an array with one less row and column to hold our values
+            double[,] temp = new double[rows - 1, cols];
+
+            int current_row_count = 0;
+            for (int i = 0; i < rows; i++)
+            {
+                // if we found our row to remove, skip it
+                if (i != num)
+                {
+                    // loop through each column and copy the elements to the new array
+                    for (int j = 0; j < cols; j++)
+                    {
+                        temp[current_row_count, j] = arr[i, j];
+                    }
+
+                    current_row_count++;
+                }
+            }
+
+            return temp;
+        }
+
+        /// <summary>
+        /// Helper function that removes a specified column from the matrix
+        /// </summary>
+        /// <param name="arr">the array to manipulate</param>
+        /// <param name="rows">number of rows in the matrix</param>
+        /// <param name="cols">number of cols in the matrix</param>
+        /// <param name="num">index to remove</param>
+        /// <returns></returns>
+        public static double[,] RemoveColumn(double[,] arr, int rows, int cols, int num)
+        {
+            if (rows < 1 || cols < 1)
+                throw new NotImplementedException("Invalid value in number of rows (" + rows + " or columns (" + cols + ") specified for the array[]");
+
+            if (num >= cols || num < 0)
+                throw new ArgumentOutOfRangeException("Out of range index received:  (" + num + ") -- rows: " + rows + "  cols: " + cols);
+
+            // create an array with one less row and column to hold our values
+            double[,] temp = new double[rows, cols - 1];
+
+            for (int i = 0; i < rows; i++)
+            {
+                int current_col_count = 0;
+                for (int j = 0; j < cols; j++)
+                {
+                    // found our row to remove so skip it
+                    if (j == num)
+                        continue;
+
+                    temp[i, current_col_count] = arr[i, j];
+                    current_col_count++;
+                }
+            }
+
+            return temp;
+        }
+
+        /// <summary>
+        /// Removes a DOF (corresponding row and column) from a matrix.
+        /// </summary>
+        /// <param name="arr">array to manipulate</param>
+        /// <param name="rows">number of rows in the matrix</param>
+        /// <param name="cols">number of cols in the matrix</param>
+        /// <param name="num">index of the dof to be removed</param>
+        public static double[,] RemoveDOF(double[,] arr, int rows, int cols, int num)
+        {
+            if (rows != cols)
+                throw new NotImplementedException("Method RemoveDOF only works on square matrices");
+
+            if (rows < 1 || cols < 1)
+                throw new NotImplementedException("Invalid value in number of rows (" + rows + " or columns (" + cols + ") specified for the array[]");
+
+            if (num >= cols || num < 0 || num >= rows)
+                throw new ArgumentOutOfRangeException("Out of range index received:  (" + num + ") -- rows: " + rows + "  cols: " + cols);
+
+            arr = MatrixOperations.RemoveRow(arr, rows, cols, num);
+            arr = MatrixOperations.RemoveColumn(arr, rows-1, cols, num);  // now there's one less row so remove the corresponding column
+
+            return arr;
+        }
     }
 }

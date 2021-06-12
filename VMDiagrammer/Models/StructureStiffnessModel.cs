@@ -33,6 +33,24 @@ namespace VMDiagrammer.Models
             }
         }
 
+        public int Rows
+        {
+            get => m_Rows;
+            set
+            {
+                m_Rows = value;
+            }
+        }
+
+        public int Cols
+        {
+            get => m_Cols;
+            set
+            {
+                m_Cols = value;
+            }
+        }
+
         /// <summary>
         /// Stiffness submatrices
         /// [
@@ -137,12 +155,11 @@ namespace VMDiagrammer.Models
                 //Console.WriteLine(this.ToString());
                 //Console.WriteLine("=================================\n");
             }
-
         }
 
         /// <summary>
         /// Function that rearranges rows and columns of an array matrix.
-        /// Used for grouping degrees of freedom
+        /// Used for grouping degrees of freedom 
         /// </summary>
         public void GroupFixedFree()
         {
@@ -227,9 +244,9 @@ namespace VMDiagrammer.Models
             str += "[ \n";
             str += "--------------------------------------------------------------------------\n";
 
-            for (int i = 0; i < m_Cols; i++)
+            for (int i = 0; i < m_Rows; i++)
             {
-                for (int j = 0; j < m_Rows; j++)
+                for (int j = 0; j < m_Cols; j++)
                 {
                     str += String.Format("{0}    \t", GlobalStiffnessMatrix[i, j].ToString());
                     if (j < m_Cols)

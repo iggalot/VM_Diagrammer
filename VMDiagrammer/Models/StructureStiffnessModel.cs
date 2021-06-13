@@ -64,7 +64,7 @@ namespace VMDiagrammer.Models
         public double[,] K_Free_Free = null;
         public double[,] K_Free_Fixed = null;
         public double[,] K_Fixed_Free = null;
-        public double[,] F_Fixed_Fixed = null;
+        public double[,] K_Fixed_Fixed = null;
 
         /// <summary>
         /// Constructor
@@ -164,11 +164,6 @@ namespace VMDiagrammer.Models
         public void GroupFixedFree()
         {
             List<int> DOF_tobeMoved = new List<int>(); // stores the DOF to be moved.
-
-            int[] tempIndex = new int[m_Cols];
-            double[] tempDispVector = new double[m_Cols];
-
-            int current_row_index = 0;
             
             // Copy the unrestrained rows
             for (int i = 0; i < m_Rows; i++)
@@ -214,10 +209,34 @@ namespace VMDiagrammer.Models
                         DOF_tobeMoved[k] = DOF_tobeMoved[k] - 1; // move all the others up one.
                 }
             }
-
-
         }
 
+        public string PrintStiffnessSubmatrix(double[,] arr, int rows, int cols)
+        {
+            string str = "";
+            str += "-----------------------------------------\n";
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    str += String.Format("{0}    \t", arr[i, j].ToString());
+                    if (j < cols-1)
+                    {
+                        str += "   ,   ";
+                    }
+                }
+
+                str += "\n";
+            }
+
+            return str;
+        }
+
+
+        /// <summary>
+        /// Displays data of the structural stiffness model.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             // The current displacement vector

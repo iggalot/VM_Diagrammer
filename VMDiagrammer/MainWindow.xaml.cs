@@ -531,21 +531,27 @@ namespace VMDiagrammer
             model.GroupFixedFree();
             Console.WriteLine(model.ToString());
 
-            // Testing for our matrix manipulation functions
-            model.GlobalStiffnessMatrix = MatrixOperations.RemoveDOF(model.GlobalStiffnessMatrix, model.Rows, model.Cols, 0);
-            model.Rows--;  // update the model number of rows
-            model.Cols--;  // update the model number of columns
-            Console.WriteLine(model.ToString());
+            model.K_Fixed_Fixed = MatrixOperations.CreateSubmatrix(model.GlobalStiffnessMatrix, model.Rows, model.Cols, 5, 3, 5, 5);
+            Console.WriteLine("K_FIXED_FIXED\n"+model.PrintStiffnessSubmatrix(model.K_Fixed_Fixed,1,3));
 
-            model.GlobalStiffnessMatrix = MatrixOperations.RemoveDOF(model.GlobalStiffnessMatrix, model.Rows, model.Cols, 4);
-            model.Rows--;  // update the model number of rows
-            model.Cols--;  // update the model number of columns
-            Console.WriteLine(model.ToString());
+            //// Testing for our matrix manipulation functions
+            //model.GlobalStiffnessMatrix = MatrixOperations.RemoveDOF(model.GlobalStiffnessMatrix, model.Rows, model.Cols, 0);
+            //model.Rows--;  // update the model number of rows
+            //model.Cols--;  // update the model number of columns
+            //Console.WriteLine(model.ToString());
 
-            model.GlobalStiffnessMatrix = MatrixOperations.RemoveDOF(model.GlobalStiffnessMatrix, model.Rows, model.Cols, 3);
-            model.Rows--;  // update the model number of rows
-            model.Cols--;  // update the model number of columns
-            Console.WriteLine(model.ToString());
+            //model.GlobalStiffnessMatrix = MatrixOperations.RemoveDOF(model.GlobalStiffnessMatrix, model.Rows, model.Cols, 4);
+            //model.Rows--;  // update the model number of rows
+            //model.Cols--;  // update the model number of columns
+            //Console.WriteLine(model.ToString());
+
+            //model.GlobalStiffnessMatrix = MatrixOperations.RemoveDOF(model.GlobalStiffnessMatrix, model.Rows, model.Cols, 3);
+            //model.Rows--;  // update the model number of rows
+            //model.Cols--;  // update the model number of columns
+            //Console.WriteLine(model.ToString());
+
+
+
 
             //BeamElement elem = new BeamElement((VM_Node)Nodes[0], (VM_Node)Nodes[1], 1, 1, 1, 1);
             //Console.WriteLine(elem.ToString());

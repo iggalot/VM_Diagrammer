@@ -188,5 +188,67 @@ namespace VMDiagrammer.Helpers
 
             return arr;
         }
+
+        /// <summary>
+        /// Creates a submatrix from a specified matrix array
+        /// </summary>
+        /// <param name="arr">the array to partition</param>
+        /// <param name="first_col">first column index (inclusive) of partition</param>
+        /// <param name="first_row">first row index (inclusive) of the partition</param>
+        /// <param name="last_col">last column index (inclusive) of the partition</param>
+        /// <param name="last_row">last row index (inclusive) of the partition</param>
+        /// <returns></returns>
+        public static double[,] CreateSubmatrix(double[,] arr, int rows, int cols, int first_row, int first_col, int last_row, int last_col )
+        {
+            // Error checking
+            if (rows < 1 || cols < 1)
+                throw new NotImplementedException("Invalid value in number of rows (" + rows + " or columns (" + cols + ") specified for the array[]");
+            if(last_row < first_row)
+                throw new ArgumentOutOfRangeException("Last row index (" + last_row + ") must be larger than first_row index (" + first_row + ")");
+            if (last_col < first_col)
+                throw new ArgumentOutOfRangeException("Last column index (" + last_col + ") must be larger than first_col index (" + first_col + ")");
+            if (first_col >= cols || first_col < 0)
+                throw new ArgumentOutOfRangeException("Out of range index for first_col received:  (" + first_col + ") -- rows: " + rows + "  cols: " + cols);
+            if (last_col >= cols || last_col < 0)
+                throw new ArgumentOutOfRangeException("Out of range index for last_col received:  (" + last_col + ") -- rows: " + rows + "  cols: " + cols);
+            if (first_row >= rows || first_row < 0)
+                throw new ArgumentOutOfRangeException("Out of range index for first_row received:  (" + first_row + ") -- rows: " + rows + "  cols: " + cols);
+            if (last_row >= rows || last_row < 0)
+                throw new ArgumentOutOfRangeException("Out of range index for first_col received:  (" + last_row + ") -- rows: " + rows + "  cols: " + cols);
+
+            double[,] temp = arr;
+
+            // remove largest row index first to preserve index counter on subsequent cycles
+            int rows_removed = 0;
+
+            for (int i = rows-1; i >= 0; i--)
+            {
+                if (i >= first_row && i <= last_row)
+                    continue;
+                else
+                {
+                    temp = RemoveRow(temp, rows - rows_removed, cols, i);
+                    rows_removed++;
+                }                    
+            }
+
+            // now remove the columns starting with largest index first to preserve counters on subsequent cycles.
+            int cols_removed = 0;
+
+            for (int i = cols - 1; i >= 0; i--)
+            {
+                if (i >= first_col && i <= last_col)
+                    continue;
+                else
+                {
+                    temp = RemoveColumn(temp, rows - rows_removed, cols-cols_removed, i);
+                    cols_removed++;
+                }
+            }
+
+            return temp;
+        }
+
+
     }
 }

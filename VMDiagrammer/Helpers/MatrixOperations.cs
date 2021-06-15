@@ -48,7 +48,7 @@ namespace VMDiagrammer.Helpers
         /// <param name="arr">source array</param>
         /// <param name="first"></param>
         /// <param name="second"></param>
-        public static void SwapRows(ref double[,] arr, int first, int second)
+        public static void SwapRows(ref double?[,] arr, int first, int second)
         {
             int rows = arr.GetLength(0);
             int cols = arr.GetLength(1);
@@ -63,7 +63,7 @@ namespace VMDiagrammer.Helpers
 
             for (int i = 0; i < cols; i++)
             {
-                double temp = arr[first,i];
+                double? temp = arr[first,i];
                 arr[first, i] = arr[second, i];
                 arr[second, i] = temp;
             }
@@ -75,7 +75,7 @@ namespace VMDiagrammer.Helpers
         /// <param name="arr">source array</param>
         /// <param name="first">first column</param>
         /// <param name="second">second column</param>
-        public static void SwapCols(ref double[,] arr, int first, int second)
+        public static void SwapCols(ref double?[,] arr, int first, int second)
         {
             int rows = arr.GetLength(0);
             int cols = arr.GetLength(1);
@@ -91,7 +91,7 @@ namespace VMDiagrammer.Helpers
 
             for (int i = 0; i < rows; i++)
             {
-                double temp = arr[i, first];
+                double? temp = arr[i, first];
                 arr[i, first] = arr[i, second];
                 arr[i, second] = temp;
             }
@@ -105,7 +105,7 @@ namespace VMDiagrammer.Helpers
         /// <param name="cols">number of cols in the matrix</param>
         /// <param name="num">index to remove</param>
         /// <returns></returns>
-        public static double[,] RemoveRow(double[,] arr, int num)
+        public static double?[,] RemoveRow(double?[,] arr, int num)
         {
             int rows = arr.GetLength(0);
             int cols = arr.GetLength(1);
@@ -117,7 +117,7 @@ namespace VMDiagrammer.Helpers
                 throw new ArgumentOutOfRangeException("Out of range index received:  (" + num + ") -- rows: " + rows + "  cols: " + cols);
 
             // create an array with one less row and column to hold our values
-            double[,] temp = new double[rows - 1, cols];
+            double?[,] temp = new double?[rows - 1, cols];
 
             int current_row_count = 0;
             for (int i = 0; i < rows; i++)
@@ -146,7 +146,7 @@ namespace VMDiagrammer.Helpers
         /// <param name="cols">number of cols in the matrix</param>
         /// <param name="num">index to remove</param>
         /// <returns></returns>
-        public static double[,] RemoveColumn(double[,] arr, int num)
+        public static double?[,] RemoveColumn(double?[,] arr, int num)
         {
             int rows = arr.GetLength(0);
             int cols = arr.GetLength(1);
@@ -158,7 +158,7 @@ namespace VMDiagrammer.Helpers
                 throw new ArgumentOutOfRangeException("Out of range index received:  (" + num + ") -- rows: " + rows + "  cols: " + cols);
 
             // create an array with one less row and column to hold our values
-            double[,] temp = new double[rows, cols - 1];
+            double?[,] temp = new double?[rows, cols - 1];
 
             for (int i = 0; i < rows; i++)
             {
@@ -184,7 +184,7 @@ namespace VMDiagrammer.Helpers
         /// <param name="rows">number of rows in the matrix</param>
         /// <param name="cols">number of cols in the matrix</param>
         /// <param name="num">index of the dof to be removed</param>
-        public static double[,] RemoveDOF(double[,] arr, int num)
+        public static double?[,] RemoveDOF(double?[,] arr, int num)
         {
             int rows = arr.GetLength(0);
             int cols = arr.GetLength(1);
@@ -213,7 +213,7 @@ namespace VMDiagrammer.Helpers
         /// <param name="last_col">last column index (inclusive) of the partition</param>
         /// <param name="last_row">last row index (inclusive) of the partition</param>
         /// <returns></returns>
-        public static double[,] CreateSubmatrix(double[,] arr, int first_row, int first_col, int last_row, int last_col )
+        public static double?[,] CreateSubmatrix(double?[,] arr, int first_row, int first_col, int last_row, int last_col )
         {
             int rows = arr.GetLength(0);
             int cols = arr.GetLength(1);
@@ -234,7 +234,7 @@ namespace VMDiagrammer.Helpers
             if (last_row >= rows || last_row < 0)
                 throw new ArgumentOutOfRangeException("Out of range index for first_col received:  (" + last_row + ") -- rows: " + rows + "  cols: " + cols);
 
-            double[,] temp = arr;
+            double?[,] temp = arr;
 
             // remove largest row index first to preserve index counter on subsequent cycles
             int rows_removed = 0;

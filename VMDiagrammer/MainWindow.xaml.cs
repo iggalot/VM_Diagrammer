@@ -532,7 +532,7 @@ namespace VMDiagrammer
             Console.WriteLine(model.ToString());
 
             model.K_Fixed_Fixed = MatrixOperations.CreateSubmatrix(model.GlobalStiffnessMatrix, 5, 3, 5, 5);
-            Console.WriteLine("K_FIXED_FIXED\n"+model.PrintStiffnessSubmatrix(model.K_Fixed_Fixed,1,3));
+            Console.WriteLine("K_FIXED_FIXED\n"+model.PrintStiffnessSubmatrix(model.K_Fixed_Fixed));
 
             Console.WriteLine("Matrix Length: " + model.GlobalStiffnessMatrix.Length);
 

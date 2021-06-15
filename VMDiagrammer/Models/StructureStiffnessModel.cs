@@ -181,7 +181,7 @@ namespace VMDiagrammer.Models
             {
                 for (int j = copyDOF_tobeMoved[i]; j < m_Rows - 1; j++)
                 {
-                    MatrixOperations.SwapRows(ref m_GlobalStiffnessMatrix, m_Rows, m_Cols, j, j + 1);
+                    MatrixOperations.SwapRows(ref m_GlobalStiffnessMatrix, j, j + 1);
                 }
 
                 for (int k = 0; k < copyDOF_tobeMoved.Count; k++)
@@ -198,7 +198,7 @@ namespace VMDiagrammer.Models
             {
                 for (int j = DOF_tobeMoved[i]; j < m_Rows - 1; j++)
                 {
-                    MatrixOperations.SwapCols(ref m_GlobalStiffnessMatrix, m_Rows, m_Cols, j, j + 1);
+                    MatrixOperations.SwapCols(ref m_GlobalStiffnessMatrix, j, j + 1);
                 }
 
                 for (int k = 0; k < DOF_tobeMoved.Count; k++)

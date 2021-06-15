@@ -532,7 +532,7 @@ namespace VMDiagrammer
             Console.WriteLine(model.ToString());
 
             model.K_Fixed_Fixed = MatrixOperations.CreateSubmatrix(model.GlobalStiffnessMatrix, 5, 3, 5, 5);
-            Console.WriteLine("K_FIXED_FIXED\n"+model.PrintStiffnessSubmatrix(model.K_Fixed_Fixed));
+            Console.WriteLine("K_FIXED_FIXED\n"+model.PrintStiffnessMatrix(model.K_Fixed_Fixed));
 
             Console.WriteLine("Matrix Length: " + model.GlobalStiffnessMatrix.Length);
 
@@ -540,20 +540,22 @@ namespace VMDiagrammer
             Console.WriteLine("Matrix[0] Cols: " + model.GlobalStiffnessMatrix.GetLength(1));
 
 
-            double[,] m = new double[,] { { 7, 2, 1 }, { 0, 3, -1 }, { -3, 4, 2 } };
-            double[,] inv = MatrixOperations.MatrixInverse(m);
+            model.PopulatePartition();
+
+            //double[,] m = new double[,] { { 7, 2, 1 }, { 0, 3, -1 }, { -3, 4, 2 } };
+            //double[,] inv = MatrixOperations.MatrixInverse(m);
 
 
-            //printing the inverse
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                    Console.Write(Math.Round(inv[i,j], 1).ToString().PadLeft(5, ' ') + "|");
-                Console.WriteLine();
-            }
+            ////printing the inverse
+            //for (int i = 0; i < 3; i++)
+            //{
+            //    for (int j = 0; j < 3; j++)
+            //        Console.Write(Math.Round(inv[i,j], 1).ToString().PadLeft(5, ' ') + "|");
+            //    Console.WriteLine();
+            //}
 
-            double[,] detMat = new double[,] { { 2, 1 }, { 1, 2 } };
-            Console.WriteLine("Determinant = " + MatrixOperations.MatrixDeterminant(detMat));
+            //double[,] detMat = new double[,] { { 2, 1 }, { 1, 2 } };
+            //Console.WriteLine("Determinant = " + MatrixOperations.MatrixDeterminant(detMat));
 
 
             //// Testing for our matrix manipulation functions

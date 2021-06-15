@@ -12,6 +12,8 @@ namespace VMDiagrammer.Models
         private double?[,] m_DisplacementVector;
         private double?[,] m_DOF_Indices;
 
+        private int numRestrainedDOF = 0;
+
         private int m_Rows = 0;
         private int m_Cols = 0;
 
@@ -97,16 +99,11 @@ namespace VMDiagrammer.Models
             DOF_Indices = new double?[rows, 1];
             DisplacementVector = new double?[rows, 1];
 
-            Console.WriteLine(DOF_Indices.GetLength(0) + "   " + DOF_Indices.GetLength(1));
             // Populate our indices vector to unsorted values.
             for (int i = 0; i < rows; i++)
             {
                 DOF_Indices[i, 0] = i;
             }
-
-
-
-
         }
 
         /// <summary>
@@ -182,6 +179,7 @@ namespace VMDiagrammer.Models
         /// </summary>
         public void GroupFixedFree()
         {
+            numRestrainedDOF = 0;  // reset our restrained degrees of freedom counter
             List<double?> DOF_tobeMoved = new List<double?>(); // stores the DOF to be moved.
             
             // Copy the unrestrained rows
@@ -190,6 +188,7 @@ namespace VMDiagrammer.Models
                 if (DisplacementVector[i, 0] == 0)
                 {
                     DOF_tobeMoved.Add(DOF_Indices[i, 0]);
+                    numRestrainedDOF++;  // incremet our count
                 }
             }
 
@@ -232,7 +231,7 @@ namespace VMDiagrammer.Models
             }
         }
 
-        public string PrintStiffnessSubmatrix(double?[,] arr)
+        public string PrintStiffnessMatrix(double?[,] arr)
         {
             int rows = arr.GetLength(0);
             int cols = arr.GetLength(1);
@@ -262,7 +261,25 @@ namespace VMDiagrammer.Models
 
         public void PopulatePartition()
         {
+            int numUnrestrainedDOF = this.Rows - numRestrainedDOF;
 
+            // populate K_FREE_FREE
+            K_Free_Free = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, 0, 0, numUnrestrainedDOF-1, numUnrestrainedDOF-1);
+                
+            // populate K_FIXED_FIXED
+            K_Fixed_Fixed = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, numUnrestrainedDOF, numUnrestrainedDOF, this.Rows-1, this.Cols-1);
+
+            // populate K_FREE_FIXED
+            K_Free_Fixed = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, 0, numUnrestrainedDOF-1, numUnrestrainedDOF, this.Cols - 1); ;
+
+            // populate K_FIXED_FREE
+            K_Fixed_Free = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, numUnrestrainedDOF, 0, this.Rows-1, numUnrestrainedDOF - 1); ;
+
+            // Display the matrices
+            MatrixOperations.Display(K_Free_Free);
+            MatrixOperations.Display(K_Fixed_Fixed);
+            MatrixOperations.Display(K_Free_Fixed);
+            MatrixOperations.Display(K_Fixed_Free);
         }
 
 

@@ -531,7 +531,27 @@ namespace VMDiagrammer.Helpers
             return result;
         }
 
+        public static void Display(double?[,] arr)
+        {
+            int rows = arr.GetLength(0);
+            int cols = arr.GetLength(1);
 
+            string str = "";
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    str += String.Format("{0}    \t", arr[i, j].ToString().PadLeft(5, ' ') + "|");
+                    //if (j < cols)
+                    //{
+                    //    str += "   ,   ";
+                    //}
+                }
+
+                str += "\n";
+            }
+        }
 
     }
 }

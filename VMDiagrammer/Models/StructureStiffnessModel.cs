@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VMDiagrammer.Helpers;
 using VMDiagrammer.Models.Elements;
 
@@ -8,11 +9,13 @@ namespace VMDiagrammer.Models
     public class StructureStiffnessModel
     {
         private List<BeamElement> m_ElementList = new List<BeamElement>();
-        private double?[,] m_GlobalStiffnessMatrix;
+        private double[,] m_GlobalStiffnessMatrix;
         private double?[,] m_DisplacementVector;
-        private double?[,] m_DOF_Indices;
+        private double?[,] m_LoadVector;
+        private double[,] m_DOF_Indices;
 
         private int numRestrainedDOF = 0;
+        private int numUnrestrainedDOF = 0;
 
         private int m_Rows = 0;
         private int m_Cols = 0;
@@ -33,7 +36,7 @@ namespace VMDiagrammer.Models
         }
 
         // Contains a vector of our index numbers
-        public double?[,] DOF_Indices
+        public double[,] DOF_Indices
         {
             get => m_DOF_Indices;
             set
@@ -41,9 +44,20 @@ namespace VMDiagrammer.Models
                 m_DOF_Indices = value;
             }
         }
-        
+
+
+        // Contains a vector of our forces.
+        public double?[,] LoadVector
+        {
+            get => m_LoadVector;
+            set
+            {
+                m_LoadVector = value;
+            }
+        }
+
         // Contains the global stiffness matrix
-        public double?[,] GlobalStiffnessMatrix
+        public double[,] GlobalStiffnessMatrix
         {
             get => m_GlobalStiffnessMatrix;
             set
@@ -78,13 +92,17 @@ namespace VMDiagrammer.Models
         ///    K_Fixed_Free      |       K_Fixed_Fixed    
         /// ]
         /// </summary>
-        public double?[,] K_Free_Free = null;
-        public double?[,] K_Free_Fixed = null;
-        public double?[,] K_Fixed_Free = null;
-        public double?[,] K_Fixed_Fixed = null;
+        public double[,] K_Free_Free = null;
+        public double[,] K_Free_Fixed = null;
+        public double[,] K_Fixed_Free = null;
+        public double[,] K_Fixed_Fixed = null;
 
-        public double?[] Disp_Free = null;   // free degrees of freedom
-        public double?[] Disp_Fixed = null;  // restrained degrees of freedom
+        public double[,] Disp_Free = null;   // displacements for free degrees of freedom
+        public double[,] Disp_Fixed = null;  // displacements for restrained degrees of freedom
+
+        public double[,] Load_Free = null;   // nodal loads for free degrees of freedom 
+        public double[,] Load_Fixed = null;  // nodal loads for fixed degrees of freedom  (support reactions)
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -95,9 +113,19 @@ namespace VMDiagrammer.Models
             m_Rows = rows;
             m_Cols = cols;
 
-            GlobalStiffnessMatrix = new double?[rows, cols];
-            DOF_Indices = new double?[rows, 1];
+            // Need to zero out all the values of Global Stiffness matrix since we used a double[]
+            GlobalStiffnessMatrix = new double[rows, cols];
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < rows; j++)
+                {
+                    GlobalStiffnessMatrix[i, j] = 0.0;
+                }
+            }
+
+            DOF_Indices = new double[rows, 1];
             DisplacementVector = new double?[rows, 1];
+            LoadVector = new double?[rows, 1];
 
             // Populate our indices vector to unsorted values.
             for (int i = 0; i < rows; i++)
@@ -109,7 +137,7 @@ namespace VMDiagrammer.Models
         /// <summary>
         /// Assembles our model stiffness matrix
         /// </summary>
-        public void Assemble()
+        protected void AssembleStiffnessMatrix()
         {
             foreach (var elem in m_ElementList)
             {
@@ -120,8 +148,6 @@ namespace VMDiagrammer.Models
                 GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.EndNode.DOF_X] += elem.StiffnessElement[0, 3];
                 GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.EndNode.DOF_Y] += elem.StiffnessElement[0, 4];
                 GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.EndNode.DOF_ROT] += elem.StiffnessElement[0, 5];
-                DisplacementVector[elem.StartNode.DOF_IndexVector[0], 0] = elem.StartNode.DisplacementVector[0];
-
 
                 // Row 1 -- DOFY at start
                 GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.StartNode.DOF_X] += elem.StiffnessElement[1, 0];
@@ -130,7 +156,6 @@ namespace VMDiagrammer.Models
                 GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.EndNode.DOF_X] += elem.StiffnessElement[1, 3];
                 GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.EndNode.DOF_Y] += elem.StiffnessElement[1, 4];
                 GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.EndNode.DOF_ROT] += elem.StiffnessElement[1, 5];
-                DisplacementVector[elem.StartNode.DOF_IndexVector[1], 0] = elem.StartNode.DisplacementVector[1];
 
                 // Row 2 -- DOF_ROT at start
                 GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.StartNode.DOF_X] += elem.StiffnessElement[2, 0];
@@ -139,7 +164,6 @@ namespace VMDiagrammer.Models
                 GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.EndNode.DOF_X] += elem.StiffnessElement[2, 3];
                 GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.EndNode.DOF_Y] += elem.StiffnessElement[2, 4];
                 GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.EndNode.DOF_ROT] += elem.StiffnessElement[2, 5];
-                DisplacementVector[elem.StartNode.DOF_IndexVector[2], 0] = elem.StartNode.DisplacementVector[2];
 
                 // Row 3 -- DOFX at end
                 GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.StartNode.DOF_X] += elem.StiffnessElement[3, 0];
@@ -148,7 +172,6 @@ namespace VMDiagrammer.Models
                 GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.EndNode.DOF_X] += elem.StiffnessElement[3, 3];
                 GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.EndNode.DOF_Y] += elem.StiffnessElement[3, 4];
                 GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.EndNode.DOF_ROT] += elem.StiffnessElement[3, 5];
-                DisplacementVector[elem.EndNode.DOF_IndexVector[0], 0] = elem.EndNode.DisplacementVector[0];
 
                 // Row 4 -- DOFY at end
                 GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.StartNode.DOF_X] += elem.StiffnessElement[4, 0];
@@ -157,7 +180,6 @@ namespace VMDiagrammer.Models
                 GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.EndNode.DOF_X] += elem.StiffnessElement[4, 3];
                 GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.EndNode.DOF_Y] += elem.StiffnessElement[4, 4];
                 GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.EndNode.DOF_ROT] += elem.StiffnessElement[4, 5];
-                DisplacementVector[elem.EndNode.DOF_IndexVector[1], 0] = elem.EndNode.DisplacementVector[1];
 
                 // Row  -- DOF_ROT at end
                 GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.StartNode.DOF_X] += elem.StiffnessElement[5, 0];
@@ -166,7 +188,6 @@ namespace VMDiagrammer.Models
                 GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.EndNode.DOF_X] += elem.StiffnessElement[5, 3];
                 GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.EndNode.DOF_Y] += elem.StiffnessElement[5, 4];
                 GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.EndNode.DOF_ROT] += elem.StiffnessElement[5, 5];
-                DisplacementVector[elem.EndNode.DOF_IndexVector[2], 0] = elem.EndNode.DisplacementVector[2];
 
                 //Console.WriteLine(this.ToString());
                 //Console.WriteLine("=================================\n");
@@ -174,13 +195,93 @@ namespace VMDiagrammer.Models
         }
 
         /// <summary>
+        /// Assembles our displacement vector
+        /// </summary>
+        protected void AssembleDisplacementVector()
+        {
+            foreach (var elem in m_ElementList)
+            {
+                // Row 0 -- DOFX at start
+                DisplacementVector[elem.StartNode.DOF_IndexVector[0], 0] = elem.StartNode.DisplacementVector[0, 0];
+
+                // Row 1 -- DOFY at start
+                DisplacementVector[elem.StartNode.DOF_IndexVector[1], 0] = elem.StartNode.DisplacementVector[1, 0];
+
+                // Row 2 -- DOF_ROT at start
+                DisplacementVector[elem.StartNode.DOF_IndexVector[2], 0] = elem.StartNode.DisplacementVector[2, 0];
+
+                // Row 3 -- DOFX at end
+                DisplacementVector[elem.EndNode.DOF_IndexVector[0], 0] = elem.EndNode.DisplacementVector[0, 0];
+
+                // Row 4 -- DOFY at end
+                DisplacementVector[elem.EndNode.DOF_IndexVector[1], 0] = elem.EndNode.DisplacementVector[1, 0];
+
+                // Row  -- DOF_ROT at end
+                DisplacementVector[elem.EndNode.DOF_IndexVector[2], 0] = elem.EndNode.DisplacementVector[2, 0];
+
+                //Console.WriteLine(this.ToString());
+                //Console.WriteLine("=================================\n");
+            }
+        }
+
+        /// <summary>
+        /// Assembles our load vector
+        /// </summary>
+        protected void AssembleLoadVector()
+        {
+            for (int i = 0; i < this.Rows; i++)
+            {
+                if (DisplacementVector[i, 0] == 0)
+                    LoadVector[i, 0] = null;
+                else
+                    if (LoadVector[i,0] == null)
+                        LoadVector[i, 0] = 0;
+            }
+
+
+            //foreach (var elem in m_ElementList)
+            //{
+            //    // Row 0 -- DOFX at start
+            //    LoadVector[elem.StartNode.DOF_IndexVector[0], 0] = elem.StartNode.ForceVector[0, 0];
+
+            //    // Row 1 -- DOFY at start
+            //    LoadVector[elem.StartNode.DOF_IndexVector[1], 0] = elem.StartNode.ForceVector[1, 0];
+
+            //    // Row 2 -- DOF_ROT at start
+            //    LoadVector[elem.StartNode.DOF_IndexVector[2], 0] = elem.StartNode.ForceVector[2, 0];
+
+            //    // Row 3 -- DOFX at end
+            //    LoadVector[elem.EndNode.DOF_IndexVector[0], 0] = elem.EndNode.ForceVector[0, 0];
+
+            //    // Row 4 -- DOFY at end
+            //    LoadVector[elem.EndNode.DOF_IndexVector[1], 0] = elem.EndNode.ForceVector[1, 0];
+
+            //    // Row  -- DOF_ROT at end
+            //    LoadVector[elem.EndNode.DOF_IndexVector[2], 0] = elem.EndNode.ForceVector[2, 0];
+
+            //    //Console.WriteLine(this.ToString());
+            //    //Console.WriteLine("=================================\n");
+            //}
+        }
+
+        /// <summary>
+        /// Assembles all matrixes and vectors needed for our model
+        /// </summary>
+        protected void AssembleAllMatrix()
+        {
+            AssembleStiffnessMatrix();
+            AssembleDisplacementVector();
+            AssembleLoadVector();
+        }
+
+
+        /// <summary>
         /// Function that rearranges rows and columns of an array matrix.
         /// Used for grouping degrees of freedom 
         /// </summary>
-        public void GroupFixedFree()
+        protected void GroupFixedFreeDOF()
         {
-            numRestrainedDOF = 0;  // reset our restrained degrees of freedom counter
-            List<double?> DOF_tobeMoved = new List<double?>(); // stores the DOF to be moved.
+            List<double> DOF_tobeMoved = new List<double>(); // stores the DOF to be moved.
             
             // Copy the unrestrained rows
             for (int i = 0; i < m_Rows; i++)
@@ -188,11 +289,10 @@ namespace VMDiagrammer.Models
                 if (DisplacementVector[i, 0] == 0)
                 {
                     DOF_tobeMoved.Add(DOF_Indices[i, 0]);
-                    numRestrainedDOF++;  // incremet our count
                 }
             }
 
-            List<double?> copyDOF_tobeMoved = new List<double?>(DOF_tobeMoved); // stores the DOF to be moved.
+            List<double> copyDOF_tobeMoved = new List<double>(DOF_tobeMoved); // stores the DOF to be moved.
 
             // Swap the rows
             for (int i = 0; i < copyDOF_tobeMoved.Count; i++)
@@ -200,8 +300,10 @@ namespace VMDiagrammer.Models
                 for (int j = (int)copyDOF_tobeMoved[i]; j < m_Rows - 1; j++)
                 {
                     MatrixOperations.SwapRows(ref m_GlobalStiffnessMatrix, j, j + 1);
-                    MatrixOperations.SwapRows(ref m_DisplacementVector, j, j + 1);
+                    MatrixOperations.SwapRowsNullableVector(ref m_DisplacementVector, j, j + 1);
+                    MatrixOperations.SwapRowsNullableVector(ref m_LoadVector, j, j + 1);
                     MatrixOperations.SwapRows(ref m_DOF_Indices, j, j + 1);
+
                 }
 
                 for (int k = 0; k < copyDOF_tobeMoved.Count; k++)
@@ -231,7 +333,7 @@ namespace VMDiagrammer.Models
             }
         }
 
-        public string PrintStiffnessMatrix(double?[,] arr)
+        public string PrintStiffnessMatrix(double[,] arr)
         {
             int rows = arr.GetLength(0);
             int cols = arr.GetLength(1);
@@ -256,10 +358,31 @@ namespace VMDiagrammer.Models
         }
 
         /// <summary>
+        /// Counts the restrained DOF for the model
+        /// </summary>
+        /// <returns></returns>
+        private void CountRestrainedDOF()
+        {
+            this.numRestrainedDOF = 0;  // reset our restrained degrees of freedom counter
+            List<double> DOF_tobeMoved = new List<double>(); // stores the DOF to be moved.
+
+            // Copy the unrestrained rows
+            for (int i = 0; i < m_Rows; i++)
+            {
+                if (DisplacementVector[i, 0] == 0)
+                {
+                    this.numRestrainedDOF++;  // increment our count
+                }
+            }
+
+            this.numUnrestrainedDOF = this.Rows - this.numRestrainedDOF;
+        }
+
+        /// <summary>
         /// Populates our submatrix partitions
         /// </summary>
 
-        public void PopulatePartition()
+        public void PopulateStiffnessPartitions()
         {
             int numUnrestrainedDOF = this.Rows - numRestrainedDOF;
 
@@ -270,16 +393,65 @@ namespace VMDiagrammer.Models
             K_Fixed_Fixed = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, numUnrestrainedDOF, numUnrestrainedDOF, this.Rows-1, this.Cols-1);
 
             // populate K_FREE_FIXED
-            K_Free_Fixed = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, 0, numUnrestrainedDOF-1, numUnrestrainedDOF, this.Cols - 1); ;
+            K_Free_Fixed = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, 0, numUnrestrainedDOF, numUnrestrainedDOF-1, this.Cols - 1); ;
 
             // populate K_FIXED_FREE
             K_Fixed_Free = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, numUnrestrainedDOF, 0, this.Rows-1, numUnrestrainedDOF - 1); ;
 
             // Display the matrices
-            MatrixOperations.Display(K_Free_Free);
-            MatrixOperations.Display(K_Fixed_Fixed);
-            MatrixOperations.Display(K_Free_Fixed);
-            MatrixOperations.Display(K_Fixed_Free);
+            Console.WriteLine(MatrixOperations.Display(K_Free_Free));
+            Console.WriteLine(MatrixOperations.Display(K_Fixed_Fixed));
+            Console.WriteLine(MatrixOperations.Display(K_Free_Fixed));
+            Console.WriteLine(MatrixOperations.Display(K_Fixed_Free));
+
+            K_Free_Free = MatrixOperations.MatrixInverse(K_Free_Free);
+            Console.WriteLine("Inverse K_FREE_FREE");
+            Console.WriteLine(MatrixOperations.Display(K_Free_Free));
+        }
+
+        /// <summary>
+        /// Solves the system of matrices
+        /// </summary>
+        public void Solve()
+        {
+
+
+            // 1. Assemble the matrices
+            this.AssembleAllMatrix(); // assemble the stiffness matrix
+
+            // 2. Count restrained DOF
+            CountRestrainedDOF();
+
+            // 3. Collect / Sort the free and fixed DOF
+            this.GroupFixedFreeDOF(); 
+
+            // 4. First populate the partitions for stiffness
+            this.PopulateStiffnessPartitions();
+
+            //// populate DISP_FREE
+            //Disp_Free = MatrixOperations.ConvertFromNullable(MatrixOperations.CreateSubmatrixNullable(m_DisplacementVector, 0, 0, numUnrestrainedDOF - 1, 0));
+            Disp_Fixed = MatrixOperations.ConvertFromNullable(MatrixOperations.CreateSubmatrixNullable(m_DisplacementVector, numUnrestrainedDOF, 0, this.Rows - 1, 0));
+
+            // populate Load_FREE
+            Load_Free = MatrixOperations.ConvertFromNullable(MatrixOperations.CreateSubmatrixNullable(m_LoadVector, 0, 0, numUnrestrainedDOF - 1, 0));
+
+
+            // 2. Invert FREE FREE stiffness matrix
+            double[,] invK_FREE_FREE = MatrixOperations.MatrixInverse(K_Free_Free);
+
+            // 3. Solve for free displacements, Disp_Free
+            double[,] prod = MatrixOperations.MatrixProduct(K_Free_Fixed, Disp_Fixed);
+            double[,] diff = MatrixOperations.MatrixSubtract(Load_Free, prod);
+
+            Disp_Free = MatrixOperations.MatrixProduct(invK_FREE_FREE, diff);
+
+            // 4. Solve for support reactions, Load_Fixed
+            double[,] prod1 = MatrixOperations.MatrixProduct(K_Fixed_Free, Disp_Free);
+            double[,] prod2 = MatrixOperations.MatrixProduct(K_Fixed_Fixed, Disp_Fixed);
+
+            Load_Fixed = MatrixOperations.MatrixAdd(prod1, prod2);
+
+            //            double[,] u_FREE = MatrixOperations
         }
 
 
@@ -289,8 +461,10 @@ namespace VMDiagrammer.Models
         /// <returns></returns>
         public override string ToString()
         {
-            // The current displacement vector
             string str = "\n";
+
+            // The current displacement vector
+            int dof_disp_rows = DisplacementVector.GetLength(0);
             for (int i = 0; i < m_Cols; i++)
             {
                 if (DisplacementVector[i, 0] == null)
@@ -302,8 +476,9 @@ namespace VMDiagrammer.Models
             str += "\n";
 
             // The DOF indices
+            int dof_index_rows = DOF_Indices.GetLength(0);
             str += "\n";
-            for (int i = 0; i < m_Cols; i++)
+            for (int i = 0; i < dof_index_rows; i++)
             {
                     str += String.Format("{0}    \t", DOF_Indices[i, 0].ToString());
                 str += "      ";
@@ -313,12 +488,15 @@ namespace VMDiagrammer.Models
             str += "[ \n";
             str += "--------------------------------------------------------------------------\n";
 
-            for (int i = 0; i < m_Rows; i++)
+            int gs_rows = GlobalStiffnessMatrix.GetLength(0);
+            int gs_cols = GlobalStiffnessMatrix.GetLength(1);
+
+            for (int i = 0; i < gs_rows; i++)
             {
-                for (int j = 0; j < m_Cols; j++)
+                for (int j = 0; j < gs_cols; j++)
                 {
                     str += String.Format("{0}    \t", GlobalStiffnessMatrix[i, j].ToString());
-                    if (j < m_Cols)
+                    if (j < m_Cols-1)
                     {
                         str += "   ,   ";
                     }

@@ -457,27 +457,27 @@ namespace VMDiagrammer
             Loads = new List<IDrawingObjects>();
 
             // Create some nodes
-            VM_Node NodeC = new VM_Node(320, 200, true, true, true);
+            VM_Node NodeC = new VM_Node(320, 200, true, true, false);
             AddNode(NodeC);
             VM_Node NodeA = new VM_Node(120, 200, false, false, false);
             AddNode(NodeA);
 
-            //VM_Node NodeB = new VM_Node(420, 200, false, true, false);
-            //AddNode(NodeB);
-            //VM_Node NodeD = new VM_Node(520, 200, false, false, false);
-            //AddNode(NodeD);
-            //VM_Node NodeE = new VM_Node(50, 200, false, false, false);
-            //AddNode(NodeE);
+            VM_Node NodeB = new VM_Node(420, 200, false, true, false);
+            AddNode(NodeB);
+            VM_Node NodeD = new VM_Node(520, 200, false, false, false);
+            AddNode(NodeD);
+            VM_Node NodeE = new VM_Node(50, 200, false, false, false);
+            AddNode(NodeE);
 
             // Create some beams
             VM_Beam Beam1 = new VM_Beam(NodeC, NodeA);
             Beams.Add(Beam1);
-            //VM_Beam Beam2 = new VM_Beam(NodeC, NodeB);
-            //Beams.Add(Beam2);
-            //VM_Beam Beam3 = new VM_Beam(NodeB, NodeD);
-            //Beams.Add(Beam3);
-            //VM_Beam Beam4 = new VM_Beam(NodeE, NodeA);
-            //Beams.Add(Beam4);
+            VM_Beam Beam2 = new VM_Beam(NodeC, NodeB);
+            Beams.Add(Beam2);
+            VM_Beam Beam3 = new VM_Beam(NodeB, NodeD);
+            Beams.Add(Beam3);
+            VM_Beam Beam4 = new VM_Beam(NodeE, NodeA);
+            Beams.Add(Beam4);
 
             //// Add point load
             //VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[0], 100, 100, -50, -50);
@@ -517,7 +517,6 @@ namespace VMDiagrammer
             // TODO:: Sort the loads from left to right based on D1 position and Start node of beam position....
 
 
-
             // Create our Structure Stiffness Model from our beams
             StructureStiffnessModel model = new StructureStiffnessModel(Nodes.Count*3, Nodes.Count*3);
             foreach (var beam in Beams)
@@ -526,59 +525,22 @@ namespace VMDiagrammer
                 // TODO::  Add matrix transformations.
             }
 
-            model.Assemble();
-            Console.WriteLine(model.ToString());
-            model.GroupFixedFree();
-            Console.WriteLine(model.ToString());
+//            model.PopulateStiffnessPartitions();
+//            Console.WriteLine(model.ToString());
 
-            model.K_Fixed_Fixed = MatrixOperations.CreateSubmatrix(model.GlobalStiffnessMatrix, 5, 3, 5, 5);
-            Console.WriteLine("K_FIXED_FIXED\n"+model.PrintStiffnessMatrix(model.K_Fixed_Fixed));
+            // Add a nodal load vector to test
+            model.LoadVector[4, 0] = -10;
+            Console.WriteLine("Load vector: " + MatrixOperations.DisplayNullable(model.LoadVector));
 
-            Console.WriteLine("Matrix Length: " + model.GlobalStiffnessMatrix.Length);
+            // Solve for the results of the model.
+            model.Solve();
 
-            Console.WriteLine("Matrix[0] Rows: " + model.GlobalStiffnessMatrix.GetLength(0));
-            Console.WriteLine("Matrix[0] Cols: " + model.GlobalStiffnessMatrix.GetLength(1));
-
-
-            model.PopulatePartition();
-
-            //double[,] m = new double[,] { { 7, 2, 1 }, { 0, 3, -1 }, { -3, 4, 2 } };
-            //double[,] inv = MatrixOperations.MatrixInverse(m);
-
-
-            ////printing the inverse
-            //for (int i = 0; i < 3; i++)
-            //{
-            //    for (int j = 0; j < 3; j++)
-            //        Console.Write(Math.Round(inv[i,j], 1).ToString().PadLeft(5, ' ') + "|");
-            //    Console.WriteLine();
-            //}
-
-            //double[,] detMat = new double[,] { { 2, 1 }, { 1, 2 } };
-            //Console.WriteLine("Determinant = " + MatrixOperations.MatrixDeterminant(detMat));
-
-
-            //// Testing for our matrix manipulation functions
-            //model.GlobalStiffnessMatrix = MatrixOperations.RemoveDOF(model.GlobalStiffnessMatrix, model.Rows, model.Cols, 0);
-            //model.Rows--;  // update the model number of rows
-            //model.Cols--;  // update the model number of columns
-            //Console.WriteLine(model.ToString());
-
-            //model.GlobalStiffnessMatrix = MatrixOperations.RemoveDOF(model.GlobalStiffnessMatrix, model.Rows, model.Cols, 4);
-            //model.Rows--;  // update the model number of rows
-            //model.Cols--;  // update the model number of columns
-            //Console.WriteLine(model.ToString());
-
-            //model.GlobalStiffnessMatrix = MatrixOperations.RemoveDOF(model.GlobalStiffnessMatrix, model.Rows, model.Cols, 3);
-            //model.Rows--;  // update the model number of rows
-            //model.Cols--;  // update the model number of columns
-            //Console.WriteLine(model.ToString());
+            Console.WriteLine("Results: \n");
+            Console.WriteLine("Free Displacements: \n" + MatrixOperations.Display(model.Disp_Free) + "\n");
+            Console.WriteLine("Support Reactions: \n" + MatrixOperations.Display(model.Load_Fixed) + "\n");
 
 
 
-
-            //BeamElement elem = new BeamElement((VM_Node)Nodes[0], (VM_Node)Nodes[1], 1, 1, 1, 1);
-            //Console.WriteLine(elem.ToString());
 
         }
 

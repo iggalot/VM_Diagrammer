@@ -29,17 +29,33 @@ namespace VMDiagrammer.Models
         private bool m_ROT_restrained = false;
 
         // Displacement vector for boundary conditions (null = unknown)
-        private double?[] m_DisplaceVector = { null, null, null };
+        private double?[,] m_DisplaceVector = { { null }, { null }, { null } };
+        private double?[,] m_ForceVector = { { null }, { null }, { null } };
+
         private int[] m_DOFIndices = { 0, 0, 0 };
 
         // Boundary conditions for displacements
         private double? disp_x = null;
         private double? disp_y = null;
         private double? disp_rot = null;
-        public double?[] DisplacementVector
+        public double?[,] DisplacementVector
         {
             get => m_DisplaceVector;
             set { m_DisplaceVector = value; }
+        }
+
+        // Load vector for this node
+        private double? load_x = null;   // x direction nodal load
+        private double? load_y = null;   // y direction nodal load
+        private double? load_rot = null; // moment nodal load
+
+        public double?[,] ForceVector
+        {
+            get => m_ForceVector;
+            set
+            {
+                m_ForceVector = value;
+            }
         }
 
         // index numbers for degrees of freedom
@@ -143,11 +159,14 @@ namespace VMDiagrammer.Models
                         m_SupportType = SupportTypes.SUPPORT_PIN;
                         disp_x = 0;
                         disp_y = 0;
+                        load_rot = 0;
                     }
                 } else
                 {
                     m_SupportType = SupportTypes.SUPPORT_ROLLER_Y;
                     disp_x = 0;
+                    load_y = 0;
+                    load_rot = 0;
                 }
             } else
             {
@@ -155,13 +174,21 @@ namespace VMDiagrammer.Models
                 {
                     m_SupportType = SupportTypes.SUPPORT_ROLLER_X;
                     disp_y = 0;
+                    load_x = 0;
+                    load_rot = 0;
+
                 }
             }
 
             // Assign boundary condition to the nodes displacement vector.
-            m_DisplaceVector[0] = disp_x;
-            m_DisplaceVector[1] = disp_y;
-            m_DisplaceVector[2] = disp_rot;
+            m_DisplaceVector[0, 0] = disp_x;
+            m_DisplaceVector[1, 0] = disp_y;
+            m_DisplaceVector[2, 0] = disp_rot;
+
+            // Assign boundary condition to the nodes displacement vector.
+            m_ForceVector[0, 0] = load_x;
+            m_ForceVector[1, 0] = load_y;
+            m_ForceVector[2, 0] = load_rot;
         }
 
         /// <summary>

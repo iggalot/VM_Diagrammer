@@ -97,6 +97,8 @@ namespace VMDiagrammer.Models
         public double[,] K_Fixed_Free = null;
         public double[,] K_Fixed_Fixed = null;
 
+        public double[,] invK_Free_Free = null;
+
         public double[,] Disp_Free = null;   // displacements for free degrees of freedom
         public double[,] Disp_Fixed = null;  // displacements for restrained degrees of freedom
 
@@ -333,19 +335,86 @@ namespace VMDiagrammer.Models
             }
         }
 
-        public string PrintStiffnessMatrix(double[,] arr)
+        public string DisplayMatrixInfo(double[,] arr)
         {
             int rows = arr.GetLength(0);
             int cols = arr.GetLength(1);
 
-            string str = "";
+            string str = "Indices: ";
+            for (int i = 0; i < rows; i++)
+            {
+                // TODO: Get a better way of tracking indices.  This method doesn't work for submatrices since we don't know the indices 
+                // based on the 'i' variable above anymore.
+                str += DOF_Indices[i, 0].ToString() + "  ";
+            }
+            
             str += "-----------------------------------------\n";
             for (int i = 0; i < rows; i++)
             {
+                double val = DOF_Indices[i, 0];
+                // Get the node number
+                str += ((int)val / 3).ToString();
+
+                // Get the X,Y,Rot DOF value
+                if (val % 3 == 0)
+                    str += "-X  :";
+                else if (val % 3 == 1)
+                    str += "-Y  :";
+                else
+                    str += "-ROT :";
+
                 for (int j = 0; j < cols; j++)
                 {
                     str += String.Format("{0}    \t", arr[i, j].ToString());
                     if (j < cols-1)
+                    {
+                        str += "   ,   ";
+                    }
+                }
+
+                str += "\n";
+            }
+
+            return str;
+        }
+
+        public string DisplayMatrixInfoNullable(double?[,] arr)
+        {
+            int rows = arr.GetLength(0);
+            int cols = arr.GetLength(1);
+
+            string str = "Indices: ";
+            for (int i = 0; i < rows; i++)
+            {
+                // TODO: Get a better way of tracking indices.  This method doesn't work for submatrices since we don't know the indices 
+                // based on the 'i' variable above anymore.
+
+                str += DOF_Indices[i, 0].ToString() + "  ";
+            }
+
+            str += "-----------------------------------------\n";
+            for (int i = 0; i < rows; i++)
+            {
+                double val = DOF_Indices[i, 0];
+                // Get the node number
+                str += ((int)val / 3).ToString();
+
+                // Get the X,Y,Rot DOF value
+                if (val % 3 == 0)
+                    str += "-X  :";
+                else if (val % 3 == 1)
+                    str += "-Y  :";
+                else
+                    str += "-ROT :";
+
+                for (int j = 0; j < cols; j++)
+                {
+                    if (arr[i, j] == null)
+                        str += String.Format("null |  \t");
+                    else
+                        str += String.Format("{0}    \t", arr[i, j].ToString().PadLeft(5, ' ') + "|");
+
+                    if (j < cols - 1)
                     {
                         str += "   ,   ";
                     }
@@ -399,14 +468,10 @@ namespace VMDiagrammer.Models
             K_Fixed_Free = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, numUnrestrainedDOF, 0, this.Rows-1, numUnrestrainedDOF - 1); ;
 
             // Display the matrices
-            Console.WriteLine(MatrixOperations.Display(K_Free_Free));
-            Console.WriteLine(MatrixOperations.Display(K_Fixed_Fixed));
-            Console.WriteLine(MatrixOperations.Display(K_Free_Fixed));
-            Console.WriteLine(MatrixOperations.Display(K_Fixed_Free));
-
-            K_Free_Free = MatrixOperations.MatrixInverse(K_Free_Free);
-            Console.WriteLine("Inverse K_FREE_FREE");
-            Console.WriteLine(MatrixOperations.Display(K_Free_Free));
+            Console.WriteLine("K_FREE_FREE\n" + MatrixOperations.Display(K_Free_Free));
+            Console.WriteLine("K_FIXED_FIXED\n" + MatrixOperations.Display(K_Fixed_Fixed));
+            Console.WriteLine("K_FIXED_FREE\n" + MatrixOperations.Display(K_Fixed_Free));
+            Console.WriteLine("K_FREE_FIXED\n" + MatrixOperations.Display(K_Free_Fixed));
         }
 
         /// <summary>
@@ -419,14 +484,22 @@ namespace VMDiagrammer.Models
             // 1. Assemble the matrices
             this.AssembleAllMatrix(); // assemble the stiffness matrix
 
+            Console.WriteLine("Ungrouped Global Stiffness Matrix\n" + MatrixOperations.Display(m_GlobalStiffnessMatrix));
+
             // 2. Count restrained DOF
             CountRestrainedDOF();
 
             // 3. Collect / Sort the free and fixed DOF
-            this.GroupFixedFreeDOF(); 
+            this.GroupFixedFreeDOF();
+
+            Console.WriteLine("Grouped DOF Stiffness Matrix\n" + MatrixOperations.Display(m_GlobalStiffnessMatrix));
 
             // 4. First populate the partitions for stiffness
             this.PopulateStiffnessPartitions();
+
+
+
+
 
             //// populate DISP_FREE
             //Disp_Free = MatrixOperations.ConvertFromNullable(MatrixOperations.CreateSubmatrixNullable(m_DisplacementVector, 0, 0, numUnrestrainedDOF - 1, 0));
@@ -437,13 +510,16 @@ namespace VMDiagrammer.Models
 
 
             // 2. Invert FREE FREE stiffness matrix
-            double[,] invK_FREE_FREE = MatrixOperations.MatrixInverse(K_Free_Free);
+            invK_Free_Free = MatrixOperations.MatrixInverse(K_Free_Free);
+            Console.WriteLine("Inverse K_FREE_FREE\n" + MatrixOperations.Display(invK_Free_Free));
 
             // 3. Solve for free displacements, Disp_Free
             double[,] prod = MatrixOperations.MatrixProduct(K_Free_Fixed, Disp_Fixed);
             double[,] diff = MatrixOperations.MatrixSubtract(Load_Free, prod);
 
-            Disp_Free = MatrixOperations.MatrixProduct(invK_FREE_FREE, diff);
+            Disp_Free = MatrixOperations.MatrixProduct(invK_Free_Free, diff);
+
+
 
             // 4. Solve for support reactions, Load_Fixed
             double[,] prod1 = MatrixOperations.MatrixProduct(K_Fixed_Free, Disp_Free);
@@ -451,9 +527,45 @@ namespace VMDiagrammer.Models
 
             Load_Fixed = MatrixOperations.MatrixAdd(prod1, prod2);
 
-            //            double[,] u_FREE = MatrixOperations
+            // Populate our full system vectors
+            CreateDisplacementVectorFull();
+            CreateLoadVectorFull();
         }
 
+        protected void CreateDisplacementVectorFull()
+        {
+            int free_DOF_count = Disp_Free.GetLength(0);
+            int fixed_DOF_count = Disp_Fixed.GetLength(0);
+            for (int i = 0; i < DisplacementVector.GetLength(0); i++)
+            {
+                if (i < free_DOF_count)
+                {
+                    DisplacementVector[i, 0] = Disp_Free[i, 0]; // Free displacements first
+                }
+                else
+                {
+                    DisplacementVector[i, 0] = Disp_Fixed[i - free_DOF_count, 0];
+                }
+            }
+        }
+
+
+        protected void CreateLoadVectorFull()
+        {
+            int free_DOF_count = Load_Free.GetLength(0);
+            int fixed_DOF_count = Load_Fixed.GetLength(0);
+            for (int i = 0; i < LoadVector.GetLength(0); i++)
+            {
+                if (i < free_DOF_count)
+                {
+                    LoadVector[i,0] = Load_Free[i, 0]; // Free displacements first
+                }
+                else
+                {
+                    LoadVector[i, 0] = Load_Fixed[i - free_DOF_count, 0];
+                }
+            }
+        }
 
         /// <summary>
         /// Displays data of the structural stiffness model.

@@ -43,6 +43,8 @@ namespace VMDiagrammer
             }
         }
 
+        public StructureStiffnessModel Model = null;
+
         public List<IDrawingObjects> Nodes
         {
             get
@@ -85,6 +87,28 @@ namespace VMDiagrammer
         public string strDisplayInfo
         {
             get => DisplayInfo();
+        }
+
+        public string strDisplayMatrixResults
+        {
+            get 
+            {
+                string str = "";
+                //str += Model.DisplayMatrixInfo(Model.K_Free_Free);
+
+                str += "\nDisplacement Vector \n";
+                str += Model.DisplayMatrixInfoNullable(Model.DisplacementVector) + "\n";
+                str += "********************************\n";
+                str += "\nLoad Vector \n";
+                str += Model.DisplayMatrixInfoNullable(Model.LoadVector) + "\n";
+                str += "********************************\n";
+
+
+
+
+
+                return str;
+            }
         }
 
         protected void UpdateBeamExtents()
@@ -457,27 +481,26 @@ namespace VMDiagrammer
             Loads = new List<IDrawingObjects>();
 
             // Create some nodes
-            VM_Node NodeC = new VM_Node(320, 200, true, true, false);
-            AddNode(NodeC);
-            VM_Node NodeA = new VM_Node(120, 200, false, false, false);
+            VM_Node NodeA = new VM_Node(120, 200, true, true, true);
             AddNode(NodeA);
-
-            VM_Node NodeB = new VM_Node(420, 200, false, true, false);
+            VM_Node NodeB = new VM_Node(320, 200, false, false, false);
             AddNode(NodeB);
-            VM_Node NodeD = new VM_Node(520, 200, false, false, false);
-            AddNode(NodeD);
-            VM_Node NodeE = new VM_Node(50, 200, false, false, false);
-            AddNode(NodeE);
+            VM_Node NodeC = new VM_Node(420, 200, true, true, true);
+            AddNode(NodeC);
+            //VM_Node NodeD = new VM_Node(520, 200, false, false, false);
+            //AddNode(NodeD);
+            //VM_Node NodeE = new VM_Node(50, 200, false, false, false);
+            //AddNode(NodeE);
 
-            // Create some beams
-            VM_Beam Beam1 = new VM_Beam(NodeC, NodeA);
+            //// Create some beams
+            VM_Beam Beam1 = new VM_Beam(NodeB, NodeA);
             Beams.Add(Beam1);
             VM_Beam Beam2 = new VM_Beam(NodeC, NodeB);
             Beams.Add(Beam2);
-            VM_Beam Beam3 = new VM_Beam(NodeB, NodeD);
-            Beams.Add(Beam3);
-            VM_Beam Beam4 = new VM_Beam(NodeE, NodeA);
-            Beams.Add(Beam4);
+            //VM_Beam Beam3 = new VM_Beam(NodeB, NodeD);
+            //Beams.Add(Beam3);
+            //VM_Beam Beam4 = new VM_Beam(NodeE, NodeA);
+            //Beams.Add(Beam4);
 
             //// Add point load
             //VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[0], 100, 100, -50, -50);
@@ -519,6 +542,8 @@ namespace VMDiagrammer
 
             // Create our Structure Stiffness Model from our beams
             StructureStiffnessModel model = new StructureStiffnessModel(Nodes.Count*3, Nodes.Count*3);
+            Model = model;
+
             foreach (var beam in Beams)
             {
                 model.AddElement((VM_Beam)beam);

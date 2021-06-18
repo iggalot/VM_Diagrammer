@@ -89,7 +89,7 @@ namespace VMDiagrammer
             get => DisplayInfo();
         }
 
-        public string strDisplayMatrixResults
+        public string strDisplayDisplacementMatrixResults
         {
             get 
             {
@@ -99,13 +99,19 @@ namespace VMDiagrammer
                 str += "\nDisplacement Vector \n";
                 str += Model.DisplayMatrixInfoNullable(Model.DisplacementVector) + "\n";
                 str += "********************************\n";
+                return str;
+            }
+        }
+
+        public string strDisplayLoadMatrixResults
+        {
+            get
+            {
+                string str = "";
+                //str += Model.DisplayMatrixInfo(Model.K_Free_Free);
                 str += "\nLoad Vector \n";
                 str += Model.DisplayMatrixInfoNullable(Model.LoadVector) + "\n";
                 str += "********************************\n";
-
-
-
-
 
                 return str;
             }
@@ -481,26 +487,26 @@ namespace VMDiagrammer
             Loads = new List<IDrawingObjects>();
 
             // Create some nodes
-            VM_Node NodeA = new VM_Node(120, 200, true, true, true);
+            VM_Node NodeA = new VM_Node(20, 200, true, true, false);
             AddNode(NodeA);
-            VM_Node NodeB = new VM_Node(320, 200, false, false, false);
+            VM_Node NodeB = new VM_Node(120, 200, false, false, false);
             AddNode(NodeB);
-            VM_Node NodeC = new VM_Node(420, 200, true, true, true);
+            VM_Node NodeC = new VM_Node(220, 200, false, true, false);
             AddNode(NodeC);
-            //VM_Node NodeD = new VM_Node(520, 200, false, false, false);
-            //AddNode(NodeD);
-            //VM_Node NodeE = new VM_Node(50, 200, false, false, false);
-            //AddNode(NodeE);
+            VM_Node NodeD = new VM_Node(320, 200, false, false, false);
+            AddNode(NodeD);
+            VM_Node NodeE = new VM_Node(420, 200, false, true, false);
+            AddNode(NodeE);
 
             //// Create some beams
             VM_Beam Beam1 = new VM_Beam(NodeB, NodeA);
             Beams.Add(Beam1);
             VM_Beam Beam2 = new VM_Beam(NodeC, NodeB);
             Beams.Add(Beam2);
-            //VM_Beam Beam3 = new VM_Beam(NodeB, NodeD);
-            //Beams.Add(Beam3);
-            //VM_Beam Beam4 = new VM_Beam(NodeE, NodeA);
-            //Beams.Add(Beam4);
+            VM_Beam Beam3 = new VM_Beam(NodeC, NodeD);
+            Beams.Add(Beam3);
+            VM_Beam Beam4 = new VM_Beam(NodeE, NodeD);
+            Beams.Add(Beam4);
 
             //// Add point load
             //VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[0], 100, 100, -50, -50);

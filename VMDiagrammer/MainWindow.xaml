@@ -14,8 +14,8 @@
                 MouseMove="MainCanvas_MouseMove"
                     MouseUp="MainCanvas_MouseUp"/>
                 <TextBlock Text="{Binding strDisplayInfo}" Width="300" Height="600" Background="DarkGray"/>
-                <TextBlock Text="{Binding strDisplayMatrixResults}" Width="120000" Height="600" Background="DarkGray"/>
-
+                <TextBlock Text="{Binding strDisplayDisplacementMatrixResults}" Width="300" Height="600" Background="DarkGray"/>
+                <TextBlock Text="{Binding strDisplayLoadMatrixResults}" Width="300" Height="600" Background="DarkGray"/>
             </StackPanel>
         </StackPanel>
     </Grid>

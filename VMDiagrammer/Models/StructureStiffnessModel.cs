@@ -347,7 +347,7 @@ namespace VMDiagrammer.Models
                 // based on the 'i' variable above anymore.
                 str += DOF_Indices[i, 0].ToString() + "  ";
             }
-            
+            str += "\n";
             str += "-----------------------------------------\n";
             for (int i = 0; i < rows; i++)
             {
@@ -391,7 +391,7 @@ namespace VMDiagrammer.Models
 
                 str += DOF_Indices[i, 0].ToString() + "  ";
             }
-
+            str += "\n";
             str += "-----------------------------------------\n";
             for (int i = 0; i < rows; i++)
             {

@@ -487,16 +487,27 @@ namespace VMDiagrammer
             Loads = new List<IDrawingObjects>();
 
             // Create some nodes
-            VM_Node NodeA = new VM_Node(20, 200, true, true, false);
+            VM_Node NodeA = new VM_Node(50, 100, true, true, true);
             AddNode(NodeA);
-            VM_Node NodeB = new VM_Node(120, 200, false, false, false);
+            VM_Node NodeB = new VM_Node(75, 100, false, false, false);
             AddNode(NodeB);
-            VM_Node NodeC = new VM_Node(220, 200, false, true, false);
+            VM_Node NodeC = new VM_Node(100, 100, false, false, false);
             AddNode(NodeC);
-            VM_Node NodeD = new VM_Node(320, 200, false, false, false);
+            VM_Node NodeD = new VM_Node(150, 100, false, false, false);
             AddNode(NodeD);
-            VM_Node NodeE = new VM_Node(420, 200, false, true, false);
+            VM_Node NodeE = new VM_Node(200, 100, false, false, false);
             AddNode(NodeE);
+            VM_Node NodeF = new VM_Node(250, 100, false, true, false); 
+            AddNode(NodeF);
+            VM_Node NodeG = new VM_Node(300, 100, false, false, false);
+            AddNode(NodeG);
+            VM_Node NodeH = new VM_Node(350, 100, false, true, false);
+            AddNode(NodeH);
+            VM_Node NodeI = new VM_Node(400, 100, false, false, false);
+            AddNode(NodeI);
+            VM_Node NodeJ = new VM_Node(450, 100, true, true, false);
+            AddNode(NodeJ);
+
 
             //// Create some beams
             VM_Beam Beam1 = new VM_Beam(NodeB, NodeA);
@@ -507,6 +518,18 @@ namespace VMDiagrammer
             Beams.Add(Beam3);
             VM_Beam Beam4 = new VM_Beam(NodeE, NodeD);
             Beams.Add(Beam4);
+            VM_Beam Beam5= new VM_Beam(NodeE, NodeF);
+            Beams.Add(Beam5);
+            VM_Beam Beam6 = new VM_Beam(NodeF, NodeG);
+            Beams.Add(Beam6);
+            VM_Beam Beam7 = new VM_Beam(NodeG, NodeH);
+            Beams.Add(Beam7);
+            VM_Beam Beam8 = new VM_Beam(NodeH, NodeI);
+            Beams.Add(Beam8);
+            VM_Beam Beam9 = new VM_Beam(NodeI, NodeJ);
+            Beams.Add(Beam9);
+
+
 
             //// Add point load
             //VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[0], 100, 100, -50, -50);
@@ -560,7 +583,8 @@ namespace VMDiagrammer
 //            Console.WriteLine(model.ToString());
 
             // Add a nodal load vector to test
-            model.LoadVector[4, 0] = -10;
+            
+            model.LoadVector[10, 0] = 10; // Positive load is downwards?
             Console.WriteLine("Load vector: " + MatrixOperations.DisplayNullable(model.LoadVector));
 
             // Solve for the results of the model.
@@ -570,6 +594,46 @@ namespace VMDiagrammer
             Console.WriteLine("Free Displacements: \n" + MatrixOperations.Display(model.Disp_Free) + "\n");
             Console.WriteLine("Support Reactions: \n" + MatrixOperations.Display(model.Load_Fixed) + "\n");
 
+
+            // *******************************
+            // Drawing the deflected shape
+            // *******************************
+            // Draw the undeformed line...
+            double vertOffset = 150;
+            double dispScale = 10;
+            DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + vertOffset, RightMostNode.X, RightMostNode.Y + vertOffset, Brushes.Purple, 1);
+
+            foreach(IDrawingObjects node in Nodes)
+            {
+                
+                // Find the displacements at the node we are searching for
+                for (int i = 0; i < model.DOF_Indices.GetLength(0); i++)
+                {
+                    // Find the x displacement
+
+                    // Find the y displacement
+                    int index = (int)((VM_Node)node).DOF_IndexVector[1];
+                    double test = model.DOF_Indices[i, 0];
+
+                    if (index == test)
+                    {
+                        // retrieve the nodal displacements
+                        double dispY = (double)model.DisplacementVector[i, 0] * dispScale;
+
+                        // Draw deflected shape
+                        DrawingHelpers.DrawCircle(MainCanvas, ((VM_Node)node).X, ((VM_Node)node).Y + vertOffset + dispY, Brushes.Purple, Brushes.Purple, 5, 1);
+                        continue;
+                    }
+
+                    // Displacements
+                }
+            }
+
+
+
+            // Draw deflected shape
+            // 1. Start at leftmost...
+            // 2. Draw displacement offset
 
 
 

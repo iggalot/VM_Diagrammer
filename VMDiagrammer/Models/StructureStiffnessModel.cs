@@ -8,7 +8,7 @@ namespace VMDiagrammer.Models
 {
     public class StructureStiffnessModel
     {
-        private List<BeamElement> m_ElementList = new List<BeamElement>();
+        private List<BeamElement2D> m_ElementList = new List<BeamElement2D>();
         private double[,] m_GlobalStiffnessMatrix;
         private double?[,] m_DisplacementVector;
         private double?[,] m_LoadVector;
@@ -22,7 +22,7 @@ namespace VMDiagrammer.Models
 
         public void AddElement(VM_Beam beam)
         {
-            m_ElementList.Add(new BeamElement(beam.Start, beam.End, 1, 1, 1, 1));
+            m_ElementList.Add(new BeamElement2D(beam.Start, beam.End, 1, 1, 1, 1));
         }
 
         // Contains a vector of our known and unknown nodal displacements
@@ -144,52 +144,52 @@ namespace VMDiagrammer.Models
             foreach (var elem in m_ElementList)
             {
                 // Row 0 -- DOFX at start
-                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.StartNode.DOF_X] += elem.StiffnessElement[0, 0];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.StartNode.DOF_Y] += elem.StiffnessElement[0, 1];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.StartNode.DOF_ROT] += elem.StiffnessElement[0, 2];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.EndNode.DOF_X] += elem.StiffnessElement[0, 3];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.EndNode.DOF_Y] += elem.StiffnessElement[0, 4];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.EndNode.DOF_ROT] += elem.StiffnessElement[0, 5];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.StartNode.DOF_X] += elem.GlobalStiffnessElement[0, 0];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.StartNode.DOF_Y] += elem.GlobalStiffnessElement[0, 1];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.StartNode.DOF_ROT] += elem.GlobalStiffnessElement[0, 2];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.EndNode.DOF_X] += elem.GlobalStiffnessElement[0, 3];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.EndNode.DOF_Y] += elem.GlobalStiffnessElement[0, 4];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_X, elem.EndNode.DOF_ROT] += elem.GlobalStiffnessElement[0, 5];
 
                 // Row 1 -- DOFY at start
-                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.StartNode.DOF_X] += elem.StiffnessElement[1, 0];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.StartNode.DOF_Y] += elem.StiffnessElement[1, 1];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.StartNode.DOF_ROT] += elem.StiffnessElement[1, 2];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.EndNode.DOF_X] += elem.StiffnessElement[1, 3];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.EndNode.DOF_Y] += elem.StiffnessElement[1, 4];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.EndNode.DOF_ROT] += elem.StiffnessElement[1, 5];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.StartNode.DOF_X] += elem.GlobalStiffnessElement[1, 0];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.StartNode.DOF_Y] += elem.GlobalStiffnessElement[1, 1];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.StartNode.DOF_ROT] += elem.GlobalStiffnessElement[1, 2];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.EndNode.DOF_X] += elem.GlobalStiffnessElement[1, 3];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.EndNode.DOF_Y] += elem.GlobalStiffnessElement[1, 4];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_Y, elem.EndNode.DOF_ROT] += elem.GlobalStiffnessElement[1, 5];
 
                 // Row 2 -- DOF_ROT at start
-                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.StartNode.DOF_X] += elem.StiffnessElement[2, 0];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.StartNode.DOF_Y] += elem.StiffnessElement[2, 1];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.StartNode.DOF_ROT] += elem.StiffnessElement[2, 2];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.EndNode.DOF_X] += elem.StiffnessElement[2, 3];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.EndNode.DOF_Y] += elem.StiffnessElement[2, 4];
-                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.EndNode.DOF_ROT] += elem.StiffnessElement[2, 5];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.StartNode.DOF_X] += elem.GlobalStiffnessElement[2, 0];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.StartNode.DOF_Y] += elem.GlobalStiffnessElement[2, 1];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.StartNode.DOF_ROT] += elem.GlobalStiffnessElement[2, 2];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.EndNode.DOF_X] += elem.GlobalStiffnessElement[2, 3];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.EndNode.DOF_Y] += elem.GlobalStiffnessElement[2, 4];
+                GlobalStiffnessMatrix[elem.StartNode.DOF_ROT, elem.EndNode.DOF_ROT] += elem.GlobalStiffnessElement[2, 5];
 
                 // Row 3 -- DOFX at end
-                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.StartNode.DOF_X] += elem.StiffnessElement[3, 0];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.StartNode.DOF_Y] += elem.StiffnessElement[3, 1];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.StartNode.DOF_ROT] += elem.StiffnessElement[3, 2];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.EndNode.DOF_X] += elem.StiffnessElement[3, 3];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.EndNode.DOF_Y] += elem.StiffnessElement[3, 4];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.EndNode.DOF_ROT] += elem.StiffnessElement[3, 5];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.StartNode.DOF_X] += elem.GlobalStiffnessElement[3, 0];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.StartNode.DOF_Y] += elem.GlobalStiffnessElement[3, 1];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.StartNode.DOF_ROT] += elem.GlobalStiffnessElement[3, 2];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.EndNode.DOF_X] += elem.GlobalStiffnessElement[3, 3];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.EndNode.DOF_Y] += elem.GlobalStiffnessElement[3, 4];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_X, elem.EndNode.DOF_ROT] += elem.GlobalStiffnessElement[3, 5];
 
                 // Row 4 -- DOFY at end
-                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.StartNode.DOF_X] += elem.StiffnessElement[4, 0];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.StartNode.DOF_Y] += elem.StiffnessElement[4, 1];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.StartNode.DOF_ROT] += elem.StiffnessElement[4, 2];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.EndNode.DOF_X] += elem.StiffnessElement[4, 3];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.EndNode.DOF_Y] += elem.StiffnessElement[4, 4];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.EndNode.DOF_ROT] += elem.StiffnessElement[4, 5];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.StartNode.DOF_X] += elem.GlobalStiffnessElement[4, 0];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.StartNode.DOF_Y] += elem.GlobalStiffnessElement[4, 1];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.StartNode.DOF_ROT] += elem.GlobalStiffnessElement[4, 2];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.EndNode.DOF_X] += elem.GlobalStiffnessElement[4, 3];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.EndNode.DOF_Y] += elem.GlobalStiffnessElement[4, 4];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_Y, elem.EndNode.DOF_ROT] += elem.GlobalStiffnessElement[4, 5];
 
                 // Row  -- DOF_ROT at end
-                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.StartNode.DOF_X] += elem.StiffnessElement[5, 0];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.StartNode.DOF_Y] += elem.StiffnessElement[5, 1];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.StartNode.DOF_ROT] += elem.StiffnessElement[5, 2];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.EndNode.DOF_X] += elem.StiffnessElement[5, 3];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.EndNode.DOF_Y] += elem.StiffnessElement[5, 4];
-                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.EndNode.DOF_ROT] += elem.StiffnessElement[5, 5];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.StartNode.DOF_X] += elem.GlobalStiffnessElement[5, 0];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.StartNode.DOF_Y] += elem.GlobalStiffnessElement[5, 1];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.StartNode.DOF_ROT] += elem.GlobalStiffnessElement[5, 2];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.EndNode.DOF_X] += elem.GlobalStiffnessElement[5, 3];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.EndNode.DOF_Y] += elem.GlobalStiffnessElement[5, 4];
+                GlobalStiffnessMatrix[elem.EndNode.DOF_ROT, elem.EndNode.DOF_ROT] += elem.GlobalStiffnessElement[5, 5];
 
                 //Console.WriteLine(this.ToString());
                 //Console.WriteLine("=================================\n");

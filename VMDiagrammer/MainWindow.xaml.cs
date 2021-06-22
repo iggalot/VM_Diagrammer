@@ -478,13 +478,10 @@ namespace VMDiagrammer
         }
 
         /// <summary>
-        /// Routine that is called once on application started
+        /// Helper function to quickly construct test cases
         /// </summary>
-        private void OnUserCreate()
+        private void TestMultispanContinuousComplexCase()
         {
-            Nodes = new List<IDrawingObjects>();
-            Beams = new List<IDrawingObjects>();
-            Loads = new List<IDrawingObjects>();
 
             // Create some nodes
             VM_Node NodeA = new VM_Node(50, 100, true, true, true);
@@ -497,7 +494,7 @@ namespace VMDiagrammer
             AddNode(NodeD);
             VM_Node NodeE = new VM_Node(200, 100, false, false, false);
             AddNode(NodeE);
-            VM_Node NodeF = new VM_Node(250, 100, false, true, false); 
+            VM_Node NodeF = new VM_Node(250, 100, false, true, false);
             AddNode(NodeF);
             VM_Node NodeG = new VM_Node(300, 100, false, false, false);
             AddNode(NodeG);
@@ -518,7 +515,7 @@ namespace VMDiagrammer
             Beams.Add(Beam3);
             VM_Beam Beam4 = new VM_Beam(NodeE, NodeD);
             Beams.Add(Beam4);
-            VM_Beam Beam5= new VM_Beam(NodeE, NodeF);
+            VM_Beam Beam5 = new VM_Beam(NodeE, NodeF);
             Beams.Add(Beam5);
             VM_Beam Beam6 = new VM_Beam(NodeF, NodeG);
             Beams.Add(Beam6);
@@ -528,8 +525,39 @@ namespace VMDiagrammer
             Beams.Add(Beam8);
             VM_Beam Beam9 = new VM_Beam(NodeI, NodeJ);
             Beams.Add(Beam9);
+        }
+
+        private void TestCantileverRightCase()
+        {
+
+            // Create some nodes
+            VM_Node NodeA = new VM_Node(50, 100, true, true, true);
+            AddNode(NodeA);
+            VM_Node NodeB = new VM_Node(75, 100, false, false, false);
+            AddNode(NodeB);
+            VM_Node NodeC = new VM_Node(100, 100, false, false, false);
+            AddNode(NodeC);
 
 
+            //// Create some beams
+            VM_Beam Beam1 = new VM_Beam(NodeA, NodeB);
+            Beams.Add(Beam1);
+            VM_Beam Beam2 = new VM_Beam(NodeB, NodeC);
+            Beams.Add(Beam2);
+        }
+
+
+        /// <summary>
+        /// Routine that is called once on application started
+        /// </summary>
+        private void OnUserCreate()
+        {
+            Nodes = new List<IDrawingObjects>();
+            Beams = new List<IDrawingObjects>();
+            Loads = new List<IDrawingObjects>();
+
+            TestMultispanContinuousComplexCase();
+            //TestCantileverRightCase();
 
             //// Add point load
             //VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[0], 100, 100, -50, -50);
@@ -584,7 +612,7 @@ namespace VMDiagrammer
 
             // Add a nodal load vector to test
             
-            model.LoadVector[10, 0] = 10; // Positive load is downwards?
+            model.LoadVector[4, 0] = 10; // Positive load is downwards?
             Console.WriteLine("Load vector: " + MatrixOperations.DisplayNullable(model.LoadVector));
 
             // Solve for the results of the model.

@@ -546,6 +546,51 @@ namespace VMDiagrammer.Helpers
             return new double[rows,cols];
         }
 
+
+        public static double[,] LUDecomposition(double[,] matrix)
+        {
+            int n = matrix.GetLength(0);
+
+            double[,] lower = new double[n, n];
+            double[,] upper = new double[n, n];
+
+            // Decomposing matrix into Upper and Lower
+            // triangular matrix
+            for (int i = 0; i < n; i++)
+            {
+                // Upper Triangular
+                for (int k = i; k < n; k++)
+                {
+                    // Summation of L(i, j) * U(j, k)
+                    double sum = 0.0;
+                    for (int j = 0; j < i; j++)
+                        sum += (lower[i, j] * upper[j, k]);
+
+                    // Evaluating U(i, k)
+                    upper[i, k] = matrix[i, k] - sum;
+                }
+
+                // Lower Triangular
+                for (int k = i; k < n; k++)
+                {
+                    if (i == k)
+                        lower[i, i] = 1; // Diagonal as 1
+                    else
+                    {
+                        // Summation of L(k, j) * U(j, i)
+                        double sum = 0;
+                        for (int j = 0; j < i; j++)
+                            sum += (lower[k, j] * upper[j, i]);
+
+                        // Evaluating L(k, i)
+                        lower[k, i]
+                            = (matrix[k, i] - sum) / upper[i, i];
+                    }
+                }
+            }
+            return lower;
+        }
+
         /// <summary>
         /// Returns the inverse of a matrix
         /// </summary>

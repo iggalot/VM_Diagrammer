@@ -74,7 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\BaseVMObject.cs" />
-    <Compile Include="Models\Elements\BeamElement.cs" />
+    <Compile Include="Models\Elements\BeamElement2D.cs" />
     <Compile Include="Models\Loads\VM_BaseLoad.cs" />
     <Compile Include="Models\Loads\VM_DistributedForce.cs" />
     <Compile Include="Models\Loads\VM_PointMoment.cs" />

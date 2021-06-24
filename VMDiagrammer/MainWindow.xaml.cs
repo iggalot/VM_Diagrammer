@@ -537,6 +537,18 @@ namespace VMDiagrammer
             AddNode(NodeB);
             VM_Node NodeC = new VM_Node(100, 100, false, false, false);
             AddNode(NodeC);
+            VM_Node NodeD = new VM_Node(125, 100, false, false, false);
+            AddNode(NodeD);
+            VM_Node NodeE = new VM_Node(150, 100, false, false, false);
+            AddNode(NodeE);
+            VM_Node NodeF = new VM_Node(175, 100, false, true, false);
+            AddNode(NodeF);
+            VM_Node NodeG = new VM_Node(200, 100, false, false, false);
+            AddNode(NodeG);
+            VM_Node NodeH = new VM_Node(225, 100, false, false, false);
+            AddNode(NodeH);
+            VM_Node NodeI = new VM_Node(250, 100, false, false, false);
+            AddNode(NodeI);
 
 
             //// Create some beams
@@ -544,6 +556,18 @@ namespace VMDiagrammer
             Beams.Add(Beam1);
             VM_Beam Beam2 = new VM_Beam(NodeB, NodeC);
             Beams.Add(Beam2);
+            VM_Beam Beam3 = new VM_Beam(NodeC, NodeD);
+            Beams.Add(Beam3);
+            VM_Beam Beam4 = new VM_Beam(NodeD, NodeE);
+            Beams.Add(Beam4);
+            VM_Beam Beam5 = new VM_Beam(NodeE, NodeF);
+            Beams.Add(Beam5);
+            VM_Beam Beam6 = new VM_Beam(NodeF, NodeG);
+            Beams.Add(Beam6);
+            VM_Beam Beam7 = new VM_Beam(NodeG, NodeH);
+            Beams.Add(Beam7);
+            VM_Beam Beam8 = new VM_Beam(NodeH, NodeI);
+            Beams.Add(Beam8);
         }
 
 
@@ -556,8 +580,8 @@ namespace VMDiagrammer
             Beams = new List<IDrawingObjects>();
             Loads = new List<IDrawingObjects>();
 
-            TestMultispanContinuousComplexCase();
-            //TestCantileverRightCase();
+            //TestMultispanContinuousComplexCase();
+            TestCantileverRightCase();
 
             //// Add point load
             //VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[0], 100, 100, -50, -50);
@@ -598,29 +622,24 @@ namespace VMDiagrammer
 
 
             // Create our Structure Stiffness Model from our beams
-            StructureStiffnessModel model = new StructureStiffnessModel(Nodes.Count*3, Nodes.Count*3);
-            Model = model;
+            Model = new StructureStiffnessModel(Nodes.Count*3, Nodes.Count*3);
 
             foreach (var beam in Beams)
             {
-                model.AddElement((VM_Beam)beam);
+                Model.AddElement((VM_Beam)beam);
                 // TODO::  Add matrix transformations.
             }
 
-//            model.PopulateStiffnessPartitions();
-//            Console.WriteLine(model.ToString());
-
             // Add a nodal load vector to test
-            
-            model.LoadVector[4, 0] = 10; // Positive load is downwards?
-            Console.WriteLine("Load vector: " + MatrixOperations.DisplayNullable(model.LoadVector));
+            Model.LoadVector[13, 0] = 10; // Positive load is downwards?
+            Console.WriteLine("Load vector: " + MatrixOperations.DisplayNullable(Model.LoadVector));
 
             // Solve for the results of the model.
-            model.Solve();
+            Model.Solve();
 
             Console.WriteLine("Results: \n");
-            Console.WriteLine("Free Displacements: \n" + MatrixOperations.Display(model.Disp_Free) + "\n");
-            Console.WriteLine("Support Reactions: \n" + MatrixOperations.Display(model.Load_Fixed) + "\n");
+            Console.WriteLine("Free Displacements: \n" + MatrixOperations.Display(Model.Disp_Free) + "\n");
+            Console.WriteLine("Support Reactions: \n" + MatrixOperations.Display(Model.Load_Fixed) + "\n");
 
 
             // *******************************
@@ -628,32 +647,48 @@ namespace VMDiagrammer
             // *******************************
             // Draw the undeformed line...
             double vertOffset = 150;
-            double dispScale = 10;
+
+            // Choose a suitable scaling factor by examining the x and y displacement vectors
+            double maxDisp = 0;
+            for (int i = 0; i < Model.Rows; i++)
+            {
+                // skip the rotational dof
+                if (i % 3 == 2)
+                    continue;
+
+                // scale based on the X and Y disp
+                if (Math.Abs((double)Model.DisplacementVector[i, 0]) > maxDisp)
+                {
+                    maxDisp = Math.Abs((double)Model.DisplacementVector[i, 0]);
+                } 
+            }
+
+            // Scale displacments so that max displacement is 75 pixels
+            double dispScale = 75 / maxDisp;
+
             DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + vertOffset, RightMostNode.X, RightMostNode.Y + vertOffset, Brushes.Purple, 1);
 
             foreach(IDrawingObjects node in Nodes)
             {
                 
                 // Find the displacements at the node we are searching for
-                for (int i = 0; i < model.DOF_Indices.GetLength(0); i++)
+                for (int i = 0; i < Model.DOF_Indices.GetLength(0); i++)
                 {
-                    // Find the x displacement
+                    // TODO:: Find the x displacement and update the deflected shape accordingly
 
                     // Find the y displacement
                     int index = (int)((VM_Node)node).DOF_IndexVector[1];
-                    double test = model.DOF_Indices[i, 0];
+                    double test = Model.DOF_Indices[i, 0];
 
                     if (index == test)
                     {
                         // retrieve the nodal displacements
-                        double dispY = (double)model.DisplacementVector[i, 0] * dispScale;
+                        double dispY = (double)Model.DisplacementVector[i, 0] * dispScale;
 
                         // Draw deflected shape
                         DrawingHelpers.DrawCircle(MainCanvas, ((VM_Node)node).X, ((VM_Node)node).Y + vertOffset + dispY, Brushes.Purple, Brushes.Purple, 5, 1);
                         continue;
                     }
-
-                    // Displacements
                 }
             }
 

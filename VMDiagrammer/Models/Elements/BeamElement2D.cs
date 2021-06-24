@@ -21,7 +21,7 @@ namespace VMDiagrammer.Models.Elements
         // Stiffness Element for this beam
         private double[,] StiffnessElement = null;
 
-        public double[,] GlobalStiffnessElement = null;
+        public double[,] TransformedGlobalStiffnessElement = null;
 
         public VM_Node StartNode
         {
@@ -104,10 +104,12 @@ namespace VMDiagrammer.Models.Elements
                 { -1 * Math.Sin(m_Angle),   Math.Cos(m_Angle),      0,          0                     ,                   0      ,       0  },
                 {         0             ,   0                ,      1,          0                     ,                   0      ,       0  },
                 {         0             ,   0                ,      0,          Math.Cos(m_Angle)     ,   Math.Sin(m_Angle)      ,       0  },
-                {         0             ,   0                ,      0,          -1 * Math.Sin(m_Angle),   Math.Sin(m_Angle)      ,       0  },
+                {         0             ,   0                ,      0,          -1 * Math.Sin(m_Angle),   Math.Cos(m_Angle)      ,       0  },
                 {         0             ,   0                ,      0,          0                     ,                   0      ,       1  }
             };
-           
+
+            //Console.WriteLine("----------- Transform -----------");
+            //Console.WriteLine(MatrixOperations.Display(m_TransformationMatrix));
 
             StiffnessElement = new double[,]
             {
@@ -124,7 +126,13 @@ namespace VMDiagrammer.Models.Elements
                 { 0         ,     6.0*E*I / (L*L),     2.0*E*I / (L),              0 ,    -6.0*E*I / (L*L),   4.0*E*I / (L) }
             };
 
-            GlobalStiffnessElement = MatrixOperations.MatrixProduct(StiffnessElement, m_TransformationMatrix);
+            TransformedGlobalStiffnessElement = MatrixOperations.MatrixProduct(StiffnessElement, m_TransformationMatrix);
+            if(!MatrixOperations.CheckSymmetric(m_TransformationMatrix))
+                Console.WriteLine("m_Transformation is not symmetric -- S: " + start.Index + " E: " + end.Index);
+            if (!MatrixOperations.CheckSymmetric(StiffnessElement))
+                Console.WriteLine("StiffnessElement is not symmetric -- S: " + start.Index + " E: " + end.Index);
+            if (!MatrixOperations.CheckSymmetric(TransformedGlobalStiffnessElement))
+                Console.WriteLine("TransformedGlobalStiffnessElement is not symmetric -- S: " + start.Index + " E: " + end.Index);
         }
 
         public override string ToString()

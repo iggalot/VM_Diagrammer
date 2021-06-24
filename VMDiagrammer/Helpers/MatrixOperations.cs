@@ -546,7 +546,13 @@ namespace VMDiagrammer.Helpers
             return new double[rows,cols];
         }
 
-
+        /// <summary>
+        /// An algorithm for creating an LU Decomposition.
+        /// lower[] is the L matrix
+        /// upper[] is the U matrix
+        /// </summary>
+        /// <param name="matrix"></param>
+        /// <returns></returns>
         public static double[,] LUDecomposition(double[,] matrix)
         {
             int n = matrix.GetLength(0);
@@ -804,6 +810,35 @@ namespace VMDiagrammer.Helpers
                 result *= lum[i, i];
 
             return result;
+        }
+
+        /// <summary>
+        /// Helper function to determine if a square matric is symmetric
+        /// </summary>
+        /// <param name="arr">the matrix to check</param>
+        /// <returns></returns>
+        public static bool CheckSymmetric(double[,] arr)
+        {
+            int rows = arr.GetLength(0);
+            int cols = arr.GetLength(1);
+
+            // is the matrix square?
+            if (rows != cols)
+                return false;
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    //Console.WriteLine("[" + i + "," + j + "]: " + arr[i, j] + " -- " + "[" + j + "," + i + "]: " + arr[j, i] + " -- ");
+                    if (arr[i, j] != arr[j, i])
+                        return false;
+                }
+                //Console.WriteLine(i.ToString() + "\n");
+            }
+
+
+            return true;
         }
 
         /// <summary>

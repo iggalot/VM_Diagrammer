@@ -179,7 +179,7 @@ namespace VMDiagrammer
         /// <param name="y">y-coordinate</param>
         /// <param name="l">the list of <see cref="IDrawingObjects"/> to be searched for matching nodes</param>
         /// <returns>true if a matching node is not found, otherwise it returns the false</returns>
-        private VM_Node FindNodeInList(double x, double y, List<IDrawingObjects> l)
+        private VM_Node FindVMNodeInList(double x, double y, List<IDrawingObjects> l)
         {
             double temp_x = x;
             double temp_y = y;
@@ -204,7 +204,7 @@ namespace VMDiagrammer
         /// Function that creates a sorted list of critical points from lowest to highest
         /// </summary>
         /// <returns></returns>
-        protected List<IDrawingObjects> ListCriticalPoints()
+        protected List<IDrawingObjects> CreateVMNodeCriticalPointsList()
         {
             List<IDrawingObjects> list = new List<IDrawingObjects>();
 
@@ -257,13 +257,13 @@ namespace VMDiagrammer
                             double temp_y = item.Beam.Start.Y;
 
                             // First check our Nodes list to see if it exists
-                            VM_Node tempNode = FindNodeInList(temp_x, temp_y, Nodes);
+                            VM_Node tempNode = FindVMNodeInList(temp_x, temp_y, Nodes);
 
                             // Is the node already in Nodes list
                             if (tempNode != null)
                             {
                                 // Is the node in the Critical Point list?
-                                if (FindNodeInList(tempNode.X, tempNode.Y, list) == null)
+                                if (FindVMNodeInList(tempNode.X, tempNode.Y, list) == null)
                                 {
                                     // No matching node already in the critical point list..
                                     list.Add(tempNode);
@@ -274,7 +274,7 @@ namespace VMDiagrammer
                             } else
                             {
                                 // Is a node with these coordinates already in the Critical Point list?
-                                if(FindNodeInList(temp_x,temp_y,list) == null)
+                                if(FindVMNodeInList(temp_x,temp_y,list) == null)
                                 {
                                     // No matching node already in critical point list..
                                     list.Add(new VM_Node(temp_x, temp_y, false, false, false));
@@ -304,13 +304,13 @@ namespace VMDiagrammer
                             double temp_y = item.Beam.Start.Y;
 
                             // First check our Nodes list to see if it exists
-                            VM_Node tempNode = FindNodeInList(temp_x, temp_y, Nodes);
+                            VM_Node tempNode = FindVMNodeInList(temp_x, temp_y, Nodes);
 
                             // Is the node already in Nodes list
                             if (tempNode != null)
                             {
                                 // Is the node in the Critical Point list?
-                                if (FindNodeInList(tempNode.X, tempNode.Y, list) == null)
+                                if (FindVMNodeInList(tempNode.X, tempNode.Y, list) == null)
                                 {
                                     // No matching node already in the critical point list..
                                     list.Add(tempNode);
@@ -323,7 +323,7 @@ namespace VMDiagrammer
                             else
                             {
                                 // Is a node with these coordinates already in the Critical Point list?
-                                if (FindNodeInList(temp_x, temp_y, list) == null)
+                                if (FindVMNodeInList(temp_x, temp_y, list) == null)
                                 {
                                     // No matching node already in critical point list..
                                     list.Add(new VM_Node(temp_x, temp_y, false, false, false));
@@ -348,13 +348,13 @@ namespace VMDiagrammer
                         double temp_y = item.Beam.Start.Y;
 
                         // First check our Nodes list to see if it exists
-                        VM_Node tempNode = FindNodeInList(temp_x, temp_y, Nodes);
+                        VM_Node tempNode = FindVMNodeInList(temp_x, temp_y, Nodes);
 
                         // Is the node already in Nodes list
                         if (tempNode != null)
                         {
                             // Is the node in the Critical Point list?
-                            if (FindNodeInList(tempNode.X, tempNode.Y, list) == null)
+                            if (FindVMNodeInList(tempNode.X, tempNode.Y, list) == null)
                             {
                                 // No matching node already in the critical point list..
                                 list.Add(tempNode);
@@ -367,7 +367,7 @@ namespace VMDiagrammer
                         else
                         {
                             // Is a node with these coordinates already in the Critical Point list?
-                            if (FindNodeInList(temp_x, temp_y, list) == null)
+                            if (FindVMNodeInList(temp_x, temp_y, list) == null)
                             {
                                 // No matching node already in critical point list..
                                 list.Add(new VM_Node(temp_x, temp_y, false, false, false));
@@ -580,8 +580,8 @@ namespace VMDiagrammer
             Beams = new List<IDrawingObjects>();
             Loads = new List<IDrawingObjects>();
 
-            //TestMultispanContinuousComplexCase();
-            TestCantileverRightCase();
+            TestMultispanContinuousComplexCase();
+            //TestCantileverRightCase();
 
             //// Add point load
             //VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[0], 100, 100, -50, -50);
@@ -611,7 +611,7 @@ namespace VMDiagrammer
             //Loads.Add(loadd);
 
             // Create a list of Critical Points.
-            CriticalPoints = ListCriticalPoints();
+            CriticalPoints = CreateVMNodeCriticalPointsList();
 
             // Sort lists in order of lowest to highest X-coord
             MathHelpers.BubbleSortNodesByXCoord(ref l_Nodes);

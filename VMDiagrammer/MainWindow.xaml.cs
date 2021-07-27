@@ -540,7 +540,7 @@ namespace VMDiagrammer
             AddNode(NodeD);
             VM_Node NodeE = new VM_Node(150, 100, false, false, false);
             AddNode(NodeE);
-            VM_Node NodeF = new VM_Node(175, 100, false, true, false);
+            VM_Node NodeF = new VM_Node(175, 100, false, false, false);
             AddNode(NodeF);
             VM_Node NodeG = new VM_Node(200, 100, false, false, false);
             AddNode(NodeG);
@@ -583,7 +583,7 @@ namespace VMDiagrammer
             AddNode(NodeD);
             VM_Node NodeE = new VM_Node(150, 100, false, false, false);
             AddNode(NodeE);
-            VM_Node NodeF = new VM_Node(175, 100, false, true, false);
+            VM_Node NodeF = new VM_Node(175, 100, false, false, false);
             AddNode(NodeF);
             VM_Node NodeG = new VM_Node(200, 100, false, false, false);
             AddNode(NodeG);
@@ -622,9 +622,9 @@ namespace VMDiagrammer
             Beams = new List<IDrawingObjects>();
             Loads = new List<IDrawingObjects>();
 
-            //TestMultispanContinuousComplexCase();
+            TestMultispanContinuousComplexCase();
             //TestCantileverRightCase();
-            TestCantileverLeftCase();
+            //TestCantileverLeftCase();
 
             //// Add point load
             //VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[0], 100, 100, -50, -50);
@@ -674,8 +674,49 @@ namespace VMDiagrammer
             }
 
             // Add a nodal load vector to test
-            Model.LoadVector[13, 0] = 10; // Positive load is downwards?
+            //Model.LoadVector[13, 0] = 10; // Positive load is downwards?
+
+            int testw1 = 10; // start intensity of the point load
+            int testw2 = 10; // end intensity of the point load
+            int val = 400; // Position of the load
+            VM_Beam testbeam = GetBeamByXCoord(val);
+            double testd1 = GetDistanceFromStartNode(val - testbeam.Start.X, testbeam);
+            double testd2 = testd1;
+
+            //// Start node nodal moment equivalent
+            //double Ma_w1 = (testw1 * testd1 * testd2 * testd2 / (testbeam.Length * testbeam.Length));
+            //double Ma_w2 = (Ma_w1);
+            //VM_BaseLoad Ma = new VM_PointMoment(testbeam, 0, 0, Ma_w1, Ma_w2, ArrowDirections.ARROW_CLOCKWISE);
+            //Loads.Add(Ma);
+            //Model.LoadVector[testbeam.Start.DOF_ROT, 0] = Ma_w1;
+
+            //Start node nodal moment equivalent
+            double Mb_w1 = (testw1 * testd1 * testd1 * testd2 / (testbeam.Length * testbeam.Length));
+            double Mb_w2 = (Mb_w1);
+            VM_BaseLoad Mb = new VM_PointMoment(testbeam, testbeam.Length, testbeam.Length, Mb_w1, Mb_w2, ArrowDirections.ARROW_COUNTERCLOCKWISE);
+            Loads.Add(Mb);
+            Model.LoadVector[testbeam.End.DOF_ROT, 0] = -Mb_w1;
+
+            //// Start node nodal force equivalent
+            //double Pa_w1 = (testw1 * testd2 / (testbeam.Length));
+            //double Pa_w2 = (Pa_w1);
+            //VM_BaseLoad Pa = new VM_PointForce(testbeam, 0, 0, -Pa_w1, -Pa_w2);
+            //Loads.Add(Pa);
+            //Model.LoadVector[testbeam.Start.DOF_Y, 0] = Pa_w1;
+
+
+            //// End node nodal moment equivalent
+            //double Pb_w1 = (testw1 * testd1 / (testbeam.Length));
+            //double Pb_w2 = (Pb_w1);
+            //VM_BaseLoad Pb = new VM_PointForce(testbeam, testbeam.Length, testbeam.Length, -Pb_w1, -Pb_w2);
+            //Loads.Add(Pb);
+            //Model.LoadVector[testbeam.End.DOF_Y, 0] = Pb_w1;
+
+            double testindex = testbeam.Index;
+
+
             Console.WriteLine("Load vector: " + MatrixOperations.DisplayNullable(Model.LoadVector));
+
 
             // Solve for the results of the model.
             Model.Solve();
@@ -744,6 +785,8 @@ namespace VMDiagrammer
 
 
         }
+
+
 
         /// <summary>
         /// Our event for when the mouse moves over the canvas
@@ -837,7 +880,32 @@ namespace VMDiagrammer
         }
 
         /// <summary>
-        /// Returns the beam that contains a specified x-coordinate.  If the x-coord is at the Rightmost node, return the
+        /// Returns the distance of an offset from the END node of a beam
+        /// 
+        /// </summary>
+        /// <param name="offset">Offset distance from the start node</param>
+        /// <param name="beam">The beam object under consideration</param>
+        /// <returns></returns>
+        protected double GetDistanceFromStartNode(double offset, VM_Beam beam)
+        {
+            return offset;
+        }
+
+        /// <summary>
+        /// Returns the distance of an offset from the END node of a beam
+        /// 
+        /// </summary>
+        /// <param name="offset">Offset distance from the start node</param>
+        /// <param name="beam">The beam object under consideration</param>
+        /// <returns></returns>
+        protected double GetDistanceFromBeamEndNode(double offset, VM_Beam beam)
+        {
+            return beam.End.X - beam.Start.X - offset;
+        }
+
+        /// <summary>
+        /// Returns the beam that contains a specified x-coordinate.
+        /// If the x-coord is at the Rightmost node, return the
         /// rightmost beam
         /// </summary>
         /// <param name="offset"></param>

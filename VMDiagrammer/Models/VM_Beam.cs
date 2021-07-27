@@ -52,6 +52,14 @@ namespace VMDiagrammer.Models
         }
 
         /// <summary>
+        /// Compute the length of the beam based on its start and end nodes.
+        /// </summary>
+        public double Length
+        {
+            get => Math.Sqrt((End.X - Start.X) * (End.X - Start.X) + (End.Y - Start.Y) * (End.Y - Start.Y));
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="start">start node for the beam</param>

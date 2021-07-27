@@ -225,7 +225,7 @@ namespace VMDiagrammer.Models
                 case SupportTypes.SUPPORT_ROLLER_X:
                     {
                         // Draw the node icon
-                        DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White, DEFAULT_NODE_RADIUS, 1.0);
+                        DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Blue, Brushes.White, DEFAULT_NODE_RADIUS, 1.0);
 
                         // Draw the roller "ball"
                         DrawingHelpers.DrawCircleHollow(c, this.X, this.Y+2.0 * offset, Brushes.Blue, radius, SUPPORT_LINE_THICKNESS);
@@ -257,7 +257,7 @@ namespace VMDiagrammer.Models
                         double base_endY = endY;
 
                         // Draw the node icon
-                        DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White, DEFAULT_NODE_RADIUS, 1.0);
+                        DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Green, Brushes.White, DEFAULT_NODE_RADIUS, 1.0);
 
                         // Draw the pin "triangle"
                         DrawingHelpers.DrawLine(c, startX, startY, insertX, insertY, Brushes.Green, SUPPORT_LINE_THICKNESS);
@@ -274,15 +274,15 @@ namespace VMDiagrammer.Models
                     {
                         double insertX = this.X;
                         double insertY = this.Y;
-                        double startX = insertX - radius;
+                        double startX = insertX;
                         double startY = insertY - 3.0 * offset;
-                        double endX = insertX - radius;
+                        double endX = insertX;
                         double endY = insertY + 3.0 * offset;
 
                         // Draw the node icon
-                        DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White, DEFAULT_NODE_RADIUS, 1.0);
+                        DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Red, Brushes.White, DEFAULT_NODE_RADIUS, 1.0);
 
-                        // Draw the pin "triangle"
+                        // Draw the fixed support line"
                         DrawingHelpers.DrawLine(c, startX, startY, endX, endY, Brushes.Red, SUPPORT_LINE_THICKNESS);
 
                         break;
@@ -323,7 +323,7 @@ namespace VMDiagrammer.Models
             }
 
             // Draw the node icon
-            DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White, DEFAULT_NODE_RADIUS, 1.0);
+            //DrawingHelpers.DrawCircle(c, this.X, this.Y, Brushes.Black, Brushes.White, DEFAULT_NODE_RADIUS, 1.0);
             
             // Draw the node label text
             DrawingHelpers.DrawText(c, xpos, ypos, zpos, Index.ToString(), Brushes.Black, DrawingHelpers.DEFAULT_TEXT_HEIGHT);

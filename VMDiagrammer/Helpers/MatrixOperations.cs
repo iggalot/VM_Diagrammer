@@ -813,17 +813,33 @@ namespace VMDiagrammer.Helpers
         }
 
         /// <summary>
-        /// Helper function to determine if a square matric is symmetric
+        /// Helper function to determine if a matrix is square
         /// </summary>
         /// <param name="arr">the matrix to check</param>
         /// <returns></returns>
-        public static bool CheckSymmetric(double[,] arr)
+        public static bool IsSquare(double[,] arr)
         {
             int rows = arr.GetLength(0);
             int cols = arr.GetLength(1);
 
             // is the matrix square?
             if (rows != cols)
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Helper function to determine if a square matric is symmetric
+        /// </summary>
+        /// <param name="arr">the matrix to check</param>
+        /// <returns></returns>
+        public static bool IsSymmetric(double[,] arr)
+        {
+            int rows = arr.GetLength(0);
+            int cols = arr.GetLength(1);
+
+            if (!IsSquare(arr))
                 return false;
 
             for (int i = 0; i < rows; i++)
@@ -842,7 +858,7 @@ namespace VMDiagrammer.Helpers
         }
 
         /// <summary>
-        /// comverts an array of type double?[,] to type double[,]
+        /// Converts an array of type double?[,] to type double[,]
         /// </summary>
         /// <param name="arr"></param>
         /// <returns></returns>

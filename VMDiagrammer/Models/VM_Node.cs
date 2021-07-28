@@ -22,7 +22,7 @@ namespace VMDiagrammer.Models
         private double m_Y;   // y-coordinate
         private SupportTypes m_SupportType;  // type of support as an ENUM
 
-        private static int dof_index_current = 0;
+        //private static int dof_index_current = 0;
 
         private bool m_X_restrained = false;
         private bool m_Y_restrained = false;
@@ -59,9 +59,6 @@ namespace VMDiagrammer.Models
         }
 
         // index numbers for degrees of freedom
-        private int m_dof_x_index = 0;
-        private int m_dof_y_index = 0;
-        private int m_dof_rot_index = 0;
         public int[] DOF_IndexVector
         {
             get => m_DOFIndices;
@@ -72,20 +69,17 @@ namespace VMDiagrammer.Models
 
         public int DOF_X
         {
-            get => m_dof_x_index;
-            set { m_dof_x_index = value; }
+            get => DOF_IndexVector[0];
         }
 
         public int DOF_Y
         {
-            get => m_dof_y_index;
-            set { m_dof_y_index = value; }
+            get => DOF_IndexVector[1];
         }
 
         public int DOF_ROT
         {
-            get => m_dof_rot_index;
-            set { m_dof_rot_index = value; }
+            get => DOF_IndexVector[2];
         }
 
         /// <summary>
@@ -117,7 +111,8 @@ namespace VMDiagrammer.Models
         /// </summary>
         /// <param name="x">x position on the canvas</param>
         /// <param name="y">y position on the canvas</param>
-        public VM_Node(double x, double y, bool x_restrain, bool y_restrain, bool rot_restrain)
+        /// <param name="start_dof">The degree of freedom number of the x-dof for this node</param>
+        public VM_Node(double x, double y, bool x_restrain, bool y_restrain, bool rot_restrain, int node_number)
         {
             m_X_restrained = x_restrain;
             m_Y_restrained = y_restrain;
@@ -127,17 +122,9 @@ namespace VMDiagrammer.Models
             Y = y;
 
             // Update degree of freedom indices
-            DOF_X = dof_index_current;
-            dof_index_current++;
-            DOF_Y = dof_index_current;
-            dof_index_current++;
-            DOF_ROT = dof_index_current;
-            dof_index_current++;
-
-            // Store index numbers in array
-            m_DOFIndices[0] = DOF_X;
-            m_DOFIndices[1] = DOF_Y;
-            m_DOFIndices[2] = DOF_ROT;
+            DOF_IndexVector[0] = 3*node_number;
+            DOF_IndexVector[1] = 3*node_number + 1;
+            DOF_IndexVector[2] = 3*node_number + 2;
 
 
             // Determine if boundary conditions can be classified as a SupportType directly

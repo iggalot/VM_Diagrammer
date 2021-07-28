@@ -52,7 +52,7 @@ namespace VMDiagrammer.Models
         /// </summary>
         /// <param name="start">start node for the beam</param>
         /// <param name="end">end node for the beam</param>
-        public VM_Beam(VM_Node start, VM_Node end)
+        public VM_Beam(VM_Node start, VM_Node end, int index) : base(index)
         {
             // If the start node is to the right of the end node, reverse their order in this data object
             if(start.X < end.X)

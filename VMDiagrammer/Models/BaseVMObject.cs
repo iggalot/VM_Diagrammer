@@ -6,15 +6,13 @@
     /// </summary>
     public class BaseVMObject
     {
-        private static double currentIndex = 0;
         private double m_Index = 0;  // our object's object id
 
         private double m_Thickness = 1;  // the line thickness of this object
 
-        public BaseVMObject()
+        public BaseVMObject(int index)
         {
-            m_Index = currentIndex;
-            currentIndex++;
+            m_Index = index;
         }
 
         public double Index

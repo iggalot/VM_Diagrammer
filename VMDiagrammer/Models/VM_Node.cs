@@ -22,8 +22,6 @@ namespace VMDiagrammer.Models
         private double m_Y;   // y-coordinate
         private SupportTypes m_SupportType;  // type of support as an ENUM
 
-        //private static int dof_index_current = 0;
-
         private bool m_X_restrained = false;
         private bool m_Y_restrained = false;
         private bool m_ROT_restrained = false;
@@ -65,22 +63,10 @@ namespace VMDiagrammer.Models
             set { m_DOFIndices = value; }
         }
 
-
-
-        public int DOF_X
-        {
-            get => DOF_IndexVector[0];
-        }
-
-        public int DOF_Y
-        {
-            get => DOF_IndexVector[1];
-        }
-
-        public int DOF_ROT
-        {
-            get => DOF_IndexVector[2];
-        }
+        // Getters for this nodes DOF values
+        public int DOF_X => DOF_IndexVector[0];
+        public int DOF_Y => DOF_IndexVector[1];
+        public int DOF_ROT => DOF_IndexVector[2];
 
         /// <summary>
         /// Accessor for the X coordinate of our node
@@ -112,7 +98,7 @@ namespace VMDiagrammer.Models
         /// <param name="x">x position on the canvas</param>
         /// <param name="y">y position on the canvas</param>
         /// <param name="start_dof">The degree of freedom number of the x-dof for this node</param>
-        public VM_Node(double x, double y, bool x_restrain, bool y_restrain, bool rot_restrain, int node_number)
+        public VM_Node(double x, double y, bool x_restrain, bool y_restrain, bool rot_restrain, int node_number) : base(node_number)
         {
             m_X_restrained = x_restrain;
             m_Y_restrained = y_restrain;
@@ -181,7 +167,7 @@ namespace VMDiagrammer.Models
         /// <summary>
         /// Default constructor
         /// </summary>
-        public VM_Node()
+        public VM_Node() : base(-1)
         {
 
         }

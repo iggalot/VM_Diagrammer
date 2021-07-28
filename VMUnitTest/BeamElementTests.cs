@@ -60,9 +60,9 @@ namespace VMUnitTest
                 NodeC = new VM_Node(2, 0, false, false, false,2);
 
             if (Beam1 == null)
-                Beam1 = new VM_Beam(NodeA, NodeB);
+                Beam1 = new VM_Beam(NodeA, NodeB, 3);
             if (Beam2 == null)
-                Beam2 = new VM_Beam(NodeB, NodeC);
+                Beam2 = new VM_Beam(NodeB, NodeC, 4);
         }
 
         [TestMethod]

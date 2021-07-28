@@ -510,23 +510,23 @@ namespace VMDiagrammer
 
 
             //// Create some beams
-            VM_Beam Beam1 = new VM_Beam(NodeB, NodeA);
+            VM_Beam Beam1 = new VM_Beam(NodeB, NodeA, 10);
             Beams.Add(Beam1);
-            VM_Beam Beam2 = new VM_Beam(NodeC, NodeB);
+            VM_Beam Beam2 = new VM_Beam(NodeC, NodeB, 11);
             Beams.Add(Beam2);
-            VM_Beam Beam3 = new VM_Beam(NodeC, NodeD);
+            VM_Beam Beam3 = new VM_Beam(NodeC, NodeD, 12);
             Beams.Add(Beam3);
-            VM_Beam Beam4 = new VM_Beam(NodeE, NodeD);
+            VM_Beam Beam4 = new VM_Beam(NodeE, NodeD,13);
             Beams.Add(Beam4);
-            VM_Beam Beam5 = new VM_Beam(NodeE, NodeF);
+            VM_Beam Beam5 = new VM_Beam(NodeE, NodeF, 14);
             Beams.Add(Beam5);
-            VM_Beam Beam6 = new VM_Beam(NodeF, NodeG);
+            VM_Beam Beam6 = new VM_Beam(NodeF, NodeG,15);
             Beams.Add(Beam6);
-            VM_Beam Beam7 = new VM_Beam(NodeG, NodeH);
+            VM_Beam Beam7 = new VM_Beam(NodeG, NodeH,16);
             Beams.Add(Beam7);
-            VM_Beam Beam8 = new VM_Beam(NodeH, NodeI);
+            VM_Beam Beam8 = new VM_Beam(NodeH, NodeI, 17);
             Beams.Add(Beam8);
-            VM_Beam Beam9 = new VM_Beam(NodeI, NodeJ);
+            VM_Beam Beam9 = new VM_Beam(NodeI, NodeJ, 18);
             Beams.Add(Beam9);
         }
 
@@ -554,21 +554,21 @@ namespace VMDiagrammer
 
 
             //// Create some beams
-            VM_Beam Beam1 = new VM_Beam(NodeA, NodeB);
+            VM_Beam Beam1 = new VM_Beam(NodeA, NodeB, 9);
             Beams.Add(Beam1);
-            VM_Beam Beam2 = new VM_Beam(NodeB, NodeC);
+            VM_Beam Beam2 = new VM_Beam(NodeB, NodeC, 10);
             Beams.Add(Beam2);
-            VM_Beam Beam3 = new VM_Beam(NodeC, NodeD);
+            VM_Beam Beam3 = new VM_Beam(NodeC, NodeD, 11);
             Beams.Add(Beam3);
-            VM_Beam Beam4 = new VM_Beam(NodeD, NodeE);
+            VM_Beam Beam4 = new VM_Beam(NodeD, NodeE, 12);
             Beams.Add(Beam4);
-            VM_Beam Beam5 = new VM_Beam(NodeE, NodeF);
+            VM_Beam Beam5 = new VM_Beam(NodeE, NodeF, 13);
             Beams.Add(Beam5);
-            VM_Beam Beam6 = new VM_Beam(NodeF, NodeG);
+            VM_Beam Beam6 = new VM_Beam(NodeF, NodeG, 14);
             Beams.Add(Beam6);
-            VM_Beam Beam7 = new VM_Beam(NodeG, NodeH);
+            VM_Beam Beam7 = new VM_Beam(NodeG, NodeH, 15);
             Beams.Add(Beam7);
-            VM_Beam Beam8 = new VM_Beam(NodeH, NodeI);
+            VM_Beam Beam8 = new VM_Beam(NodeH, NodeI, 16);
             Beams.Add(Beam8);
         }
 
@@ -597,21 +597,21 @@ namespace VMDiagrammer
 
 
             //// Create some beams
-            VM_Beam Beam1 = new VM_Beam(NodeA, NodeB);
+            VM_Beam Beam1 = new VM_Beam(NodeA, NodeB, 9);
             Beams.Add(Beam1);
-            VM_Beam Beam2 = new VM_Beam(NodeB, NodeC);
+            VM_Beam Beam2 = new VM_Beam(NodeB, NodeC,10);
             Beams.Add(Beam2);
-            VM_Beam Beam3 = new VM_Beam(NodeC, NodeD);
+            VM_Beam Beam3 = new VM_Beam(NodeC, NodeD, 11);
             Beams.Add(Beam3);
-            VM_Beam Beam4 = new VM_Beam(NodeD, NodeE);
+            VM_Beam Beam4 = new VM_Beam(NodeD, NodeE, 12);
             Beams.Add(Beam4);
-            VM_Beam Beam5 = new VM_Beam(NodeE, NodeF);
+            VM_Beam Beam5 = new VM_Beam(NodeE, NodeF,13);
             Beams.Add(Beam5);
-            VM_Beam Beam6 = new VM_Beam(NodeF, NodeG);
+            VM_Beam Beam6 = new VM_Beam(NodeF, NodeG, 14);
             Beams.Add(Beam6);
-            VM_Beam Beam7 = new VM_Beam(NodeG, NodeH);
+            VM_Beam Beam7 = new VM_Beam(NodeG, NodeH, 15);
             Beams.Add(Beam7);
-            VM_Beam Beam8 = new VM_Beam(NodeH, NodeI);
+            VM_Beam Beam8 = new VM_Beam(NodeH, NodeI, 16);
             Beams.Add(Beam8);
         }
 

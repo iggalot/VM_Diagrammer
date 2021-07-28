@@ -23,6 +23,8 @@ namespace VMDiagrammer
         private List<IDrawingObjects> l_Loads = new List<IDrawingObjects>();
         private List<IDrawingObjects> l_CriticalPoints = new List<IDrawingObjects>();
 
+        private int m_NextNodeNumber = 0;  // the numbering for the next node
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged(string propertyName)
@@ -81,6 +83,7 @@ namespace VMDiagrammer
             }
         }
 
+        
         public VM_Node LeftMostNode { get; set; } = null; // leftmost node on the structure
         public VM_Node RightMostNode { get; set; } = null; // leftmost node on the structure
 
@@ -277,7 +280,7 @@ namespace VMDiagrammer
                                 if(FindVMNodeInList(temp_x,temp_y,list) == null)
                                 {
                                     // No matching node already in critical point list..
-                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false));
+                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false, GetNextNodeNumber()));
                                 } else
                                 {
                                     // Do nothing
@@ -326,7 +329,7 @@ namespace VMDiagrammer
                                 if (FindVMNodeInList(temp_x, temp_y, list) == null)
                                 {
                                     // No matching node already in critical point list..
-                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false));
+                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false,GetNextNodeNumber()));
                                 }
                                 else
                                 {
@@ -370,7 +373,7 @@ namespace VMDiagrammer
                             if (FindVMNodeInList(temp_x, temp_y, list) == null)
                             {
                                 // No matching node already in critical point list..
-                                list.Add(new VM_Node(temp_x, temp_y, false, false, false));
+                                list.Add(new VM_Node(temp_x, temp_y, false, false, false, GetNextNodeNumber()));
                             }
                             else
                             {
@@ -484,25 +487,25 @@ namespace VMDiagrammer
         {
 
             // Create some nodes
-            VM_Node NodeA = new VM_Node(50, 100, true, true, true);
+            VM_Node NodeA = new VM_Node(50, 100, true, true, true,0);
             AddNode(NodeA);
-            VM_Node NodeB = new VM_Node(75, 100, false, false, false);
+            VM_Node NodeB = new VM_Node(75, 100, false, false, false,1);
             AddNode(NodeB);
-            VM_Node NodeC = new VM_Node(100, 100, false, false, false);
+            VM_Node NodeC = new VM_Node(100, 100, false, false, false,2);
             AddNode(NodeC);
-            VM_Node NodeD = new VM_Node(150, 100, false, false, false);
+            VM_Node NodeD = new VM_Node(150, 100, false, false, false,3);
             AddNode(NodeD);
-            VM_Node NodeE = new VM_Node(200, 100, false, false, false);
+            VM_Node NodeE = new VM_Node(200, 100, false, false, false,4);
             AddNode(NodeE);
-            VM_Node NodeF = new VM_Node(250, 100, false, true, false);
+            VM_Node NodeF = new VM_Node(250, 100, false, true, false,5);
             AddNode(NodeF);
-            VM_Node NodeG = new VM_Node(300, 100, false, false, false);
+            VM_Node NodeG = new VM_Node(300, 100, false, false, false,6);
             AddNode(NodeG);
-            VM_Node NodeH = new VM_Node(350, 100, false, true, false);
+            VM_Node NodeH = new VM_Node(350, 100, false, true, false,7);
             AddNode(NodeH);
-            VM_Node NodeI = new VM_Node(400, 100, false, false, false);
+            VM_Node NodeI = new VM_Node(400, 100, false, false, false,8);
             AddNode(NodeI);
-            VM_Node NodeJ = new VM_Node(450, 100, true, true, false);
+            VM_Node NodeJ = new VM_Node(450, 100, true, true, false,9);
             AddNode(NodeJ);
 
 
@@ -530,23 +533,23 @@ namespace VMDiagrammer
         private void TestCantileverRightCase()
         {
             // Create some nodes
-            VM_Node NodeA = new VM_Node(50, 100, true, true, true);
+            VM_Node NodeA = new VM_Node(50, 100, true, true, true,0);
             AddNode(NodeA);
-            VM_Node NodeB = new VM_Node(75, 100, false, false, false);
+            VM_Node NodeB = new VM_Node(75, 100, false, false, false,1);
             AddNode(NodeB);
-            VM_Node NodeC = new VM_Node(100, 100, false, false, false);
+            VM_Node NodeC = new VM_Node(100, 100, false, false, false,2);
             AddNode(NodeC);
-            VM_Node NodeD = new VM_Node(125, 100, false, false, false);
+            VM_Node NodeD = new VM_Node(125, 100, false, false, false,3);
             AddNode(NodeD);
-            VM_Node NodeE = new VM_Node(150, 100, false, false, false);
+            VM_Node NodeE = new VM_Node(150, 100, false, false, false,4);
             AddNode(NodeE);
-            VM_Node NodeF = new VM_Node(175, 100, false, false, false);
+            VM_Node NodeF = new VM_Node(175, 100, false, false, false,5);
             AddNode(NodeF);
-            VM_Node NodeG = new VM_Node(200, 100, false, false, false);
+            VM_Node NodeG = new VM_Node(200, 100, false, false, false,6);
             AddNode(NodeG);
-            VM_Node NodeH = new VM_Node(225, 100, false, false, false);
+            VM_Node NodeH = new VM_Node(225, 100, false, false, false,7);
             AddNode(NodeH);
-            VM_Node NodeI = new VM_Node(250, 100, false, false, false);
+            VM_Node NodeI = new VM_Node(250, 100, false, false, false,8);
             AddNode(NodeI);
 
 
@@ -573,23 +576,23 @@ namespace VMDiagrammer
         private void TestCantileverLeftCase()
         {
             // Create some nodes
-            VM_Node NodeA = new VM_Node(50, 100, false, false, false);
+            VM_Node NodeA = new VM_Node(50, 100, false, false, false,0);
             AddNode(NodeA);
-            VM_Node NodeB = new VM_Node(75, 100, false, false, false);
+            VM_Node NodeB = new VM_Node(75, 100, false, false, false,1);
             AddNode(NodeB);
-            VM_Node NodeC = new VM_Node(100, 100, false, false, false);
+            VM_Node NodeC = new VM_Node(100, 100, false, false, false,2);
             AddNode(NodeC);
-            VM_Node NodeD = new VM_Node(125, 100, false, false, false);
+            VM_Node NodeD = new VM_Node(125, 100, false, false, false,3);
             AddNode(NodeD);
-            VM_Node NodeE = new VM_Node(150, 100, false, false, false);
+            VM_Node NodeE = new VM_Node(150, 100, false, false, false,4);
             AddNode(NodeE);
-            VM_Node NodeF = new VM_Node(175, 100, false, false, false);
+            VM_Node NodeF = new VM_Node(175, 100, false, false, false,5);
             AddNode(NodeF);
-            VM_Node NodeG = new VM_Node(200, 100, false, false, false);
+            VM_Node NodeG = new VM_Node(200, 100, false, false, false,6);
             AddNode(NodeG);
-            VM_Node NodeH = new VM_Node(225, 100, false, false, false);
+            VM_Node NodeH = new VM_Node(225, 100, false, false, false,7);
             AddNode(NodeH);
-            VM_Node NodeI = new VM_Node(250, 100, true, true, true);
+            VM_Node NodeI = new VM_Node(250, 100, true, true, true,8);
             AddNode(NodeI);
 
 
@@ -808,7 +811,7 @@ namespace VMDiagrammer
             Point p = e.GetPosition(MainCanvas);  // retrieve the current mouse poistion
 
             // Create a node at the position
-            VM_Node newNode = new VM_Node(p.X, p.Y, false, false, false);  
+            VM_Node newNode = new VM_Node(p.X, p.Y, false, false, false,GetNextNodeNumber());  
 
             // Add it to the model
             Nodes.Add(newNode);
@@ -1000,6 +1003,29 @@ namespace VMDiagrammer
                 // Iterate along distributed load for 10x points to establish the line.
 
             // At last point (after CP), plot a zero point
+        }
+
+        // Scans the node list for the next available node number
+        public int GetNextNodeNumber()
+        {
+            int count = 0;
+            bool found = true;
+
+            while (true)
+            {
+                found = false;
+                foreach (VM_Node node in l_Nodes)
+                {
+                    if (count == node.Index)
+                        found = true;
+                }
+
+                if (found)
+                    count++;
+            }
+
+            return count;
+
         }
     }
 

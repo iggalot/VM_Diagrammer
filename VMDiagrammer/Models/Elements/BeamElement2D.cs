@@ -127,11 +127,11 @@ namespace VMDiagrammer.Models.Elements
             };
 
             TransformedGlobalStiffnessElement = MatrixOperations.MatrixProduct(StiffnessElement, m_TransformationMatrix);
-            if(!MatrixOperations.CheckSymmetric(m_TransformationMatrix))
+            if(!MatrixOperations.IsSymmetric(m_TransformationMatrix))
                 Console.WriteLine("m_Transformation is not symmetric -- S: " + start.Index + " E: " + end.Index);
-            if (!MatrixOperations.CheckSymmetric(StiffnessElement))
+            if (!MatrixOperations.IsSymmetric(StiffnessElement))
                 Console.WriteLine("StiffnessElement is not symmetric -- S: " + start.Index + " E: " + end.Index);
-            if (!MatrixOperations.CheckSymmetric(TransformedGlobalStiffnessElement))
+            if (!MatrixOperations.IsSymmetric(TransformedGlobalStiffnessElement))
                 Console.WriteLine("TransformedGlobalStiffnessElement is not symmetric -- S: " + start.Index + " E: " + end.Index);
         }
 

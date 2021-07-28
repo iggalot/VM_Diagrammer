@@ -40,18 +40,6 @@ namespace VMDiagrammer.Models
         }
 
         /// <summary>
-        /// Returns the mid point of the beam on a stored value.
-        /// </summary>
-        public VM_Node MidPoint
-        {
-            get => m_MidPoint;
-            set
-            {
-                m_MidPoint = value;
-            }
-        }
-
-        /// <summary>
         /// Compute the length of the beam based on its start and end nodes.
         /// </summary>
         public double Length
@@ -81,7 +69,7 @@ namespace VMDiagrammer.Models
             Thickness = 8.0;
 
             // Calculate the midpoint of the beam
-            MidPoint = new VM_Node(0.5 * (Start.X + End.X), 0.5 * (Start.Y + End.Y), false, false, false);
+            //MidPoint = new VM_Node(0.5 * (Start.X + End.X), 0.5 * (Start.Y + End.Y), false, false, false);
         }
         public override string ToString()
         {
@@ -98,7 +86,7 @@ namespace VMDiagrammer.Models
             DrawingHelpers.DrawLine(c, this.Start.X, this.Start.Y, this.End.X, this.End.Y, Brushes.Red, Thickness);
 
             // Draw the beam label
-            DrawBeamLabel(c, this.MidPoint.X, this.MidPoint.Y, 0);
+            DrawBeamLabel(c, 0.5 * (Start.X + End.X), 0.5 * (Start.Y + End.Y), 0);
         }
 
         /// <summary>

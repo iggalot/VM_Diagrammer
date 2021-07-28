@@ -139,7 +139,7 @@ namespace VMDiagrammer.Models
         /// <summary>
         /// Assembles our model stiffness matrix
         /// </summary>
-        protected void AssembleStiffnessMatrix()
+        public void AssembleStiffnessMatrix()
         {
             foreach (var elem in m_ElementList)
             {
@@ -194,7 +194,7 @@ namespace VMDiagrammer.Models
                 //Console.WriteLine(this.ToString());
                 //Console.WriteLine("=================================\n");
 
-                if(!MatrixOperations.CheckSymmetric(GlobalStiffnessMatrix))
+                if(!MatrixOperations.IsSymmetric(GlobalStiffnessMatrix))
                 {
                     Console.WriteLine("S: " + elem.StartNode.Index.ToString() + "   E: " + elem.EndNode.Index.ToString() + " is not symmetric!");
                 }
@@ -274,7 +274,7 @@ namespace VMDiagrammer.Models
         /// <summary>
         /// Assembles all matrixes and vectors needed for our model
         /// </summary>
-        protected void AssembleAllMatrix()
+        public void AssembleAllMatrix()
         {
             AssembleStiffnessMatrix();
             AssembleDisplacementVector();
@@ -491,7 +491,7 @@ namespace VMDiagrammer.Models
 
 
 
-            if (!MatrixOperations.CheckSymmetric(this.GlobalStiffnessMatrix))
+            if (!MatrixOperations.IsSymmetric(this.GlobalStiffnessMatrix))
                 throw new InvalidOperationException("In Solve():  Global Stiffness Matrix is not symmetric!");
 
             Console.WriteLine("Ungrouped Global Stiffness Matrix\n" + MatrixOperations.Display(m_GlobalStiffnessMatrix));
@@ -508,9 +508,9 @@ namespace VMDiagrammer.Models
             this.PopulateStiffnessPartitions();
 
             // Check symmetric status of stiffness partitions
-            if (!MatrixOperations.CheckSymmetric(this.K_Fixed_Fixed))
+            if (!MatrixOperations.IsSymmetric(this.K_Fixed_Fixed))
                 throw new InvalidOperationException("K_Fixed_Fixed is not symmetric!");
-            if (!MatrixOperations.CheckSymmetric(this.K_Free_Free))
+            if (!MatrixOperations.IsSymmetric(this.K_Free_Free))
                 throw new InvalidOperationException("K_Free_Free is not symmetric!");
 
 

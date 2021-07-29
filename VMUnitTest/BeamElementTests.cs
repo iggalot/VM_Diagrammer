@@ -37,6 +37,23 @@ namespace VMUnitTest
             {0, 0, 0, 0, -12, -6, 0, 12, -6},
             {0, 0, 0, 0, 6, 2, 0, -6, 4}
         };
+
+        /// <summary>
+        /// Inverse stiffness matrix for 1 --- 2 ---- 3  model of UnitGlobalStiffnessMatrixTwoElements
+        /// with DOF 0, 1, 2 removed
+        /// A=1, L=1, E=1
+        /// </summary>
+        public static double[,] InvK_free_free = new double[,]
+        {
+            {1,         0,         0,        1,        0,        0},
+            {0,   0.33333,   0.50000,        0,  0.83333,  0.50000},
+            {0,   0.50000,         1,        0,  1.50000,        1},
+            {1,         0,         0,        2,        0,        0},
+            {0,   0.83333,   1.50000,        0,  2.66666,        2},
+            {0,   0.50000,         1,        0,        2,        2}
+        };
+
+
     }
 
     [TestClass]
@@ -95,7 +112,6 @@ namespace VMUnitTest
             }
         }
 
-
         [TestMethod]
         public void GlobalStiffnessMatrixConstruction()
         {
@@ -129,20 +145,11 @@ namespace VMUnitTest
         }
 
         [TestMethod]
-        public void GlobalStiffnessGetSubmatrix()
+        public void MatrixCreateSubmatrix()
         {
-            // Create the model
-            StructureStiffnessModel Model3 = new StructureStiffnessModel(9, 9);
-
-            // Add the elements
-            Model3.AddElement(Beam1);
-            Model3.AddElement(Beam2);
-            Model3.AssembleStiffnessMatrix();
-
-
             // ACT
             // Row 0-4 (incl.), Col 0-4 (incl.)
-            double[,] submatrix = MatrixOperations.CreateSubmatrix(Model3.GlobalStiffnessMatrix, 0, 0, 4, 4);
+            double[,] submatrix = MatrixOperations.CreateSubmatrix(TestMatrices.UnitGlobalStiffnessMatrixTwoElements, 0, 0, 4, 4);
 
             // ASSERT
             for (int i = 0; i < 5; i++)
@@ -156,7 +163,7 @@ namespace VMUnitTest
 
             // ACT
             // Row 0-4 (incl.), Col 5-8 (incl.)
-            double[,] submatrix2 = MatrixOperations.CreateSubmatrix(Model3.GlobalStiffnessMatrix, 0, 5, 4, 8);
+            double[,] submatrix2 = MatrixOperations.CreateSubmatrix(TestMatrices.UnitGlobalStiffnessMatrixTwoElements, 0, 5, 4, 8);
 
             // ASSERT
             for (int i = 0; i < 5; i++)
@@ -170,7 +177,7 @@ namespace VMUnitTest
 
             // ACT
             // Row 5-8 (incl.), Col 0-4 (incl.)
-            double[,] submatrix3 = MatrixOperations.CreateSubmatrix(Model3.GlobalStiffnessMatrix, 5, 0, 8, 4);
+            double[,] submatrix3 = MatrixOperations.CreateSubmatrix(TestMatrices.UnitGlobalStiffnessMatrixTwoElements, 5, 0, 8, 4);
 
             // ASSERT
             for (int i = 0; i < 4; i++)
@@ -184,7 +191,7 @@ namespace VMUnitTest
 
             // ACT
             // Row 5-8 (incl.), Col 5-8 (incl.)
-            double[,] submatrix4 = MatrixOperations.CreateSubmatrix(Model3.GlobalStiffnessMatrix, 5, 5, 8, 8);
+            double[,] submatrix4 = MatrixOperations.CreateSubmatrix(TestMatrices.UnitGlobalStiffnessMatrixTwoElements, 5, 5, 8, 8);
 
             // ASSERT
             for (int i = 0; i < 4; i++)
@@ -198,7 +205,7 @@ namespace VMUnitTest
 
             // ACT
             // Row 2-6 (incl.), Col 2-6 (incl.)
-            double[,] submatrix5 = MatrixOperations.CreateSubmatrix(Model3.GlobalStiffnessMatrix, 2, 2, 6, 6);
+            double[,] submatrix5 = MatrixOperations.CreateSubmatrix(TestMatrices.UnitGlobalStiffnessMatrixTwoElements, 2, 2, 6, 6);
 
             // ASSERT
             for (int i = 0; i < 5; i++)
@@ -212,7 +219,7 @@ namespace VMUnitTest
         }
 
         [TestMethod]
-        public void GlobalStiffnessRemoveColumn()
+        public void MatrixRemoveColumn()
         {
             // Create the model
             StructureStiffnessModel Model4 = new StructureStiffnessModel(9, 9);
@@ -249,8 +256,9 @@ namespace VMUnitTest
             Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[0, 5], temp2[0, 6]);
             Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[8, 8], temp2[8, 7]);
         }
+
         [TestMethod]
-        public void GlobalStiffnessRemoveRow()
+        public void MatrixRemoveRow()
         {
             // Create the model
             StructureStiffnessModel Model5 = new StructureStiffnessModel(9, 9);
@@ -286,6 +294,52 @@ namespace VMUnitTest
             Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[3, 0], temp2[3, 0]);
             Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[5, 0], temp2[4, 0]);
             Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[8, 8], temp2[7, 8]);
+        }
+
+        [TestMethod]
+        public void MatrixRemoveDOF()
+        {
+            double[,] temp = MatrixOperations.RemoveDOF(TestMatrices.UnitGlobalStiffnessMatrixTwoElements, 0);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[1, 1], temp[0, 0]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[8, 1], temp[7, 0]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[8, 8], temp[7, 7]);
+
+            double[,] temp2 = MatrixOperations.RemoveDOF(TestMatrices.UnitGlobalStiffnessMatrixTwoElements, 2);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[0, 0], temp2[0, 0]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[1, 1], temp2[1, 1]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[3, 3], temp2[2, 2]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[8, 8], temp2[7, 7]);
+        }
+
+        [TestMethod]
+        public void MatrixInversionTest()
+        {
+            // Remove DOF 0, 1, 2
+            double[,] temp = MatrixOperations.RemoveDOF(TestMatrices.UnitGlobalStiffnessMatrixTwoElements, 2);
+            temp = MatrixOperations.RemoveDOF(temp, 1);
+            temp = MatrixOperations.RemoveDOF(temp, 0);
+
+            // Still Square and symmetric?
+            Assert.IsTrue(MatrixOperations.IsSymmetric(temp));
+            Assert.IsTrue(MatrixOperations.IsSquare(temp));
+
+            // Check that DOF removals match expected results
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[3, 3], temp[0, 0]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[8, 8], temp[5, 5]);
+
+            // ACT
+            // Invert the matrix.
+            double[,] temp_inverse = MatrixOperations.MatrixInverse(temp);
+
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    string str = "--  " + i.ToString() + " , " + j.ToString() + " does not match";
+                    Assert.AreEqual(TestMatrices.InvK_free_free[i, j], temp_inverse[i, j], 0.00001, str);
+                }
+            }
+
         }
     }
 }

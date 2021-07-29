@@ -128,5 +128,164 @@ namespace VMUnitTest
             Assert.IsTrue(MatrixOperations.IsSymmetric(TestMatrices.UnitGlobalStiffnessMatrixTwoElements));
         }
 
+        [TestMethod]
+        public void GlobalStiffnessGetSubmatrix()
+        {
+            // Create the model
+            StructureStiffnessModel Model3 = new StructureStiffnessModel(9, 9);
+
+            // Add the elements
+            Model3.AddElement(Beam1);
+            Model3.AddElement(Beam2);
+            Model3.AssembleStiffnessMatrix();
+
+
+            // ACT
+            // Row 0-4 (incl.), Col 0-4 (incl.)
+            double[,] submatrix = MatrixOperations.CreateSubmatrix(Model3.GlobalStiffnessMatrix, 0, 0, 4, 4);
+
+            // ASSERT
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    string str = i.ToString() + "  , " + j.ToString() + "failed";
+                    Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[i,j],submatrix[i,j],str);
+                }
+            }
+
+            // ACT
+            // Row 0-4 (incl.), Col 5-8 (incl.)
+            double[,] submatrix2 = MatrixOperations.CreateSubmatrix(Model3.GlobalStiffnessMatrix, 0, 5, 4, 8);
+
+            // ASSERT
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    string str = i.ToString() + "  , " + j.ToString() + "failed";
+                    Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[i, j+5], submatrix2[i, j], str);
+                }
+            }
+
+            // ACT
+            // Row 5-8 (incl.), Col 0-4 (incl.)
+            double[,] submatrix3 = MatrixOperations.CreateSubmatrix(Model3.GlobalStiffnessMatrix, 5, 0, 8, 4);
+
+            // ASSERT
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    string str = i.ToString() + "  , " + j.ToString() + "failed";
+                    Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[i+5, j], submatrix3[i, j], str);
+                }
+            }
+
+            // ACT
+            // Row 5-8 (incl.), Col 5-8 (incl.)
+            double[,] submatrix4 = MatrixOperations.CreateSubmatrix(Model3.GlobalStiffnessMatrix, 5, 5, 8, 8);
+
+            // ASSERT
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    string str = i.ToString() + "  , " + j.ToString() + "failed";
+                    Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[i + 5, j+5], submatrix4[i, j], str);
+                }
+            }
+
+            // ACT
+            // Row 2-6 (incl.), Col 2-6 (incl.)
+            double[,] submatrix5 = MatrixOperations.CreateSubmatrix(Model3.GlobalStiffnessMatrix, 2, 2, 6, 6);
+
+            // ASSERT
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    string str = i.ToString() + "  , " + j.ToString() + "failed";
+                    Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[i + 2, j + 2], submatrix5[i, j], str);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void GlobalStiffnessRemoveColumn()
+        {
+            // Create the model
+            StructureStiffnessModel Model4 = new StructureStiffnessModel(9, 9);
+
+            // ACT
+            // Add the elements
+            Model4.AddElement(Beam1);
+            Model4.AddElement(Beam2);
+            Model4.AssembleStiffnessMatrix();
+
+            // Assert
+            Assert.AreEqual(Model4.GlobalStiffnessMatrix.GetLength(0), 9, " Before Row dimension does not match");
+            Assert.AreEqual(Model4.GlobalStiffnessMatrix.GetLength(1), 9, " Before Column dimension does not match");
+
+            // Remove the Column 0
+            double[,] temp = MatrixOperations.RemoveColumn(Model4.GlobalStiffnessMatrix, 0);
+
+            // Assert
+            Assert.AreEqual(temp.GetLength(0), 9, " After Row dimension does not match");
+            Assert.AreEqual(temp.GetLength(1), 8, " After Column dimension does not match");
+
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[0, 1], temp[0, 0]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[8, 8], temp[8, 7]);
+
+            // Remove Column 4
+            double[,] temp2 = MatrixOperations.RemoveColumn(Model4.GlobalStiffnessMatrix, 4);
+
+            // Assert
+            Assert.AreEqual(temp2.GetLength(0), 9, " After Row dimension does not match");
+            Assert.AreEqual(temp2.GetLength(1), 8, " After Column dimension does not match");
+
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[0, 0], temp2[0, 0]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[0, 4], temp2[0, 5]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[0, 5], temp2[0, 6]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[8, 8], temp2[8, 7]);
+        }
+        [TestMethod]
+        public void GlobalStiffnessRemoveRow()
+        {
+            // Create the model
+            StructureStiffnessModel Model5 = new StructureStiffnessModel(9, 9);
+
+            // ACT
+            // Add the elements
+            Model5.AddElement(Beam1);
+            Model5.AddElement(Beam2);
+            Model5.AssembleStiffnessMatrix();
+
+            // Assert
+            Assert.AreEqual(Model5.GlobalStiffnessMatrix.GetLength(0), 9, " Before Row dimension does not match");
+            Assert.AreEqual(Model5.GlobalStiffnessMatrix.GetLength(1), 9, " Before Column dimension does not match");
+
+            // Remove the Row 0
+            double[,] temp = MatrixOperations.RemoveRow(Model5.GlobalStiffnessMatrix, 0);
+
+            // Assert
+            Assert.AreEqual(temp.GetLength(0), 8, " After Row dimension does not match");
+            Assert.AreEqual(temp.GetLength(1), 9, " After Column dimension does not match");
+
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[1, 0], temp[0, 0]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[8, 8], temp[7, 8]);
+
+            // Remove Row 4
+            double[,] temp2 = MatrixOperations.RemoveRow(Model5.GlobalStiffnessMatrix, 4);
+
+            // Assert
+            Assert.AreEqual(temp2.GetLength(0), 8, " After Row dimension does not match");
+            Assert.AreEqual(temp2.GetLength(1), 9, " After Column dimension does not match");
+
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[0, 0], temp2[0, 0]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[3, 0], temp2[3, 0]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[5, 0], temp2[4, 0]);
+            Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[8, 8], temp2[7, 8]);
+        }
     }
 }

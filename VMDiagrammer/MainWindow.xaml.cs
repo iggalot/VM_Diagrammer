@@ -625,8 +625,9 @@ namespace VMDiagrammer
             Beams = new List<IDrawingObjects>();
             Loads = new List<IDrawingObjects>();
 
-            TestMultispanContinuousComplexCase();
-            //TestCantileverRightCase();
+            //// Several Test Scenario shortcuts
+            //TestMultispanContinuousComplexCase();
+            TestCantileverRightCase();
             //TestCantileverLeftCase();
 
             //// Add point load
@@ -681,7 +682,7 @@ namespace VMDiagrammer
 
             int testw1 = 10; // start intensity of the point load
             int testw2 = 10; // end intensity of the point load
-            int val = 400; // Position of the load
+            int val = 200; // Position of the load
             VM_Beam testbeam = GetBeamByXCoord(val);
             double testd1 = GetDistanceFromStartNode(val - testbeam.Start.X, testbeam);
             double testd2 = testd1;

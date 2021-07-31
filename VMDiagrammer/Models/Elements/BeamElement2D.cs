@@ -76,7 +76,20 @@ namespace VMDiagrammer.Models.Elements
                 m_YoungsModulus = value;            }
         }
 
+        public BeamElement2D(VM_Beam beam)
+        {
+            StartNode = beam.Start;
+            EndNode = beam.End;
+            m_Angle = Math.Atan((EndNode.Y - StartNode.Y) / (EndNode.X - StartNode.X));
 
+
+            A = beam.Area;
+            L = beam.Length;
+            E = beam.YoungsModulus;
+            I = beam.Inertia;
+
+            CreateStiffnessMatrices();
+        }
 
         /// <summary>
         /// Constructor
@@ -93,6 +106,11 @@ namespace VMDiagrammer.Models.Elements
             E = young;
             I = inertia;
 
+            CreateStiffnessMatrices();
+        }
+
+        private void CreateStiffnessMatrices()
+        {
             m_TransformationMatrix = new double[,]
             {
                 // Degrees of freedom u1, v1, theta1, u2, v2, theta2
@@ -127,12 +145,12 @@ namespace VMDiagrammer.Models.Elements
             };
 
             TransformedGlobalStiffnessElement = MatrixOperations.MatrixProduct(StiffnessElement, m_TransformationMatrix);
-            if(!MatrixOperations.IsSymmetric(m_TransformationMatrix))
-                Console.WriteLine("m_Transformation is not symmetric -- S: " + start.Index + " E: " + end.Index);
+            if (!MatrixOperations.IsSymmetric(m_TransformationMatrix))
+                Console.WriteLine("m_Transformation is not symmetric -- S: " + StartNode.Index + " E: " + EndNode.Index);
             if (!MatrixOperations.IsSymmetric(StiffnessElement))
-                Console.WriteLine("StiffnessElement is not symmetric -- S: " + start.Index + " E: " + end.Index);
+                Console.WriteLine("StiffnessElement is not symmetric -- S: " + StartNode.Index + " E: " + StartNode.Index);
             if (!MatrixOperations.IsSymmetric(TransformedGlobalStiffnessElement))
-                Console.WriteLine("TransformedGlobalStiffnessElement is not symmetric -- S: " + start.Index + " E: " + end.Index);
+                Console.WriteLine("TransformedGlobalStiffnessElement is not symmetric -- S: " + StartNode.Index + " E: " + StartNode.Index);
         }
 
         public override string ToString()

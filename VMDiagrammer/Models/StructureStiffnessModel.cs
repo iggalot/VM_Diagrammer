@@ -22,7 +22,7 @@ namespace VMDiagrammer.Models
 
         public void AddElement(VM_Beam beam)
         {
-            m_ElementList.Add(new BeamElement2D(beam.Start, beam.End, 1, 1, 1, 1));
+            m_ElementList.Add(new BeamElement2D(beam.Start, beam.End, beam.Area, beam.Length, beam.YoungsModulus, beam.Inertia));
         }
 
         // Contains a vector of our known and unknown nodal displacements

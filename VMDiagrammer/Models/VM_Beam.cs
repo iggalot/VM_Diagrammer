@@ -47,12 +47,22 @@ namespace VMDiagrammer.Models
             get => Math.Sqrt((End.X - Start.X) * (End.X - Start.X) + (End.Y - Start.Y) * (End.Y - Start.Y));
         }
 
+        public double Area { get; set; }
+
+        public double Inertia { get; set; }
+
+        public double YoungsModulus { get; set; }
+
         /// <summary>
-        /// Constructor
+        /// Default constructor
         /// </summary>
         /// <param name="start">start node for the beam</param>
         /// <param name="end">end node for the beam</param>
-        public VM_Beam(VM_Node start, VM_Node end, int index) : base(index)
+        /// <param name="index"></param>
+        /// <param name="area">cross sectional area of the beam member (normal to length)</param>
+        /// <param name="youngsModulus">Young's modulus for the material</param>
+        /// <param name="inertia">moment of inertia of the beam member (with respect to horizontal axis of the cross section</param>
+        public VM_Beam(VM_Node start, VM_Node end, int index, double area=1, double youngsModulus=1, double inertia=1) : base(index)
         {
             // If the start node is to the right of the end node, reverse their order in this data object
             if(start.X < end.X)
@@ -65,11 +75,13 @@ namespace VMDiagrammer.Models
                 End = start;
             }
 
+            Area = area;
+            YoungsModulus = youngsModulus;
+            Inertia = inertia;
+
             // Set the line thickness for this object when drawn
             Thickness = 8.0;
 
-            // Calculate the midpoint of the beam
-            //MidPoint = new VM_Node(0.5 * (Start.X + End.X), 0.5 * (Start.Y + End.Y), false, false, false);
         }
         public override string ToString()
         {

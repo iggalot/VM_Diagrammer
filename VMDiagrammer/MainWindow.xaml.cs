@@ -99,9 +99,18 @@ namespace VMDiagrammer
                 string str = "";
                 //str += Model.DisplayMatrixInfo(Model.K_Free_Free);
 
-                str += "\nDisplacement Vector \n";
-                str += Model.DisplayMatrixInfoNullable(Model.DisplacementVector) + "\n";
-                str += "********************************\n";
+                if (Model == null)
+                {
+                    str += "No valid model\n";
+                }
+                else
+                {
+                    str += "\nDisplacement Vector \n";
+                    str += Model.DisplayMatrixInfoNullable(Model.DisplacementVector) + "\n";
+                    str += "********************************\n";
+                }
+
+
                 return str;
             }
         }
@@ -111,10 +120,19 @@ namespace VMDiagrammer
             get
             {
                 string str = "";
-                //str += Model.DisplayMatrixInfo(Model.K_Free_Free);
-                str += "\nLoad Vector \n";
-                str += Model.DisplayMatrixInfoNullable(Model.LoadVector) + "\n";
-                str += "********************************\n";
+
+                if (Model == null)
+                {
+                    str += "No valid model\n";
+                }
+                else
+                {
+                    //str += Model.DisplayMatrixInfo(Model.K_Free_Free);
+                    str += "\nLoad Vector \n";
+                    str += Model.DisplayMatrixInfoNullable(Model.LoadVector) + "\n";
+                    str += "********************************\n";
+                }
+
 
                 return str;
             }
@@ -437,14 +455,20 @@ namespace VMDiagrammer
         private void OnUserUpdate()
         {
             // Draw the beams -- drawn first so they are behind everything on the screen
+            if(Beams==null)
+                DrawingHelpers.DrawText(MainCanvas, 20, 20, 0, "No Beams", Brushes.Black, 15);
             foreach (VM_Beam item in Beams)
                 item.Draw(MainCanvas);
 
             // Draw the nodes
+            if (Nodes == null)
+                DrawingHelpers.DrawText(MainCanvas, 40, 40, 0, "No Nodes", Brushes.Black, 15);
             foreach (VM_Node item in Nodes)
                 item.Draw(MainCanvas);
 
             // Draw the loads
+            if (Loads == null)
+                DrawingHelpers.DrawText(MainCanvas, 60, 60, 0, "No Loads", Brushes.Black, 15);
             foreach (VM_BaseLoad item in Loads)
             {
                 switch(item.LoadType)
@@ -465,8 +489,11 @@ namespace VMDiagrammer
                 }
             }
 
+            // Draw the loads
+            if (Loads == null)
+                DrawingHelpers.DrawText(MainCanvas, 80, 80, 0, "No Critical Points", Brushes.Black, 15);
             // Draw the lines for the critical points
-            foreach(VM_Node item in CriticalPoints)
+            foreach (VM_Node item in CriticalPoints)
             {
                 DrawingHelpers.DrawLine(MainCanvas, item.X, item.Y + 50, item.X, item.Y + 600, Brushes.Green, item.Thickness);
             }
@@ -478,6 +505,8 @@ namespace VMDiagrammer
             //for(double i = LeftMostNode.X; i<= 520; i = i+10)
             //Console.WriteLine(i.ToString() + " is on Beam #" + GetBeamByXCoord(i).Index) ;
         
+            // Update the display info
+            UpdateDisplayInfo();
         }
 
         /// <summary>
@@ -624,10 +653,29 @@ namespace VMDiagrammer
             Nodes = new List<IDrawingObjects>();
             Beams = new List<IDrawingObjects>();
             Loads = new List<IDrawingObjects>();
+        }
+
+        private protected void ClearExistingModelInfo()
+        {
+            // Clear the canvas
+            MainCanvas.Children.Clear();
+
+            // Clear the existing model
+            Model = null;
+            Nodes.Clear();
+            Beams.Clear();
+            Loads.Clear();
+            CriticalPoints.Clear();
+
+            UpdateDisplayInfo();
+        }
+
+        private void MakeModel()
+        {
 
             //// Several Test Scenario shortcuts
             //TestMultispanContinuousComplexCase();
-            TestCantileverRightCase();
+            //TestCantileverRightCase();
             //TestCantileverLeftCase();
 
             //// Add point load
@@ -669,7 +717,7 @@ namespace VMDiagrammer
 
 
             // Create our Structure Stiffness Model from our beams
-            Model = new StructureStiffnessModel(Nodes.Count*3, Nodes.Count*3);
+            Model = new StructureStiffnessModel(Nodes.Count * 3, Nodes.Count * 3);
 
             foreach (var beam in Beams)
             {
@@ -748,7 +796,7 @@ namespace VMDiagrammer
                 if (Math.Abs((double)Model.DisplacementVector[i, 0]) > maxDisp)
                 {
                     maxDisp = Math.Abs((double)Model.DisplacementVector[i, 0]);
-                } 
+                }
             }
 
             // Scale displacments so that max displacement is 75 pixels
@@ -756,9 +804,9 @@ namespace VMDiagrammer
 
             DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + vertOffset, RightMostNode.X, RightMostNode.Y + vertOffset, Brushes.Purple, 1);
 
-            foreach(IDrawingObjects node in Nodes)
+            foreach (IDrawingObjects node in Nodes)
             {
-                
+
                 // Find the displacements at the node we are searching for
                 for (int i = 0; i < Model.DOF_Indices.GetLength(0); i++)
                 {
@@ -785,11 +833,7 @@ namespace VMDiagrammer
             // Draw deflected shape
             // 1. Start at leftmost...
             // 2. Draw displacement offset
-
-
-
         }
-
 
 
         /// <summary>
@@ -820,6 +864,12 @@ namespace VMDiagrammer
             OnUserUpdate();
         }
 
+        private protected void UpdateDisplayInfo()
+        {
+            OnPropertyChanged("strDisplayInfo");
+            OnPropertyChanged("strDisplayDisplacementMatrixResults");
+            OnPropertyChanged("strDisplayLoadMatrixResults");
+        }
 
         private protected string DisplayInfo()
         {
@@ -1027,6 +1077,48 @@ namespace VMDiagrammer
 
             return count;
 
+        }
+
+        private void Button_Click_Model1(object sender, RoutedEventArgs e)
+        {
+            ClearExistingModelInfo();
+
+            TestMultispanContinuousComplexCase();
+
+            MakeModel();
+
+            OnUserUpdate();
+
+        }
+
+        private void Button_Click_Model2(object sender, RoutedEventArgs e)
+        {
+
+            ClearExistingModelInfo();
+
+            TestCantileverRightCase();
+
+            MakeModel();
+
+            OnUserUpdate();
+        }
+
+        private void Button_Click_Model3(object sender, RoutedEventArgs e)
+        {
+            ClearExistingModelInfo();
+
+            TestCantileverLeftCase();
+
+            MakeModel();
+
+            OnUserUpdate();
+        }
+
+        private void Button_Click_ClearAll(object sender, RoutedEventArgs e)
+        {
+            ClearExistingModelInfo();
+
+            OnUserUpdate();
         }
     }
 

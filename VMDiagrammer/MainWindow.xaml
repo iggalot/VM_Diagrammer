@@ -7,6 +7,15 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="2000">
     <Grid Margin ="15">
+        <StackPanel Orientation="Horizontal">
+            <Button VerticalAlignment="Top" Width="75" Height="25" Content="Model 1" Click="Button_Click_Model1"/>
+            <Button VerticalAlignment="Top" Width="75" Height="25" Content="Model 2" Click="Button_Click_Model2"/>
+            <Button VerticalAlignment="Top" Width="75" Height="25" Content="Model 3" Click="Button_Click_Model3"/>
+            <Button VerticalAlignment="Top" Width="75" Height="25" Content="CLEAR ALL" Click="Button_Click_ClearAll"/>
+
+
+
+        </StackPanel>
         <StackPanel Orientation="Vertical">
             <TextBox Height="25" Width="100" Text="{Binding MouseLocationString}"/>
             <StackPanel Orientation="Horizontal">

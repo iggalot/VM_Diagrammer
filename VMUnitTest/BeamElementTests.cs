@@ -39,6 +39,33 @@ namespace VMUnitTest
         };
 
         /// <summary>
+        /// Free DOF stiffness matrix for 1 --- 2 ---- 3  model of UnitGlobalStiffnessMatrixTwoElements
+        /// DOF 3, 4, 5, 6, 7, 8
+        /// A=1, L=1, E=1
+        /// </summary>
+        public static double[,] UnitK_free_free = new double[,]
+        {
+            { 2,     0,    0,     -1,     0,     0},
+            { 0,    24,    0,      0,   -12,     6},
+            { 0,     0,    8,      0,    -6,     2},
+            {-1,     0,    0,      1,     0,     0},
+            { 0,   -12,   -6,      0,    12,    -6},
+            { 0,     6,    2,      0,    -6,     4}
+        };
+
+        /// <summary>
+        /// Free DOF stiffness matrix for 1 --- 2 ---- 3  model of UnitGlobalStiffnessMatrixTwoElements
+        /// DOF 3, 4, 5, 6, 7, 8
+        /// A=1, L=1, E=1
+        /// </summary>
+        public static double[,] UnitK_fixed_fixed = new double[,]
+        {
+            { 1,  0,  0},
+            { 0, 12,  6},
+            { 0,  6,  4}
+        };
+
+        /// <summary>
         /// Inverse stiffness matrix for 1 --- 2 ---- 3  model of UnitGlobalStiffnessMatrixTwoElements
         /// with DOF 0, 1, 2 removed
         /// A=1, L=1, E=1
@@ -52,6 +79,8 @@ namespace VMUnitTest
             {0,   0.83333,   1.50000,        0,  2.66666,        2},
             {0,   0.50000,         1,        0,        2,        2}
         };
+
+
 
 
     }
@@ -132,6 +161,42 @@ namespace VMUnitTest
                 {
                     Assert.AreEqual(TestMatrices.UnitGlobalStiffnessMatrixTwoElements[i, j],
                         Model2.GlobalStiffnessMatrix[i, j]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void PopulateStiffnessPartitionsConstruction()
+        {
+            // Create the model
+            StructureStiffnessModel Model6 = new StructureStiffnessModel(9, 9);
+
+            // ACT
+            // Add the elements
+            Model6.AddElement(Beam1);
+            Model6.AddElement(Beam2);
+            Model6.AssembleAllMatrix();
+
+            Model6.PopulateStiffnessPartitions();
+
+            // ASSERT
+            // Fixed Fixed stiffness matrix
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    Assert.AreEqual(TestMatrices.UnitK_fixed_fixed[i, j],
+                        Model6.K_Fixed_Fixed[i, j], " Fixed-Fixed partition does not match for element"+i.ToString()+ ","+j.ToString());
+                }
+            }
+
+            // Free Free stiffness matrix
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    Assert.AreEqual(TestMatrices.UnitK_free_free[i, j],
+                        Model6.K_Free_Free[i, j], " Free-Free partition does not match for element" + i.ToString() + "," + j.ToString());
                 }
             }
         }

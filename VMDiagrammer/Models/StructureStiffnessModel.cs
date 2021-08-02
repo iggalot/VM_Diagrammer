@@ -45,7 +45,6 @@ namespace VMDiagrammer.Models
             }
         }
 
-
         // Contains a vector of our forces.
         public double?[,] LoadVector
         {
@@ -85,7 +84,7 @@ namespace VMDiagrammer.Models
         }
 
         /// <summary>
-        /// Stiffness submatrices
+        /// Grouped Stiffness submatrices
         /// [
         ///    K_Free_Free       |       K_Free_Fixed     
         ///   -------------------------------------------
@@ -244,31 +243,6 @@ namespace VMDiagrammer.Models
                     if (LoadVector[i,0] == null)
                         LoadVector[i, 0] = 0;
             }
-
-
-            //foreach (var elem in m_ElementList)
-            //{
-            //    // Row 0 -- DOFX at start
-            //    LoadVector[elem.StartNode.DOF_IndexVector[0], 0] = elem.StartNode.ForceVector[0, 0];
-
-            //    // Row 1 -- DOFY at start
-            //    LoadVector[elem.StartNode.DOF_IndexVector[1], 0] = elem.StartNode.ForceVector[1, 0];
-
-            //    // Row 2 -- DOF_ROT at start
-            //    LoadVector[elem.StartNode.DOF_IndexVector[2], 0] = elem.StartNode.ForceVector[2, 0];
-
-            //    // Row 3 -- DOFX at end
-            //    LoadVector[elem.EndNode.DOF_IndexVector[0], 0] = elem.EndNode.ForceVector[0, 0];
-
-            //    // Row 4 -- DOFY at end
-            //    LoadVector[elem.EndNode.DOF_IndexVector[1], 0] = elem.EndNode.ForceVector[1, 0];
-
-            //    // Row  -- DOF_ROT at end
-            //    LoadVector[elem.EndNode.DOF_IndexVector[2], 0] = elem.EndNode.ForceVector[2, 0];
-
-            //    //Console.WriteLine(this.ToString());
-            //    //Console.WriteLine("=================================\n");
-            //}
         }
 
         /// <summary>
@@ -279,8 +253,9 @@ namespace VMDiagrammer.Models
             AssembleStiffnessMatrix();
             AssembleDisplacementVector();
             AssembleLoadVector();
-        }
 
+            //Console.WriteLine("Ungrouped Global Stiffness Matrix\n" + MatrixOperations.Display(m_GlobalStiffnessMatrix));
+        }
 
         /// <summary>
         /// Function that rearranges rows and columns of an array matrix.
@@ -310,7 +285,6 @@ namespace VMDiagrammer.Models
                     MatrixOperations.SwapRowsNullableVector(ref m_DisplacementVector, j, j + 1);
                     MatrixOperations.SwapRowsNullableVector(ref m_LoadVector, j, j + 1);
                     MatrixOperations.SwapRows(ref m_DOF_Indices, j, j + 1);
-
                 }
 
                 for (int k = 0; k < copyDOF_tobeMoved.Count; k++)
@@ -376,7 +350,6 @@ namespace VMDiagrammer.Models
                         str += "   ,   ";
                     }
                 }
-
                 str += "\n";
             }
 
@@ -455,28 +428,32 @@ namespace VMDiagrammer.Models
         /// <summary>
         /// Populates our submatrix partitions
         /// </summary>
-
         public void PopulateStiffnessPartitions()
         {
+            // Count restrained DOF
+            CountRestrainedDOF();
+
+            // Collect / Sort the free and fixed DOF
+            this.GroupFixedFreeDOF();
+            //Console.WriteLine("Grouped DOF Stiffness Matrix\n" + MatrixOperations.Display(m_GlobalStiffnessMatrix));
+
             int numUnrestrainedDOF = this.Rows - numRestrainedDOF;
 
             // populate K_FREE_FREE
             K_Free_Free = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, 0, 0, numUnrestrainedDOF-1, numUnrestrainedDOF-1);
-                
+            // Console.WriteLine("K_FREE_FREE\n" + MatrixOperations.Display(K_Free_Free));
+            
             // populate K_FIXED_FIXED
             K_Fixed_Fixed = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, numUnrestrainedDOF, numUnrestrainedDOF, this.Rows-1, this.Cols-1);
+            //Console.WriteLine("K_FIXED_FIXED\n" + MatrixOperations.Display(K_Fixed_Fixed));
 
             // populate K_FREE_FIXED
             K_Free_Fixed = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, 0, numUnrestrainedDOF, numUnrestrainedDOF-1, this.Cols - 1); ;
+            //Console.WriteLine("K_FREE_FIXED\n" + MatrixOperations.Display(K_Free_Fixed));
 
             // populate K_FIXED_FREE
             K_Fixed_Free = MatrixOperations.CreateSubmatrix(m_GlobalStiffnessMatrix, numUnrestrainedDOF, 0, this.Rows-1, numUnrestrainedDOF - 1); ;
-
-            // Display the matrices
-            Console.WriteLine("K_FREE_FREE\n" + MatrixOperations.Display(K_Free_Free));
-            Console.WriteLine("K_FIXED_FIXED\n" + MatrixOperations.Display(K_Fixed_Fixed));
-            Console.WriteLine("K_FIXED_FREE\n" + MatrixOperations.Display(K_Fixed_Free));
-            Console.WriteLine("K_FREE_FIXED\n" + MatrixOperations.Display(K_Free_Fixed));
+            //Console.WriteLine("K_FIXED_FREE\n" + MatrixOperations.Display(K_Fixed_Free));
         }
 
         /// <summary>
@@ -484,27 +461,13 @@ namespace VMDiagrammer.Models
         /// </summary>
         public void Solve()
         {
-
-
             // 1. Assemble the matrices
             this.AssembleAllMatrix(); // assemble the stiffness matrix
-
-
 
             if (!MatrixOperations.IsSymmetric(this.GlobalStiffnessMatrix))
                 throw new InvalidOperationException("In Solve():  Global Stiffness Matrix is not symmetric!");
 
-            Console.WriteLine("Ungrouped Global Stiffness Matrix\n" + MatrixOperations.Display(m_GlobalStiffnessMatrix));
-
-            // 2. Count restrained DOF
-            CountRestrainedDOF();
-
-            // 3. Collect / Sort the free and fixed DOF
-            this.GroupFixedFreeDOF();
-
-            Console.WriteLine("Grouped DOF Stiffness Matrix\n" + MatrixOperations.Display(m_GlobalStiffnessMatrix));
-
-            // 4. First populate the partitions for stiffness
+            // 2. Then populate the subpartitions for stiffness
             this.PopulateStiffnessPartitions();
 
             // Check symmetric status of stiffness partitions
@@ -513,8 +476,6 @@ namespace VMDiagrammer.Models
             if (!MatrixOperations.IsSymmetric(this.K_Free_Free))
                 throw new InvalidOperationException("K_Free_Free is not symmetric!");
 
-
-
             //// populate DISP_FREE
             //Disp_Free = MatrixOperations.ConvertFromNullable(MatrixOperations.CreateSubmatrixNullable(m_DisplacementVector, 0, 0, numUnrestrainedDOF - 1, 0));
             Disp_Fixed = MatrixOperations.ConvertFromNullable(MatrixOperations.CreateSubmatrixNullable(m_DisplacementVector, numUnrestrainedDOF, 0, this.Rows - 1, 0));
@@ -522,18 +483,15 @@ namespace VMDiagrammer.Models
             // populate Load_FREE
             Load_Free = MatrixOperations.ConvertFromNullable(MatrixOperations.CreateSubmatrixNullable(m_LoadVector, 0, 0, numUnrestrainedDOF - 1, 0));
 
-
             // 2. Invert FREE FREE stiffness matrix
             invK_Free_Free = MatrixOperations.MatrixInverse(K_Free_Free);
-            Console.WriteLine("Inverse K_FREE_FREE\n" + MatrixOperations.Display(invK_Free_Free));
+            //Console.WriteLine("Inverse K_FREE_FREE\n" + MatrixOperations.Display(invK_Free_Free));
 
             // 3. Solve for free displacements, Disp_Free
             double[,] prod = MatrixOperations.MatrixProduct(K_Free_Fixed, Disp_Fixed);
             double[,] diff = MatrixOperations.MatrixSubtract(Load_Free, prod);
 
             Disp_Free = MatrixOperations.MatrixProduct(invK_Free_Free, diff);
-
-
 
             // 4. Solve for support reactions, Load_Fixed
             double[,] prod1 = MatrixOperations.MatrixProduct(K_Fixed_Free, Disp_Free);
@@ -546,6 +504,9 @@ namespace VMDiagrammer.Models
             CreateLoadVectorFull();
         }
 
+        /// <summary>
+        /// Combines the Disp_Free results and the Disp_Fixed results into a single non-null vector.
+        /// </summary>
         protected void CreateDisplacementVectorFull()
         {
             int free_DOF_count = Disp_Free.GetLength(0);
@@ -563,7 +524,9 @@ namespace VMDiagrammer.Models
             }
         }
 
-
+        /// <summary>
+        /// Combines the Load_Free results and the Load_Fixed results into a single non-null vector.
+        /// </summary>
         protected void CreateLoadVectorFull()
         {
             int free_DOF_count = Load_Free.GetLength(0);

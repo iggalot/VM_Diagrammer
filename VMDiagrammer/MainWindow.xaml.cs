@@ -836,33 +836,7 @@ namespace VMDiagrammer
         }
 
 
-        /// <summary>
-        /// Our event for when the mouse moves over the canvas
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MainCanvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            CurrentMouseLocationPoint = e.GetPosition(MainCanvas);
-        }
-
-        /// <summary>
-        /// Out event for when the mouse button is released.  Used to draw a node at that location.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MainCanvas_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            Point p = e.GetPosition(MainCanvas);  // retrieve the current mouse poistion
-
-            // Create a node at the position
-            VM_Node newNode = new VM_Node(p.X, p.Y, false, false, false,GetNextNodeNumber());  
-
-            // Add it to the model
-            Nodes.Add(newNode);
-
-            OnUserUpdate();
-        }
+ 
 
         private protected void UpdateDisplayInfo()
         {
@@ -1059,26 +1033,36 @@ namespace VMDiagrammer
         // Scans the node list for the next available node number
         public int GetNextNodeNumber()
         {
-            int count = 0;
+            int index = 0;
             bool found = true;
 
-            while (true)
+            while (found)
             {
                 found = false;
                 foreach (VM_Node node in l_Nodes)
                 {
-                    if (count == node.Index)
+                    if (index == node.Index)
+                    {
+                        // found a matching node number
                         found = true;
+
+                        // so increase our count number
+                        index++;
+                        break;
+                    }
                 }
 
-                if (found)
-                    count++;
+                // We've searched the list...if no node found with that number, we have our index so break out of the while loop
+                if (!found)
+                    break;
             }
 
-            return count;
+
+            return index;
 
         }
 
+        #region UI Button Clicks
         private void Button_Click_Model1(object sender, RoutedEventArgs e)
         {
             ClearExistingModelInfo();
@@ -1120,6 +1104,36 @@ namespace VMDiagrammer
 
             OnUserUpdate();
         }
-    }
+        #endregion
 
+        #region Mouse Controls
+        /// <summary>
+        /// Our event for when the mouse moves over the canvas
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainCanvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            CurrentMouseLocationPoint = e.GetPosition(MainCanvas);
+        }
+
+        /// <summary>
+        /// Out event for when the mouse button is released.  Used to draw a node at that location.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainCanvas_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Point p = e.GetPosition(MainCanvas);  // retrieve the current mouse position
+
+            // Create a node at the position
+            VM_Node newNode = new VM_Node(p.X, p.Y, false, false, false, GetNextNodeNumber());
+
+            // Add it to the model
+            Nodes.Add(newNode);
+
+            OnUserUpdate();
+        }
+        #endregion
+    }
 }

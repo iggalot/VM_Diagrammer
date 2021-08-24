@@ -492,6 +492,7 @@ namespace VMDiagrammer
             // Draw the loads
             if (Loads == null)
                 DrawingHelpers.DrawText(MainCanvas, 80, 80, 0, "No Critical Points", Brushes.Black, 15);
+
             // Draw the lines for the critical points
             foreach (VM_Node item in CriticalPoints)
             {
@@ -504,9 +505,60 @@ namespace VMDiagrammer
             // Testing node location function
             //for(double i = LeftMostNode.X; i<= 520; i = i+10)
             //Console.WriteLine(i.ToString() + " is on Beam #" + GetBeamByXCoord(i).Index) ;
-        
+
+            // *******************************
+            // Drawing the deflected shape
+            // *******************************
+            DrawDeflectedShape();
+
+
             // Update the display info
             UpdateDisplayInfo();
+        }
+
+        private void TestSimplySupportedCase()
+        {
+            // Create some nodes
+            VM_Node NodeA = new VM_Node(50, 100, true, true, false, 0);
+            AddNode(NodeA);
+            VM_Node NodeB = new VM_Node(75, 100, false, false, false, 1);
+            AddNode(NodeB);
+            VM_Node NodeC = new VM_Node(100, 100, false, false, false, 2);
+            AddNode(NodeC);
+            VM_Node NodeD = new VM_Node(150, 100, false, false, false, 3);
+            AddNode(NodeD);
+            VM_Node NodeE = new VM_Node(200, 100, false, false, false, 4);
+            AddNode(NodeE);
+            VM_Node NodeF = new VM_Node(250, 100, false, false, false, 5);
+            AddNode(NodeF);
+            VM_Node NodeG = new VM_Node(300, 100, false, false, false, 6);
+            AddNode(NodeG);
+            VM_Node NodeH = new VM_Node(350, 100, false, false, false, 7);
+            AddNode(NodeH);
+            VM_Node NodeI = new VM_Node(400, 100, false, false, false, 8);
+            AddNode(NodeI);
+            VM_Node NodeJ = new VM_Node(450, 100, false, true, false, 9);
+            AddNode(NodeJ);
+
+            //// Create some beams
+            VM_Beam Beam1 = new VM_Beam(NodeB, NodeA, 10);
+            Beams.Add(Beam1);
+            VM_Beam Beam2 = new VM_Beam(NodeC, NodeB, 11);
+            Beams.Add(Beam2);
+            VM_Beam Beam3 = new VM_Beam(NodeC, NodeD, 12);
+            Beams.Add(Beam3);
+            VM_Beam Beam4 = new VM_Beam(NodeE, NodeD, 13);
+            Beams.Add(Beam4);
+            VM_Beam Beam5 = new VM_Beam(NodeE, NodeF, 14);
+            Beams.Add(Beam5);
+            VM_Beam Beam6 = new VM_Beam(NodeF, NodeG, 15);
+            Beams.Add(Beam6);
+            VM_Beam Beam7 = new VM_Beam(NodeG, NodeH, 16);
+            Beams.Add(Beam7);
+            VM_Beam Beam8 = new VM_Beam(NodeH, NodeI, 17);
+            Beams.Add(Beam8);
+            VM_Beam Beam9 = new VM_Beam(NodeI, NodeJ, 18);
+            Beams.Add(Beam9);
         }
 
         /// <summary>
@@ -644,86 +696,8 @@ namespace VMDiagrammer
             Beams.Add(Beam8);
         }
 
-
-        /// <summary>
-        /// Routine that is called once on application started
-        /// </summary>
-        private void OnUserCreate()
+        protected void TestLoadCreate()
         {
-            Nodes = new List<IDrawingObjects>();
-            Beams = new List<IDrawingObjects>();
-            Loads = new List<IDrawingObjects>();
-        }
-
-        private protected void ClearExistingModelInfo()
-        {
-            // Clear the canvas
-            MainCanvas.Children.Clear();
-
-            // Clear the existing model
-            Model = null;
-            Nodes.Clear();
-            Beams.Clear();
-            Loads.Clear();
-            CriticalPoints.Clear();
-
-            UpdateDisplayInfo();
-        }
-
-        private void MakeModel()
-        {
-
-            //// Several Test Scenario shortcuts
-            //TestMultispanContinuousComplexCase();
-            //TestCantileverRightCase();
-            //TestCantileverLeftCase();
-
-            //// Add point load
-            //VM_BaseLoad loada = new VM_PointForce((VM_Beam)Beams[0], 100, 100, -50, -50);
-            //Loads.Add(loada);
-
-            //// Add point load
-            //VM_BaseLoad loadb = new VM_PointForce((VM_Beam)Beams[2], 60, 60, +100, +100);
-            //Loads.Add(loadb);
-
-            //// Add distributed load
-            //VM_BaseLoad load2 = new VM_DistributedForce((VM_Beam)Beams[0], 50, 150, -50, -80);
-            //Loads.Add(load2);
-            //// Add distributed load
-            //VM_BaseLoad load4 = new VM_DistributedForce((VM_Beam)Beams[0], 150, 200, -80, 0);
-            //Loads.Add(load4);
-            //// Add distributed load
-            //VM_BaseLoad load3 = new VM_DistributedForce((VM_Beam)Beams[1], 20, 60, +30, +100);
-            //Loads.Add(load3);
-            //// Add distributed load
-            //VM_BaseLoad load5 = new VM_DistributedForce((VM_Beam)Beams[1], 60, 80, +100, +100);
-            //Loads.Add(load5);
-
-            //// Add concentrated moments
-            //VM_BaseLoad loadc = new VM_PointMoment((VM_Beam)Beams[3], 70, 70, 50, 50, ArrowDirections.ARROW_COUNTERCLOCKWISE);
-            //Loads.Add(loadc);
-            //VM_BaseLoad loadd = new VM_PointMoment((VM_Beam)Beams[2], 0, 0, 50, 50, ArrowDirections.ARROW_CLOCKWISE);
-            //Loads.Add(loadd);
-
-            // Create a list of Critical Points.
-            CriticalPoints = CreateVMNodeCriticalPointsList();
-
-            // Sort lists in order of lowest to highest X-coord
-            MathHelpers.BubbleSortNodesByXCoord(ref l_Nodes);
-            MathHelpers.BubbleSortBeamsByXCoord(ref l_Beams);
-            MathHelpers.BubbleSortNodesByXCoord(ref l_CriticalPoints);
-
-            // TODO:: Sort the loads from left to right based on D1 position and Start node of beam position....
-
-
-            // Create our Structure Stiffness Model from our beams
-            Model = new StructureStiffnessModel(Nodes.Count * 3, Nodes.Count * 3);
-
-            foreach (var beam in Beams)
-            {
-                Model.AddElement((VM_Beam)beam);
-                // TODO::  Add matrix transformations.
-            }
 
             // Add a nodal load vector to test
             //Model.LoadVector[13, 0] = 10; // Positive load is downwards?
@@ -732,7 +706,7 @@ namespace VMDiagrammer
             int testw2 = 10; // end intensity of the point load
             int val = 200; // Position of the load
             VM_Beam testbeam = GetBeamByXCoord(val);
-            double testd1 = GetDistanceFromStartNode(val - testbeam.Start.X, testbeam);
+            double testd1 = val - testbeam.Start.X;
             double testd2 = testd1;
 
             //// Start node nodal moment equivalent
@@ -769,29 +743,89 @@ namespace VMDiagrammer
 
             Console.WriteLine("Load vector: " + MatrixOperations.DisplayNullable(Model.LoadVector));
 
+        }
 
-            // Solve for the results of the model.
+        protected void SolveModel()
+        {
             Model.Solve();
 
             Console.WriteLine("Results: \n");
             Console.WriteLine("Free Displacements: \n" + MatrixOperations.Display(Model.Disp_Free) + "\n");
             Console.WriteLine("Support Reactions: \n" + MatrixOperations.Display(Model.Load_Fixed) + "\n");
+        }
+
+        /// <summary>
+        /// Routine that is called once on application started
+        /// </summary>
+        private void OnUserCreate()
+        {
+            Nodes = new List<IDrawingObjects>();
+            Beams = new List<IDrawingObjects>();
+            Loads = new List<IDrawingObjects>();
+        }
+
+        private protected void ClearExistingModelInfo()
+        {
+            // Clear the canvas
+            MainCanvas.Children.Clear();
+
+            // Clear the existing model
+            Model = null;
+            Nodes.Clear();
+            Beams.Clear();
+            Loads.Clear();
+            CriticalPoints.Clear();
+
+            UpdateDisplayInfo();
+        }
+
+        private void MakeModel()
+        {
+            // Create a list of Critical Points.
+            CriticalPoints = CreateVMNodeCriticalPointsList();
+
+            // Sort lists in order of lowest to highest X-coord
+            MathHelpers.BubbleSortNodesByXCoord(ref l_Nodes);
+            MathHelpers.BubbleSortBeamsByXCoord(ref l_Beams);
+            MathHelpers.BubbleSortNodesByXCoord(ref l_CriticalPoints);
+
+            // TODO:: Sort the loads from left to right based on D1 position and Start node of beam position....
 
 
-            // *******************************
-            // Drawing the deflected shape
-            // *******************************
+            // Create our Structure Stiffness Model from our beams
+            Model = new StructureStiffnessModel(Nodes.Count * 3, Nodes.Count * 3);
+
+            foreach (var beam in Beams)
+            {
+                Model.AddElement((VM_Beam)beam);
+                // TODO::  Add matrix transformations.
+            }
+
+
+            
+        }
+
+        /// <summary>
+        /// Draws the deflected shape of the beam.
+        /// </summary>
+        private void DrawDeflectedShape()
+        {
+
+
+
             // Draw the undeformed line...
             double vertOffset = 150;
+
+            if (Model == null)
+            {
+                DrawingHelpers.DrawText(MainCanvas, 50, 50, 0, "No Model Created", Brushes.Red,30);
+                return;
+            }
 
             // Choose a suitable scaling factor by examining the x and y displacement vectors
             double maxDisp = 0;
             for (int i = 0; i < Model.Rows; i++)
             {
-                // skip the rotational dof
-                if (i % 3 == 2)
-                    continue;
-
                 // scale based on the X and Y disp
                 if (Math.Abs((double)Model.DisplacementVector[i, 0]) > maxDisp)
                 {
@@ -802,22 +836,25 @@ namespace VMDiagrammer
             // Scale displacments so that max displacement is 75 pixels
             double dispScale = 75 / maxDisp;
 
+            // Draw the grid line
             DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + vertOffset, RightMostNode.X, RightMostNode.Y + vertOffset, Brushes.Purple, 1);
 
+            // Draw the displaced nodes
             foreach (IDrawingObjects node in Nodes)
             {
+                //get the y-DOF index for the node
+                int index = (int)((VM_Node)node).DOF_IndexVector[1];
 
                 // Find the displacements at the node we are searching for
                 for (int i = 0; i < Model.DOF_Indices.GetLength(0); i++)
                 {
-                    // TODO:: Find the x displacement and update the deflected shape accordingly
-
-                    // Find the y displacement
-                    int index = (int)((VM_Node)node).DOF_IndexVector[1];
                     double test = Model.DOF_Indices[i, 0];
 
                     if (index == test)
                     {
+                        Console.WriteLine(test + ":" + (double)Model.DisplacementVector[i, 0] + "\n");
+
+                        // TODO:: Find the x displacement and update the deflected shape accordingly
                         // retrieve the nodal displacements
                         double dispY = (double)Model.DisplacementVector[i, 0] * dispScale;
 
@@ -834,9 +871,6 @@ namespace VMDiagrammer
             // 1. Start at leftmost...
             // 2. Draw displacement offset
         }
-
-
- 
 
         private protected void UpdateDisplayInfo()
         {
@@ -958,46 +992,7 @@ namespace VMDiagrammer
             throw new NotImplementedException("No beam found contains specified position of X: " + x);
         }
 
-        /// <summary>
-        /// Algorithm for computing support reactions of statically determinate beam
-        /// </summary>
-        protected void ComputeVerticalSupportReactions()
-        {
-            // Compute total vertical force on beam
-            double totalVert = 0.0;
-            foreach(IDrawingObjects b in Loads)
-            {
-                VM_BaseLoad bl = (VM_BaseLoad)b;
 
-                switch (bl.LoadType)
-                {
-
-                    case LoadTypes.LOADTYPE_CONC_FORCE:
-                        break;
-                    case LoadTypes.LOADTYPE_CONC_MOMENT:
-                        break;
-                    case LoadTypes.LOADTYPE_DIST_FORCE:
-                        break;
-                    case LoadTypes.LOADTYPE_DIST_MOMENT:
-                        break;
-                    case LoadTypes.LOADTYPE_UNDEFINED:                      
-                    default:
-                        throw new NotImplementedException("Unrecognized Load Type in load " + ": " + bl.LoadType);
-                        break;
-                }
-            }
-                    
-            // Compute equivalent moment calculation at leftmost support reaction
-                    //Compute moments of all loads relative to leftmost support reaction
-                    // Add results to get total equivalent moment
-
-            // If selected support is a fixed support (has a concentrated moment).
-                   // Moment reaction is Total equivalent moment.
-                   // Vertical force at support is total vertical force
-            // Else
-                   // Divide total by distance to other support to get second vertical reaction
-                   // Compute second vertical reaction = Total vertical force minus 2nd reaction.
-        }
 
         /// <summary>
         /// Algorithm for finding the shear value at a specified point x along the beam.
@@ -1070,6 +1065,10 @@ namespace VMDiagrammer
             TestMultispanContinuousComplexCase();
 
             MakeModel();
+            
+            TestLoadCreate();
+
+            SolveModel();
 
             OnUserUpdate();
 
@@ -1084,6 +1083,10 @@ namespace VMDiagrammer
 
             MakeModel();
 
+            TestLoadCreate();
+
+            SolveModel();
+
             OnUserUpdate();
         }
 
@@ -1094,6 +1097,25 @@ namespace VMDiagrammer
             TestCantileverLeftCase();
 
             MakeModel();
+
+            TestLoadCreate();
+
+            SolveModel();
+
+            OnUserUpdate();
+        }
+
+        private void Button_Click_Model4(object sender, RoutedEventArgs e)
+        {
+            ClearExistingModelInfo();
+
+            TestSimplySupportedCase();
+
+            MakeModel();
+
+            TestLoadCreate();
+
+            SolveModel();
 
             OnUserUpdate();
         }

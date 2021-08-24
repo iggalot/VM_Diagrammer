@@ -11,6 +11,7 @@
             <Button VerticalAlignment="Top" Width="75" Height="25" Content="Model 1" Click="Button_Click_Model1"/>
             <Button VerticalAlignment="Top" Width="75" Height="25" Content="Model 2" Click="Button_Click_Model2"/>
             <Button VerticalAlignment="Top" Width="75" Height="25" Content="Model 3" Click="Button_Click_Model3"/>
+            <Button VerticalAlignment="Top" Width="75" Height="25" Content="Simple Support" Click="Button_Click_Model4"/>
             <Button VerticalAlignment="Top" Width="75" Height="25" Content="CLEAR ALL" Click="Button_Click_ClearAll"/>
 
 

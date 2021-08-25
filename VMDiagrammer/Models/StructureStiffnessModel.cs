@@ -506,6 +506,11 @@ namespace VMDiagrammer.Models
 
         /// <summary>
         /// Combines the Disp_Free results and the Disp_Fixed results into a single non-null vector.
+        /// {
+        ///   { FREE DOFS }
+        ///   ----------------
+        ///   { FIXED DOFS}
+        /// }
         /// </summary>
         protected void CreateDisplacementVectorFull()
         {
@@ -526,6 +531,11 @@ namespace VMDiagrammer.Models
 
         /// <summary>
         /// Combines the Load_Free results and the Load_Fixed results into a single non-null vector.
+        /// {
+        ///   { FREE DOFS }
+        ///   ----------------
+        ///   { FIXED DOFS}
+        /// }
         /// </summary>
         protected void CreateLoadVectorFull()
         {

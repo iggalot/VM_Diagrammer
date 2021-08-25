@@ -298,7 +298,7 @@ namespace VMDiagrammer
                                 if(FindVMNodeInList(temp_x,temp_y,list) == null)
                                 {
                                     // No matching node already in critical point list..
-                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false, GetNextNodeNumber()));
+                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false, GetAvailableNodeNumber()));
                                 } else
                                 {
                                     // Do nothing
@@ -347,7 +347,7 @@ namespace VMDiagrammer
                                 if (FindVMNodeInList(temp_x, temp_y, list) == null)
                                 {
                                     // No matching node already in critical point list..
-                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false,GetNextNodeNumber()));
+                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false,GetAvailableNodeNumber()));
                                 }
                                 else
                                 {
@@ -391,7 +391,7 @@ namespace VMDiagrammer
                             if (FindVMNodeInList(temp_x, temp_y, list) == null)
                             {
                                 // No matching node already in critical point list..
-                                list.Add(new VM_Node(temp_x, temp_y, false, false, false, GetNextNodeNumber()));
+                                list.Add(new VM_Node(temp_x, temp_y, false, false, false, GetAvailableNodeNumber()));
                             }
                             else
                             {
@@ -454,68 +454,85 @@ namespace VMDiagrammer
         /// </summary>
         private void OnUserUpdate()
         {
-            // Draw the beams -- drawn first so they are behind everything on the screen
-            if(Beams==null)
-                DrawingHelpers.DrawText(MainCanvas, 20, 20, 0, "No Beams", Brushes.Black, 15);
-            foreach (VM_Beam item in Beams)
-                item.Draw(MainCanvas);
-
-            // Draw the nodes
-            if (Nodes == null)
-                DrawingHelpers.DrawText(MainCanvas, 40, 40, 0, "No Nodes", Brushes.Black, 15);
-            foreach (VM_Node item in Nodes)
-                item.Draw(MainCanvas);
-
-            // Draw the loads
-            if (Loads == null)
-                DrawingHelpers.DrawText(MainCanvas, 60, 60, 0, "No Loads", Brushes.Black, 15);
-            foreach (VM_BaseLoad item in Loads)
+            // Draw the Nodes / Beams / Loads of the model
+            if (Nodes.Count() == 0 && Beams.Count == 0)
             {
-                switch(item.LoadType)
+                DrawingHelpers.DrawText(MainCanvas, 50, 200, 0, "No Model Created", Brushes.Red, 15);
+                return;
+            } else
+            {
+                // Draw the beams -- drawn first so they are behind everything on the screen
+                if (Beams == null || Beams.Count == 0)
+                    DrawingHelpers.DrawText(MainCanvas, 50, 220, 0, "No Beams", Brushes.Red, 15);
+
+                foreach (VM_Beam item in Beams)
+                    item.Draw(MainCanvas);
+
+                // Draw the nodes
+                if (Nodes == null || Nodes.Count == 0)
+                    DrawingHelpers.DrawText(MainCanvas, 50, 240, 0, "No Nodes", Brushes.Red, 15);
+                foreach (VM_Node item in Nodes)
+                    item.Draw(MainCanvas);
+
+                // Draw the loads
+                if (Loads == null || Loads.Count == 0)
+                    DrawingHelpers.DrawText(MainCanvas, 50, 260, 0, "No Loads", Brushes.Red, 15);
+                foreach (VM_BaseLoad item in Loads)
                 {
-                    case LoadTypes.LOADTYPE_CONC_FORCE:
-                        ((VM_PointForce)item).Draw(MainCanvas);
-                        break;
-                    case LoadTypes.LOADTYPE_DIST_FORCE:
-                        ((VM_DistributedForce)item).Draw(MainCanvas);
-                        break;
-                    case LoadTypes.LOADTYPE_CONC_MOMENT:
-                        ((VM_PointMoment)item).Draw(MainCanvas);
-                        break;
-                    case LoadTypes.LOADTYPE_UNDEFINED:
-                    case LoadTypes.LOADTYPE_DIST_MOMENT:
-                    default:
-                        throw new NotImplementedException("In drawing loads of MainWindow.xaml.cs -- load type detected for which there is no DRAW implemented!");
+                    switch (item.LoadType)
+                    {
+                        case LoadTypes.LOADTYPE_CONC_FORCE:
+                            ((VM_PointForce)item).Draw(MainCanvas);
+                            break;
+                        case LoadTypes.LOADTYPE_DIST_FORCE:
+                            ((VM_DistributedForce)item).Draw(MainCanvas);
+                            break;
+                        case LoadTypes.LOADTYPE_CONC_MOMENT:
+                            ((VM_PointMoment)item).Draw(MainCanvas);
+                            break;
+                        case LoadTypes.LOADTYPE_UNDEFINED:
+                        case LoadTypes.LOADTYPE_DIST_MOMENT:
+                        default:
+                            throw new NotImplementedException("In drawing loads of MainWindow.xaml.cs -- load type detected for which there is no DRAW implemented!");
+                    }
                 }
+
+                //// Draw the loads
+                //if (Loads == null)
+                //    DrawingHelpers.DrawText(MainCanvas, 80, 80, 0, "No Critical Points", Brushes.Black, 15);
+
+                // Draw the lines for the critical points
+                foreach (VM_Node item in CriticalPoints)
+                {
+                    DrawingHelpers.DrawLine(MainCanvas, item.X, item.Y + 50, item.X, item.Y + 600, Brushes.Green, item.Thickness);
+                }
+
+                // Draw a reference line just below the nodes (temp)
+                //           DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + 40, RightMostNode.X, RightMostNode.Y + 40, Brushes.Blue);
+
+                // Testing node location function
+                //for(double i = LeftMostNode.X; i<= 520; i = i+10)
+                //Console.WriteLine(i.ToString() + " is on Beam #" + GetBeamByXCoord(i).Index) ;
+
             }
-
-            // Draw the loads
-            if (Loads == null)
-                DrawingHelpers.DrawText(MainCanvas, 80, 80, 0, "No Critical Points", Brushes.Black, 15);
-
-            // Draw the lines for the critical points
-            foreach (VM_Node item in CriticalPoints)
-            {
-                DrawingHelpers.DrawLine(MainCanvas, item.X, item.Y + 50, item.X, item.Y + 600, Brushes.Green, item.Thickness);
-            }
-
-            // Draw a reference line just below the nodes (temp)
-            //           DrawingHelpers.DrawLine(MainCanvas, LeftMostNode.X, LeftMostNode.Y + 40, RightMostNode.X, RightMostNode.Y + 40, Brushes.Blue);
-
-            // Testing node location function
-            //for(double i = LeftMostNode.X; i<= 520; i = i+10)
-            //Console.WriteLine(i.ToString() + " is on Beam #" + GetBeamByXCoord(i).Index) ;
 
             // *******************************
             // Drawing the deflected shape
             // *******************************
-            DrawDeflectedShape();
-
+            if (Model == null)
+            {
+                DrawingHelpers.DrawText(MainCanvas, 50, 200, 0, "Click the Solve Button", Brushes.Red, 15);
+                return;
+            } else
+            {
+                DrawDeflectedShape();
+            }
 
             // Update the display info
             UpdateDisplayInfo();
         }
 
+        #region Test Cases
         private void TestSimplySupportedCase()
         {
             // Create some nodes
@@ -698,6 +715,10 @@ namespace VMDiagrammer
 
         protected void TestLoadCreate()
         {
+            if(Model == null)
+            {
+                throw new NotImplementedException("Unable to create a load before the StructureStiffnessModel has been created!");
+            }
 
             // Add a nodal load vector to test
             //Model.LoadVector[13, 0] = 10; // Positive load is downwards?
@@ -709,12 +730,12 @@ namespace VMDiagrammer
             double testd1 = val - testbeam.Start.X;
             double testd2 = testd1;
 
-            //// Start node nodal moment equivalent
-            //double Ma_w1 = (testw1 * testd1 * testd2 * testd2 / (testbeam.Length * testbeam.Length));
-            //double Ma_w2 = (Ma_w1);
-            //VM_BaseLoad Ma = new VM_PointMoment(testbeam, 0, 0, Ma_w1, Ma_w2, ArrowDirections.ARROW_CLOCKWISE);
-            //Loads.Add(Ma);
-            //Model.LoadVector[testbeam.Start.DOF_ROT, 0] = Ma_w1;
+            // Start node nodal moment equivalent
+            double Ma_w1 = (testw1 * testd1 * testd2 * testd2 / (testbeam.Length * testbeam.Length));
+            double Ma_w2 = (Ma_w1);
+            VM_BaseLoad Ma = new VM_PointMoment(testbeam, 0, 0, Ma_w1, Ma_w2, ArrowDirections.ARROW_CLOCKWISE);
+            Loads.Add(Ma);
+            Model.LoadVector[testbeam.Start.DOF_ROT, 0] = Ma_w1;
 
             //Start node nodal moment equivalent
             double Mb_w1 = (testw1 * testd1 * testd1 * testd2 / (testbeam.Length * testbeam.Length));
@@ -723,27 +744,27 @@ namespace VMDiagrammer
             Loads.Add(Mb);
             Model.LoadVector[testbeam.End.DOF_ROT, 0] = -Mb_w1;
 
-            //// Start node nodal force equivalent
-            //double Pa_w1 = (testw1 * testd2 / (testbeam.Length));
-            //double Pa_w2 = (Pa_w1);
-            //VM_BaseLoad Pa = new VM_PointForce(testbeam, 0, 0, -Pa_w1, -Pa_w2);
-            //Loads.Add(Pa);
-            //Model.LoadVector[testbeam.Start.DOF_Y, 0] = Pa_w1;
+            // Start node nodal force equivalent
+            double Pa_w1 = (testw1 * testd2 / (testbeam.Length));
+            double Pa_w2 = (Pa_w1);
+            VM_BaseLoad Pa = new VM_PointForce(testbeam, 0, 0, -Pa_w1, -Pa_w2);
+            Loads.Add(Pa);
+            Model.LoadVector[testbeam.Start.DOF_Y, 0] = Pa_w1;
 
 
-            //// End node nodal moment equivalent
-            //double Pb_w1 = (testw1 * testd1 / (testbeam.Length));
-            //double Pb_w2 = (Pb_w1);
-            //VM_BaseLoad Pb = new VM_PointForce(testbeam, testbeam.Length, testbeam.Length, -Pb_w1, -Pb_w2);
-            //Loads.Add(Pb);
-            //Model.LoadVector[testbeam.End.DOF_Y, 0] = Pb_w1;
+            // End node nodal moment equivalent
+            double Pb_w1 = (testw1 * testd1 / (testbeam.Length));
+            double Pb_w2 = (Pb_w1);
+            VM_BaseLoad Pb = new VM_PointForce(testbeam, testbeam.Length, testbeam.Length, -Pb_w1, -Pb_w2);
+            Loads.Add(Pb);
+            Model.LoadVector[testbeam.End.DOF_Y, 0] = Pb_w1;
 
             double testindex = testbeam.Index;
 
-
             Console.WriteLine("Load vector: " + MatrixOperations.DisplayNullable(Model.LoadVector));
-
         }
+
+        #endregion
 
         protected void SolveModel()
         {
@@ -800,9 +821,6 @@ namespace VMDiagrammer
                 Model.AddElement((VM_Beam)beam);
                 // TODO::  Add matrix transformations.
             }
-
-
-            
         }
 
         /// <summary>
@@ -810,17 +828,8 @@ namespace VMDiagrammer
         /// </summary>
         private void DrawDeflectedShape()
         {
-
-
-
             // Draw the undeformed line...
             double vertOffset = 150;
-
-            if (Model == null)
-            {
-                DrawingHelpers.DrawText(MainCanvas, 50, 50, 0, "No Model Created", Brushes.Red,30);
-                return;
-            }
 
             // Choose a suitable scaling factor by examining the x and y displacement vectors
             double maxDisp = 0;
@@ -852,24 +861,17 @@ namespace VMDiagrammer
 
                     if (index == test)
                     {
-                        Console.WriteLine(test + ":" + (double)Model.DisplacementVector[i, 0] + "\n");
-
                         // TODO:: Find the x displacement and update the deflected shape accordingly
                         // retrieve the nodal displacements
                         double dispY = (double)Model.DisplacementVector[i, 0] * dispScale;
 
                         // Draw deflected shape
                         DrawingHelpers.DrawCircle(MainCanvas, ((VM_Node)node).X, ((VM_Node)node).Y + vertOffset + dispY, Brushes.Purple, Brushes.Purple, 5, 1);
+                        DrawingHelpers.DrawText(MainCanvas, ((VM_Node)node).X, ((VM_Node)node).Y + vertOffset + dispY, 0, (Math.Round((decimal)Model.DisplacementVector[i, 0],3)).ToString(), Brushes.Purple, 10);
                         continue;
                     }
                 }
             }
-
-
-
-            // Draw deflected shape
-            // 1. Start at leftmost...
-            // 2. Draw displacement offset
         }
 
         private protected void UpdateDisplayInfo()
@@ -885,7 +887,6 @@ namespace VMDiagrammer
             str += NodesListToString() + "\n";
             str += BeamsListToString()+ "\n";
             str += CriticalPointsListToString() + "\n";
-
 
             return str;
         }
@@ -1026,7 +1027,7 @@ namespace VMDiagrammer
         }
 
         // Scans the node list for the next available node number
-        public int GetNextNodeNumber()
+        public int GetAvailableNodeNumber()
         {
             int index = 0;
             bool found = true;
@@ -1064,12 +1065,6 @@ namespace VMDiagrammer
 
             TestMultispanContinuousComplexCase();
 
-            MakeModel();
-            
-            TestLoadCreate();
-
-            SolveModel();
-
             OnUserUpdate();
 
         }
@@ -1081,12 +1076,6 @@ namespace VMDiagrammer
 
             TestCantileverRightCase();
 
-            MakeModel();
-
-            TestLoadCreate();
-
-            SolveModel();
-
             OnUserUpdate();
         }
 
@@ -1095,12 +1084,6 @@ namespace VMDiagrammer
             ClearExistingModelInfo();
 
             TestCantileverLeftCase();
-
-            MakeModel();
-
-            TestLoadCreate();
-
-            SolveModel();
 
             OnUserUpdate();
         }
@@ -1111,18 +1094,23 @@ namespace VMDiagrammer
 
             TestSimplySupportedCase();
 
-            MakeModel();
-
-            TestLoadCreate();
-
-            SolveModel();
-
             OnUserUpdate();
         }
 
         private void Button_Click_ClearAll(object sender, RoutedEventArgs e)
         {
             ClearExistingModelInfo();
+
+            OnUserUpdate();
+        }
+
+        private void Button_Click_Solve(object sender, RoutedEventArgs e)
+        {
+            MakeModel();
+
+            TestLoadCreate();
+
+            SolveModel();
 
             OnUserUpdate();
         }
@@ -1149,7 +1137,7 @@ namespace VMDiagrammer
             Point p = e.GetPosition(MainCanvas);  // retrieve the current mouse position
 
             // Create a node at the position
-            VM_Node newNode = new VM_Node(p.X, p.Y, false, false, false, GetNextNodeNumber());
+            VM_Node newNode = new VM_Node(p.X, p.Y, false, false, false, GetAvailableNodeNumber());
 
             // Add it to the model
             Nodes.Add(newNode);

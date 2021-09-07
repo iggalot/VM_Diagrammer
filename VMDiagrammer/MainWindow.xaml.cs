@@ -298,7 +298,7 @@ namespace VMDiagrammer
                                 if(FindVMNodeInList(temp_x,temp_y,list) == null)
                                 {
                                     // No matching node already in critical point list..
-                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false, GetAvailableNodeNumber()));
+                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false, GetFirstAvailableNodeNumber()));
                                 } else
                                 {
                                     // Do nothing
@@ -347,7 +347,7 @@ namespace VMDiagrammer
                                 if (FindVMNodeInList(temp_x, temp_y, list) == null)
                                 {
                                     // No matching node already in critical point list..
-                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false,GetAvailableNodeNumber()));
+                                    list.Add(new VM_Node(temp_x, temp_y, false, false, false,GetFirstAvailableNodeNumber()));
                                 }
                                 else
                                 {
@@ -391,7 +391,7 @@ namespace VMDiagrammer
                             if (FindVMNodeInList(temp_x, temp_y, list) == null)
                             {
                                 // No matching node already in critical point list..
-                                list.Add(new VM_Node(temp_x, temp_y, false, false, false, GetAvailableNodeNumber()));
+                                list.Add(new VM_Node(temp_x, temp_y, false, false, false, GetFirstAvailableNodeNumber()));
                             }
                             else
                             {
@@ -454,6 +454,9 @@ namespace VMDiagrammer
         /// </summary>
         private void OnUserUpdate()
         {
+            // Clear the Canvas
+            MainCanvas.Children.Clear();
+
             // Draw the Nodes / Beams / Loads of the model
             if (Nodes.Count() == 0 && Beams.Count == 0)
             {
@@ -533,6 +536,66 @@ namespace VMDiagrammer
         }
 
         #region Test Cases
+
+        /// <summary>
+        /// Test case for a wall frame with top plate, sill plate, and vertical members
+        /// </summary>
+        private void TestWallCase()
+        {
+            int NUM_NODES = 5;
+            VM_Node node;
+            VM_Beam beam;
+
+            int spacing = 16;
+
+            // sill plate
+            for (int i = 0; i < NUM_NODES; i++)
+            {
+                node = new VM_Node(50+i*40, 300, true, true, false, i);
+                AddNode(node);
+            }
+
+            int last_node_sill = Nodes.Count();
+
+
+
+            // top plate
+            for (int i = 0; i < NUM_NODES; i++)
+            {
+                node = new VM_Node(50+i*40, 100, false, false, false, last_node_sill + i + 1);
+                AddNode(node);
+            }
+
+            int last_node_top = Nodes.Count();
+
+
+            //// BEAMS
+            // top plate
+            for (int i = 1; i < last_node_sill; i++)
+            {
+                beam = new VM_Beam((VM_Node)Nodes[i], (VM_Node)Nodes[i - 1], i);
+                Beams.Add(beam);
+            }
+
+            // sill plate
+            for (int i = last_node_sill+1; i < last_node_top; i++)
+            {
+                beam = new VM_Beam((VM_Node)Nodes[i], (VM_Node)Nodes[i - 1], i-1);
+                Beams.Add(beam);
+            }
+
+            // wall studs
+            for (int i = 0; i < last_node_sill; i++)
+            {
+                beam = new VM_Beam((VM_Node)Nodes[i], (VM_Node)Nodes[i + last_node_sill], last_node_top -1 + i);
+                Beams.Add(beam);
+            }
+        }
+
+
+        /// <summary>
+        /// Test data for simply supported case
+        /// </summary>
         private void TestSimplySupportedCase()
         {
             // Create some nodes
@@ -773,6 +836,9 @@ namespace VMDiagrammer
             Console.WriteLine("Results: \n");
             Console.WriteLine("Free Displacements: \n" + MatrixOperations.Display(Model.Disp_Free) + "\n");
             Console.WriteLine("Support Reactions: \n" + MatrixOperations.Display(Model.Load_Fixed) + "\n");
+
+            Console.WriteLine("BEAMS TEST");
+            Beams.ForEach(Console.WriteLine);
         }
 
         /// <summary>
@@ -787,15 +853,14 @@ namespace VMDiagrammer
 
         private protected void ClearExistingModelInfo()
         {
-            // Clear the canvas
-            MainCanvas.Children.Clear();
-
             // Clear the existing model
             Model = null;
             Nodes.Clear();
             Beams.Clear();
             Loads.Clear();
             CriticalPoints.Clear();
+
+            OnUserUpdate();
 
             UpdateDisplayInfo();
         }
@@ -831,7 +896,8 @@ namespace VMDiagrammer
             // Draw the undeformed line...
             double vertOffset = 150;
 
-            // Choose a suitable scaling factor by examining the x and y displacement vectors
+            // Choose a suitable scaling factor by examining the values of the displacement vectors
+            // TODO:  This should be done based only on x and y directions...includes rotation values for now
             double maxDisp = 0;
             for (int i = 0; i < Model.Rows; i++)
             {
@@ -917,6 +983,7 @@ namespace VMDiagrammer
             return str;
         }
 
+        
         private protected string BeamsListToString()
         {
             string str = "";
@@ -993,8 +1060,6 @@ namespace VMDiagrammer
             throw new NotImplementedException("No beam found contains specified position of X: " + x);
         }
 
-
-
         /// <summary>
         /// Algorithm for finding the shear value at a specified point x along the beam.
         /// </summary>
@@ -1026,8 +1091,11 @@ namespace VMDiagrammer
             // At last point (after CP), plot a zero point
         }
 
-        // Scans the node list for the next available node number
-        public int GetAvailableNodeNumber()
+        /// <summary>
+        /// Scans the node list for the first available node number
+        /// starting from 0 that isnt already used.
+        /// </summary>
+        public int GetFirstAvailableNodeNumber()
         {
             int index = 0;
             bool found = true;
@@ -1052,7 +1120,6 @@ namespace VMDiagrammer
                 if (!found)
                     break;
             }
-
 
             return index;
 
@@ -1097,6 +1164,15 @@ namespace VMDiagrammer
             OnUserUpdate();
         }
 
+        private void Button_Click_Model5(object sender, RoutedEventArgs e)
+        {
+            ClearExistingModelInfo();
+
+            TestWallCase();
+
+            OnUserUpdate();
+        }
+
         private void Button_Click_ClearAll(object sender, RoutedEventArgs e)
         {
             ClearExistingModelInfo();
@@ -1137,7 +1213,7 @@ namespace VMDiagrammer
             Point p = e.GetPosition(MainCanvas);  // retrieve the current mouse position
 
             // Create a node at the position
-            VM_Node newNode = new VM_Node(p.X, p.Y, false, false, false, GetAvailableNodeNumber());
+            VM_Node newNode = new VM_Node(p.X, p.Y, false, false, false, GetFirstAvailableNodeNumber());
 
             // Add it to the model
             Nodes.Add(newNode);

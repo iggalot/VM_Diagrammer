@@ -84,7 +84,7 @@ namespace VMDiagrammer.Models
         }
         public override string ToString()
         {
-            return Index.ToString() + " -- START: " + Start.Index.ToString() + "    END: " + End.Index.ToString() + "\n";
+            return Index.ToString() + " -- START: " + Start.Index.ToString() + "    END: " + End.Index.ToString();
         }
 
         /// <summary>
